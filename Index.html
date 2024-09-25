@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sergio's Life</title>
+    <link rel="stylesheet" href="Css/Style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="navigation">
+        <!-- Menú de navegación -->
+        <div class="left-menu">
+            <div class="logo">
+                <img src="Recursos/logo.png" alt="Logo Sergio's Life" width="50">
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#inicio" class="inicio">Inicio</a></li>
+                <li><a href="#sobre-mi" class="sobre-mi">Sobre Mi</a></li>
+                <li><a href="#trabajos" class="trabajos">Trabajos</a></li>
+            </ul>
+        </div>
+        <div class="right-menu">
+            <ul class="contact-link">
+                <li><a href="#contacto" class="contacto">Contacto</a></li>
+            </ul>
+            <div class="menu-icon" id="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección principal de inicio -->
+    <section id="inicio" class="container">
+        <div class="content">
+            <p class="hello">HELLO!!</p>
+            <h1 class="name">Sergio Andres</h1>
+            <button class="about-button descargar-cv">DESCARGAR CV</button>
+        </div>
+    </section>
+
+
+    <!-- Nueva sección "Sobre Mi" -->
+    <section id="sobre-mi" class="about-section">
+        <div class="about-content">
+            <img src="Recursos/mi-foto.png" alt="Foto de Sergio" class="about-photo">
+            <div class="about-text">
+                <h2 class="about-title">Sobre Mi</h2>
+                <p class="about-description">
+                    Soy Sergio Andrés, Ingeniero en Multimedia y Sistemas | Especialista en Animación Digital y Diseño de Personajes, comprometido con la Innovación Creativa en Medios Digitales.
+                </p>
+                <button class="about-button">Ver Más</button>
+            </div>
+        </div>
+    </section>
+
+
+<!-- Sección de Trabajos -->
+<section id="trabajos" class="trabajos-section">
+    <h2 class="trabajos-title">Trabajos</h2>
+    <div class="trabajos-container">
+        <div class="trabajo-item">
+            <a href="trabajo1.html">
+                <img src="Recursos/trabajo1.png" alt="Trabajo 1" class="trabajo-img">
+                <h3 class="trabajo-titulo">Al borde del Misterio</h3>
+            </a>
+        </div>
+        <div class="trabajo-item">
+            <a href="trabajo2.html">
+                <img src="Recursos/trabajo2.jpg" alt="Trabajo 2" class="trabajo-img">
+                <h3 class="trabajo-titulo">Un Mundo Desconocido</h3>
+            </a>
+        </div>
+        <div class="trabajo-item">
+            <a href="trabajo3.html">
+                <img src="Recursos/trabajo3.jpg" alt="Trabajo 3" class="trabajo-img">
+                <h3 class="trabajo-titulo">Made in Hell</h3>
+            </a>
+        </div>
+        <!-- Nuevas casillas de trabajos -->
+        <div class="trabajo-item">
+            <a href="trabajo4.html">
+                <img src="Recursos/trabajo4.jpg" alt="Trabajo 4" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 4</h3>
+            </a>
+        </div>
+        <div class="trabajo-item">
+            <a href="trabajo5.html">
+                <img src="Recursos/trabajo5.jpg" alt="Trabajo 5" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 5</h3>
+            </a>
+        </div>
+        <div class="trabajo-item">
+            <a href="trabajo6.html">
+                <img src="Recursos/trabajo6.jpg" alt="Trabajo 6" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 6</h3>
+            </a>
+        </div>
+        <!-- Nuevas casillas ocultas -->
+        <div class="trabajo-item hidden">
+            <a href="trabajo7.html">
+                <img src="Recursos/trabajo7.jpg" alt="Trabajo 7" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 7</h3>
+            </a>
+        </div>
+        <div class="trabajo-item hidden">
+            <a href="trabajo8.html">
+                <img src="Recursos/trabajo8.jpg" alt="Trabajo 8" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 8</h3>
+            </a>
+        </div>
+        <div class="trabajo-item hidden">
+            <a href="trabajo9.html">
+                <img src="Recursos/trabajo9.jpg" alt="Trabajo 9" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 9</h3>
+            </a>
+        </div>
+        <div class="trabajo-item hidden">
+            <a href="trabajo10.html">
+                <img src="Recursos/trabajo10.jpg" alt="Trabajo 10" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 10</h3>
+            </a>
+        </div>
+        <div class="trabajo-item hidden">
+            <a href="trabajo11.html">
+                <img src="Recursos/trabajo11.jpg" alt="Trabajo 11" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 11</h3>
+            </a>
+        </div>
+        <div class="trabajo-item hidden">
+            <a href="trabajo12.html">
+                <img src="Recursos/trabajo12.jpg" alt="Trabajo 12" class="trabajo-img">
+                <h3 class="trabajo-titulo">Trabajo 12</h3>
+            </a>
+        </div>
+    </div>
+    <div class="button-container">
+        <button id="ver-mas" class="ver-mas-button">Todos los Proyectos</button>
+    </div>
+</section>
+
+
+
+ <!-- Sección de Formulario de Contacto -->
+ <section id="contacto" class="contact-section">
+    <h2 class="contact-title">Contacto</h2>
+    <form action="enviar.php" method="post" class="contact-form">
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Correo Electrónico:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="asunto">Asunto:</label>
+            <input type="text" id="asunto" name="asunto" required>
+        </div>
+        <div class="form-group">
+            <label for="mensaje">Mensaje:</label>
+            <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="submit-button">Enviar</button>
+    </form>
+</section>
+
+
+
+    <!-- Footer -->
+<footer style="background-color: black; color: white; padding: 20px; text-align: center; margin-top: 50px;">
+    <!-- Logo -->
+    <div class="footer-logo">
+        <img src="Recursos/logo.png" alt="Logo Sergio's Life" style="width: 100px; margin-bottom: 20px;">
+    </div>
+
+    <!-- Iconos de redes sociales -->
+    <div class="footer-social-icons" style="margin-bottom: 20px;">
+        <a href="https://www.instagram.com/sergio.s_life_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" style="color: white; margin: 0 10px;">
+            <i class="fab fa-instagram fa-2x"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/sergios-life/" target="_blank" style="color: white; margin: 0 10px;">
+            <i class="fab fa-linkedin fa-2x"></i>
+        </a>
+        <a href="https://www.behance.net/sergioslife" target="_blank" style="color: white; margin: 0 10px;">
+            <i class="fab fa-behance fa-2x"></i>
+        </a>
+        <a href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw?sub_confirmation=1" target="_blank" style="color: white; margin: 0 10px;">
+            <i class="fab fa-youtube fa-2x"></i>
+        </a>
+        <a href="https://vimeo.com/user179129330" target="_blank" style="color: white; margin: 0 10px;">
+            <i class="fab fa-vimeo fa-2x"></i>
+        </a>
+    </div>
+
+    <!-- Derechos reservados -->
+    <div class="footer-copyright" style="margin-bottom: 20px;">
+        &copy; 2024 Todos los derechos reservados a Sergio's Life.
+    </div>
+
+    <!-- Información de contacto -->
+    <div class="footer-contact" style="font-size: 14px;">
+        <a href="https://wa.me/573223738838" target="_blank" style="color: white; text-decoration: none; display: block; margin-bottom: 10px;">
+            <i class="fab fa-whatsapp"></i> +57 322 373 8838
+        </a>
+        <a href="mailto:sergioalife@gmail.com" style="color: white; text-decoration: none;">
+            <i class="fas fa-envelope"></i> sergioalife@gmail.com
+        </a>
+    </div>
+</footer>
+
+
+    <div class="line"></div>
+
+    <script>
+        // Función para abrir y cerrar el menú en modo móvil
+        document.getElementById('menu-icon').onclick = function() {
+            var navLinks = document.getElementById('nav-links');
+            navLinks.classList.toggle('show-menu');
+        }
+
+        // Scroll suave entre secciones
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        document.getElementById('ver-mas').onclick = function() {
+    const hiddenItems = document.querySelectorAll('.trabajo-item.hidden');
+    hiddenItems.forEach(item => {
+        item.classList.remove('hidden');
+    });
+    this.style.display = 'none'; // Oculta el botón después de hacer clic
+}
+
+    </script>
+</body>
+</html>
