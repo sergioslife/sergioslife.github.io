@@ -12,7 +12,6 @@ body {
 html {
     scroll-behavior: smooth;
 }
-
 /* Navegación */
 .navigation {
     display: flex;
@@ -27,7 +26,7 @@ html {
     z-index: 10;
 }
 
-/* Nueva clase para el contenedor izquierdo */
+/* Contenedores de menú */
 .left-menu,
 .right-menu {
     display: flex;
@@ -43,7 +42,7 @@ html {
     margin: 0 20px; /* Espacio entre el logo y los enlaces de navegación */
 }
 
-/* Enlaces de navegación a la izquierda */
+/* Enlaces de navegación */
 .nav-links,
 .contact-link {
     display: flex;
@@ -66,17 +65,24 @@ html {
     font-family: "Oswald", sans-serif;
 }
 
-/* Estilos para las líneas de color debajo de cada enlace */
-.inicio::after, .sobre-mi::after, .trabajos::after, .contacto::after {
+/* Efectos hover y líneas de color */
+.inicio::after,
+.sobre-mi::after,
+.trabajos::after,
+.contacto::after {
     content: '';
     position: absolute;
     width: 100%;
     height: 3px;
-    background-color: #E6135a;
     bottom: -5px;
     left: 0;
     transform: scaleX(0);
     transition: transform 0.3s ease;
+}
+
+/* Colores específicos para cada enlace */
+.inicio::after {
+    background-color: #E6135a;
 }
 
 .sobre-mi::after {
@@ -91,7 +97,7 @@ html {
     background-color: lightgray;
 }
 
-/* Efectos hover */
+/* Efectos hover para enlaces */
 .inicio:hover::after,
 .sobre-mi:hover::after,
 .trabajos:hover::after,
@@ -173,8 +179,20 @@ html {
     .hello {
         font-size: 1.2rem;
     }
+
+    /* Centramos el logo en móviles */
+    .left-menu {
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Ocultamos el margen del logo en móvil */
+    .logo {
+        margin: 0;
+    }
 }
 
+/* Ajustes para pantallas más pequeñas */
 @media (max-width: 480px) {
     .name {
         font-size: 2rem;
@@ -195,13 +213,58 @@ html {
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start; /* Mantén el contenido alineado a la izquierda */
+    text-align: left;
+    padding-left: 20px;
+    position: relative;
+    width: 100%; /* Asegura que el contenedor use todo el ancho */
 }
-  
-/* Botones */
-.about-button, .ver-mas-button, .submit-button, .descargar-cv {
-    background-color: #1e90ff; /* Color azul para los botones */
+
+/* Estilo para alinear los textos a la izquierda */
+.content {
+    text-align: left;
+    position: relative;
+    z-index: 1;
+}
+
+/* Estilos para el "HELLO!!" */
+.hello {
+    font-size: 2rem;
+    font-weight: 300;
+    margin: 0 0 20px 0;
+    text-align: left;
+}
+
+/* Estilo para el nombre */
+.name {
+    font-size: 5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Estilo para la sección principal de inicio */
+.seccion-inicio {
+    height: 100vh;
+    background-image: url('/Recursos/FONDO.svg');
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+    background-position: center; /* Mantén centrada la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-attachment: fixed; /* Opcional: hace que el fondo permanezca fijo al hacer scroll */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Mantén el contenido a la izquierda */
+    text-align: left;
+    padding-left: 20px; /* Espacio entre el borde y el texto */
+}
+
+
+/* Estilos para los botones */
+.about-button,
+.ver-mas-button,
+.submit-button,
+.descargar-cv {
+    background-color: #1e90ff;
     color: white;
     border: none;
     padding: 15px 30px;
@@ -216,9 +279,14 @@ html {
     color: black;
 }
 
-.about-button:hover, .ver-mas-button:hover, .submit-button:hover, .descargar-cv:hover {
+/* Efectos hover para los botones */
+.about-button:hover,
+.ver-mas-button:hover,
+.submit-button:hover,
+.descargar-cv:hover {
     background-color: #555;
 }
+
 
 /* Estilos para la sección "Sobre Mi" */
 .about-section {
@@ -259,6 +327,7 @@ html {
     margin-bottom: 20px;
 }
 
+/* Estilo específico para el botón "Sobre Mi" */
 .about-button {
     padding: 10px 20px;
     font-size: 1rem;
@@ -273,9 +342,17 @@ html {
     background-color: #4d897d;
 }
 
+/* Responsivo: ajusta el tamaño en pantallas pequeñas */
+@media (max-width: 768px) {
+    .name {
+        font-size: 4rem;
+    }
+    .hello {
+        font-size: 1.5rem;
+    }
+}
 
 
-/* Sección de Trabajos */
 .trabajos-section {
     padding: 100px 20px;
     background-color: #000; /* Fondo negro */
@@ -286,29 +363,37 @@ html {
     text-align: center;
     font-size: 3rem;
     margin-bottom: 40px;
-    color: #ffffff; /* Título en color */
+    color: #ffffff;
 }
 
 .trabajos-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trabajos-row {
+    display: flex;
     justify-content: space-around;
-    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .trabajo-item {
-    width: 300px;
+    width: calc(33.33% - 40px);
+    margin: 20px;
     text-align: center;
-    border: 3px solid #FDC415; /* Marco de color */
+    border: 3px solid #FDC415; /* Marco */
     border-radius: 10px;
     padding: 10px;
-    background-color: #1c1c1c; /* Fondo oscuro de cada casilla */
+    background-color: #1c1c1c; /* Fondo oscuro */
     transition: transform 0.3s ease, border-color 0.3s ease;
+    position: relative;
 }
 
 .trabajo-item:hover {
     transform: scale(1.05);
-    border-color: #b19216; /* Cambia el color del borde al hacer hover */
+    border-color: #b19216;
 }
 
 .trabajo-img {
@@ -323,24 +408,13 @@ html {
     color: #fff;
 }
 
-/* Enlace dentro de cada trabajo */
-.trabajo-item a {
-    text-decoration: none;
-    color: inherit;
-}
-
-/* Hover en el título */
-.trabajo-titulo:hover {
-    color: #FDC415; /* Cambia el color del título al pasar el mouse */
-}
 .hidden {
     display: none;
 }
 
 .ver-mas-button {
-    margin-top: 20px;
     padding: 10px 20px;
-    background-color: #FDC415; /* Color del botón */
+    background-color: #FDC415;
     color: white;
     border: none;
     border-radius: 5px;
@@ -348,22 +422,19 @@ html {
 }
 
 .ver-mas-button:hover {
-    background-color: #e0b711; /* Cambia el color al pasar el mouse */
+    background-color: #e0b711;
 }
 
 .button-container {
-    text-align: center; /* Centra el contenido */
-    margin-top: 20px; /* Espaciado superior para el botón */
+    text-align: center;
+    margin-top: 20px;
 }
-
-
-
 
 /* Sección de contacto */
 .contact-section {
     padding: 100px 20px;
-    background-color: white; /* Fondo blanco */
-    color: black; /* Texto en negro */
+    background-color: white;
+    color: black;
     text-align: center;
 }
 
@@ -379,6 +450,7 @@ html {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    padding: 0 20px; /* Añadimos padding en los lados del formulario */
 }
 
 .form-group {
@@ -389,18 +461,18 @@ html {
     display: block;
     font-size: 1.2rem;
     margin-bottom: 10px;
-    color: black; /* Etiquetas en negro */
+    color: black;
 }
 
 .form-group input,
 .form-group textarea {
-    width: 100%;
+    width: calc(100% - 20px); /* Ajustamos el ancho para evitar que se desborde y respetar el padding */
     padding: 10px;
     font-size: 1rem;
     border-radius: 5px;
     border: 2px solid #E6135a;
-    background-color: #f9f9f9; /* Fondo gris claro para los campos */
-    color: black; /* Texto de los campos en negro */
+    background-color: #f9f9f9;
+    color: black;
 }
 
 .form-group input:focus,
@@ -427,30 +499,72 @@ html {
 /* Responsividad */
 @media (max-width: 768px) {
     .contact-section {
-        padding: 50px 20px; /* Reduce el padding en móviles */
+        padding: 50px 20px;
     }
 
     .contact-title {
         font-size: 2rem;
     }
 
+    .contact-form {
+        padding: 0 15px; /* Reducimos el padding en pantallas más pequeñas */
+        width: 100%; /* Aseguramos que el formulario ocupe todo el ancho disponible en pantallas pequeñas */
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: calc(100% - 30px); /* Ajustamos el ancho para respetar el padding en móviles */
+    }
+
     .submit-button {
-        padding: 10px 15px; /* Ajusta el tamaño del botón */
+        padding: 10px 15px;
+        font-size: 1rem;
     }
 }
 
+@media (max-width: 480px) {
+    .contact-title {
+        font-size: 1.5rem;
+    }
 
+    .contact-form {
+        padding: 0 10px; /* Reducimos aún más el padding en pantallas muy pequeñas */
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: calc(100% - 20px); /* Ajustamos el ancho en pantallas más pequeñas */
+    }
+
+    .submit-button {
+        padding: 8px 12px;
+        font-size: 1rem;
+    }
+
+    .form-group label {
+        font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 0.9rem;
+    }
+}
 
 /* Estilos para pantallas grandes (desktop) */
 @media (min-width: 1024px) {
-    .container, .about-section, .trabajos-section, .contact-section {
+    .container,
+    .about-section,
+    .trabajos-section,
+    .contact-section {
         padding: 100px 40px; /* Más espaciado en pantallas grandes */
     }
 }
 
 /* Estilos para tablets (768px a 1024px) */
 @media (max-width: 1024px) {
-    .nav-links, .contact-link {
+    .nav-links,
+    .contact-link {
         margin-right: 10px;
     }
 
@@ -497,7 +611,8 @@ html {
         width: 90%; /* Más ancho para que los trabajos ocupen más espacio */
     }
 
-    .about-text, .about-photo {
+    .about-text,
+    .about-photo {
         width: 100%; /* Ajusta las secciones sobre mí en pantallas pequeñas */
     }
 
@@ -512,11 +627,15 @@ html {
 
 /* Estilos para móviles muy pequeños (menor a 480px) */
 @media (max-width: 480px) {
-    .container, .about-section, .trabajos-section, .contact-section {
+    .container,
+    .about-section,
+    .trabajos-section,
+    .contact-section {
         padding: 50px 20px; /* Reduce el padding en móviles */
     }
 
-    .trabajos-title, .contact-title {
+    .trabajos-title,
+    .contact-title {
         font-size: 2rem;
     }
 
@@ -553,5 +672,3 @@ html {
         font-size: 1rem;
     }
 }
-
-
