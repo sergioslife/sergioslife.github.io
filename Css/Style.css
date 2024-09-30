@@ -1,4 +1,4 @@
-/* Estilos globales */
+/* Estilos globales */ 
 body {
     background-color: black;
     color: white;
@@ -12,6 +12,7 @@ body {
 html {
     scroll-behavior: smooth;
 }
+
 /* Navegación */
 .navigation {
     display: flex;
@@ -127,7 +128,6 @@ html {
     font-size: 2rem;
     cursor: pointer;
     color: white;
-    margin-right: 20px;
 }
 
 /* Estilos responsivos para el menú hamburguesa */
@@ -157,10 +157,12 @@ html {
 
     .menu-icon {
         display: block;
+        margin-left: auto; /* Asegura que el icono esté alineado a la derecha */
+        margin-right: 10px; /* Espacio a la derecha para evitar que se pegue al borde */
     }
 
     .navigation {
-        padding: 10px 20px;
+        padding: 10px 0; /* Reduce el padding para más espacio */
     }
 
     .container {
@@ -208,26 +210,25 @@ html {
     }
 }
 
-/* Estilos para la sección principal */
+/* Sección Principal */
 .container {
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Mantén el contenido alineado a la izquierda */
+    justify-content: flex-start;
     text-align: left;
     padding-left: 20px;
     position: relative;
-    width: 100%; /* Asegura que el contenedor use todo el ancho */
+    width: 100%;
 }
 
-/* Estilo para alinear los textos a la izquierda */
-.content {
-    text-align: left;
-    position: relative;
-    z-index: 1;
+/* Estilo para el nombre y el saludo */
+.name {
+    font-size: 5rem;
+    font-weight: 700;
+    margin: 0;
 }
 
-/* Estilos para el "HELLO!!" */
 .hello {
     font-size: 2rem;
     font-weight: 300;
@@ -235,35 +236,24 @@ html {
     text-align: left;
 }
 
-/* Estilo para el nombre */
-.name {
-    font-size: 5rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-/* Estilo para la sección principal de inicio */
+/* Sección de Inicio */
 .seccion-inicio {
     height: 100vh;
     background-image: url('/Recursos/FONDO.svg');
-    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
-    background-position: center; /* Mantén centrada la imagen */
-    background-repeat: no-repeat; /* Evita que la imagen se repita */
-    background-attachment: fixed; /* Opcional: hace que el fondo permanezca fijo al hacer scroll */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: white;
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Mantén el contenido a la izquierda */
+    justify-content: flex-start;
     text-align: left;
-    padding-left: 20px; /* Espacio entre el borde y el texto */
+    padding-left: 20px;
 }
 
-
 /* Estilos para los botones */
-.about-button,
-.ver-mas-button,
-.submit-button,
-.descargar-cv {
+.button {
     background-color: #1e90ff;
     color: white;
     border: none;
@@ -272,49 +262,58 @@ html {
     cursor: pointer;
     margin-top: 20px;
     transition: background-color 0.3s;
+    border-radius: 5px;
 }
 
-.descargar-cv {
-    background-color: white;
-    color: black;
-}
-
-/* Efectos hover para los botones */
-.about-button:hover,
-.ver-mas-button:hover,
-.submit-button:hover,
-.descargar-cv:hover {
+.button:hover {
     background-color: #555;
 }
 
+/* Botón Descargar CV */
+.descargar-cv {
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+}
 
-/* Estilos para la sección "Sobre Mi" */
+.descargar-cv:hover {
+    background-color: #555;
+    color: white;
+
+    
+}/* Sección Sobre Mi */
 .about-section {
     display: flex;
+    flex-direction: column; /* Para poder centrar tanto horizontal como verticalmente */
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Centrado vertical */
     padding: 100px 20px;
     background-color: #ffffff;
-    color: rgb(0, 0, 0);
-    height: 100vh; /* Ocupa toda la altura de la ventana */
+    color: black;
+    min-height: 100vh;
 }
 
 .about-content {
     display: flex;
+    flex-direction: column; /* Organizar imagen y texto en columna */
     align-items: center;
     max-width: 1200px;
     width: 100%;
+    margin-left: 0;
 }
 
 .about-photo {
     width: 300px;
     height: auto;
     border-radius: 10px;
-    margin-right: 40px;
+    margin-bottom: 20px; /* Espaciado debajo de la imagen */
 }
 
 .about-text {
-    max-width: 600px;
+    max-width: 70%; /* Ajusta el ancho máximo al 70% del contenedor */
+    text-align: left; /* Alinear el texto a la izquierda */
+    margin-left: 15%; /* Margen izquierdo del 15% para respetar los bordes */
+    margin-right: 15%; /* Asegura simetría también en el margen derecho */
 }
 
 .about-title {
@@ -324,10 +323,16 @@ html {
 
 .about-description {
     font-size: 1.2rem;
+    line-height: 1.8;
     margin-bottom: 20px;
+    text-align: justify; /* Justificar el texto para una mejor lectura */
 }
 
-/* Estilo específico para el botón "Sobre Mi" */
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
 .about-button {
     padding: 10px 20px;
     font-size: 1rem;
@@ -336,23 +341,166 @@ html {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    display: block;
+    margin: 0 auto;
 }
 
 .about-button:hover {
     background-color: #4d897d;
 }
 
-/* Responsivo: ajusta el tamaño en pantallas pequeñas */
-@media (max-width: 768px) {
-    .name {
-        font-size: 4rem;
+/* Ajustes para pantallas pequeñas */
+@media (min-width: 768px) {
+    .about-content {
+        flex-direction: row; /* En pantallas grandes, organizamos la imagen y el texto en fila */
+        align-items: center;
+        margin-left: 40px;
     }
-    .hello {
-        font-size: 1.5rem;
+
+    .about-photo {
+        margin-right: 40px;
+        margin-bottom: 0; /* Eliminamos el margen inferior */
+    }
+
+    .about-text {
+        max-width: 70%; /* Mantener el 70% del ancho también en pantallas grandes */
+        margin-left: 15%; /* Margen del 15% en pantallas grandes */
+        margin-right: 15%;
+        text-align: left; /* Alineación a la izquierda */
     }
 }
 
+/* Certificaciones, Experiencia y Educación */
+.certification-box,
+.experience-box,
+.education-box {
+    background-color: #f0f4f8;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    border-top: 5px solid transparent;
+    border-left: none;
+}
 
+.certification-box {
+    background-color: #000000; 
+    border-top-color: #E6135a; 
+}
+
+.experience-box {
+    background-color: #000000;
+    border-top-color: #69C0AF;
+}
+
+.education-box {
+    background-color: #000000;
+    border-top-color: #FDC415;
+}
+
+.qualification__content {
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start;
+}
+
+.education-container,
+.experience-container,
+.certifications-container {
+    margin-bottom: 20px;
+    padding: 20px; /* Añadir padding para respetar los márgenes */
+}
+
+/* Sección "Trabajos" */
+.trabajos-section {
+    padding: 100px 20px;
+    background-color: #000; 
+    color: #fff;
+}
+
+.trabajos-title {
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    color: #ffffff;
+}
+
+.trabajos-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trabajos-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.trabajo-item {
+    width: calc(33.33% - 40px);
+    margin: 20px;
+    text-align: center;
+    border: 3px solid #FDC415; /* Borde de color */
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #1c1c1c;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    position: relative;
+}
+
+.trabajo-item:hover {
+    transform: scale(1.05);
+    border-color: #b19216;
+}
+
+.trabajo-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.trabajo-titulo {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.ver-mas-button {
+    padding: 10px 20px;
+    background-color: #FDC415;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.ver-mas-button:hover {
+    background-color: #e0b711;
+}
+
+
+
+/* Ajustes para pantallas pequeñas */
+@media (min-width: 768px) {
+    .about-content {
+        flex-direction: row; /* En pantallas grandes, organizamos la imagen y el texto en fila */
+        align-items: center;
+        margin-left: 40px; /* Añadimos de nuevo el margen izquierdo en pantallas más grandes */
+    }
+
+    .about-photo {
+        margin-right: 40px;
+        margin-bottom: 0; /* Eliminamos el margen inferior */
+    }
+
+    .about-text {
+        text-align: left;
+    }
+}
+
+/* Estilos para la sección "Trabajos" */
 .trabajos-section {
     padding: 100px 20px;
     background-color: #000; /* Fondo negro */
@@ -429,6 +577,51 @@ html {
     text-align: center;
     margin-top: 20px;
 }
+
+/* Adaptaciones para dispositivos móviles */
+@media (max-width: 768px) {
+    .about-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .about-photo {
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+
+    .qualification__content,
+    .services__data {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .services__container {
+        grid-template-columns: 1fr;
+    }
+
+    .about-title {
+        font-size: 1.5rem;
+    }
+
+    .about-description {
+        font-size: 0.9rem;
+    }
+}
+
+/* Responsivo: ajusta el tamaño en pantallas pequeñas */
+@media (max-width: 768px) {
+    .name {
+        font-size: 4rem;
+    }
+
+    .hello {
+        font-size: 1.5rem;
+    }
+}
+
 
 /* Sección de contacto */
 .contact-section {

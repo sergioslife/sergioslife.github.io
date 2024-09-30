@@ -74,8 +74,39 @@ function typeWriter(element, text, speed) {
     erase(); // Iniciar la animación borrando primero el texto
 }
 
-// Iniciar el cambio después de 2 segundos
-setTimeout(function() {
-    const element = document.getElementById('hello-text');
-    typeWriter(element, 'Yo soy', 150); // Cambia 'HELLO!!' a 'Yo soy' con velocidad de 150ms
-}, 2000); // 2000 milisegundos = 2 segundos
+    // Iniciar el cambio después de 2 segundos
+    setTimeout(function() {
+        const element = document.getElementById('hello-text');
+        typeWriter(element, 'Yo soy', 150); // Cambia 'HELLO!!' a 'Yo soy' con velocidad de 150ms
+    }, 2000); // 2000 milisegundos = 2 segundos
+    document.addEventListener('DOMContentLoaded', function() {
+        // Array de colores
+        const colores = ['#69C0AF', '#FDC415', '#E6135a'];
+        
+        // Seleccionamos todos los recuadros con la clase trabajo-item
+        const trabajosItems = document.querySelectorAll('.trabajo-item');
+        
+        // Recorremos cada recuadro y le asignamos un color cíclico
+        trabajosItems.forEach((item, index) => {
+            item.style.borderColor = colores[index % colores.length];
+        });
+    });
+
+ // Mostrar/Ocultar secciones adicionales
+document.getElementById('verMasButton').addEventListener('click', function() {
+    const additionalSections = document.getElementById('additional-sections');
+    const verMenosButton = document.getElementById('verMenosButton');
+    
+    additionalSections.classList.remove('hidden');
+    verMenosButton.style.display = 'block';
+    this.style.display = 'none';
+});
+
+document.getElementById('verMenosButton').addEventListener('click', function() {
+    const additionalSections = document.getElementById('additional-sections');
+    const verMasButton = document.getElementById('verMasButton');
+    
+    additionalSections.classList.add('hidden');
+    this.style.display = 'none';
+    verMasButton.style.display = 'block';
+});

@@ -37,24 +37,131 @@
         <div class="content">
             <p class="hello" id="hello-text">HELLO!!</p>
             <h1 class="name" id="name-text">Sergio Andres</h1>
-            <button class="about-button descargar-cv">DESCARGAR CV</button>
+            <!-- El botón ahora tiene un enlace para descargar el archivo PDF -->
+            <a href="Recursos/PDF/CV_SERGIO_231115.pdf" download="CV_SERGIO_231115.pdf">
+                <button class="about-button descargar-cv">DESCARGAR CV</button>
+            </a>
         </div>
     </section>
+    
+<!-- Sección "Sobre Mi" -->
+<section id="sobre-mi" class="about-section">
+    <div class="about-content">
+        <img src="Recursos/mi-foto.png" alt="Foto de Sergio" class="about-photo">
+        <div class="about-text">
+            <h2 class="about-title">Sobre Mi</h2>
+            <p class="about-description">
+                Soy Sergio Andrés, Ingeniero en Multimedia y Sistemas | Especialista en Animación Digital y Diseño de Personajes, comprometido con la Innovación Creativa en Medios Digitales.
+            </p>
+            <p class="about-description">
+                A lo largo de mi carrera he adquirido diversas certificaciones en áreas clave como la ilustración digital, diseño gráfico, y ciberseguridad, lo que me ha permitido estar a la vanguardia en la creación de soluciones multimedia.
+            </p>
+            <div class="button-container">
+                <button class="about-button" id="verMasButton">Ver Más</button>
+            </div>
+        </div>
+    </div>
+</section>
 
+<!-- Sección de Calificaciones -->
+<div id="additional-sections" class="hidden">
+    <section class="qualification section bd-container">
+        <h2 class="trabajos-title">Más Sobre</h2>
+        <div class="qualification__container bd-grid">
+            <!-- Experiencia laboral -->
+            <div class="qualification__content experience-box">
+                <h3 class="qualification__title">Experiencia Laboral</h3>
+                <div class="qualification__data">
+                    <p>Animador 2D - Producciones Wiiim</p>
+                    <span>nov. 2023 - ene. 2024</span>
+                </div>
+            </div>
 
-    <!-- Nueva sección "Sobre Mi" -->
-    <section id="sobre-mi" class="about-section">
-        <div class="about-content">
-            <img src="Recursos/mi-foto.png" alt="Foto de Sergio" class="about-photo">
-            <div class="about-text">
-                <h2 class="about-title">Sobre Mi</h2>
-                <p class="about-description">
-                    Soy Sergio Andrés, Ingeniero en Multimedia y Sistemas | Especialista en Animación Digital y Diseño de Personajes, comprometido con la Innovación Creativa en Medios Digitales.
-                </p>
-                <button class="about-button">Ver Más</button>
+            <!-- Educación -->
+            <div class="qualification__content education-box">
+                <h3 class="qualification__title">Educación</h3>
+                <div class="qualification__data">
+                    <p>Ingeniería de Sistemas - Universidad de Boyacá</p>
+                    <span>ene. 2018 - jul. 2024</span>
+                </div>
+                <div class="qualification__data">
+                    <p>Ingeniería Multimedia - Universidad de Boyacá</p>
+                    <span>2021 - 2024</span>
+                </div>
+            </div>
+
+            <!-- Certificaciones destacadas -->
+            <div class="qualification__content certification-box">
+                <h3 class="qualification__title">Certificaciones Destacadas</h3>
+                <div class="certifications__container bd-grid">
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Competencias Digitales para Profesionales</h3>
+                        <p class="certifications__description">Google Actívate · nov. 2023 · ID 224040559</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Introducción a la Ilustración Digital</h3>
+                        <p class="certifications__description">Crehana · sept. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Dibujo a Lápiz: De Principiante a Experto</h3>
+                        <p class="certifications__description">Crehana · jun. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Pintura Acrílica: Técnicas de Pintado</h3>
+                        <p class="certifications__description">Crehana · jun. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Teoría del Color desde Cero</h3>
+                        <p class="certifications__description">Crehana · may. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Ilustración de Personajes para Marcas</h3>
+                        <p class="certifications__description">Crehana · abr. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Manejo Fundamental de Adobe Illustrator CC2020</h3>
+                        <p class="certifications__description">Crehana · abr. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Digitaliza Tu Negocio con Google</h3>
+                        <p class="certifications__description">Google Actívate · ene. 2022 · ID GGZ CU6 SJ5</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Protege Tu Negocio: Ciberseguridad en el Teletrabajo</h3>
+                        <p class="certifications__description">Google Actívate · ene. 2022 · ID 8SZ ZAD YQ5</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Técnicas de Dibujo para Explorar tu Creatividad</h3>
+                        <p class="certifications__description">Crehana · ene. 2022</p>
+                    </div>
+                    <div class="certifications__data">
+                        <i class="certifications__icon bx bx-award"></i>
+                        <h3 class="certifications__title">Fundamentos del Diseño Gráfico</h3>
+                        <p class="certifications__description">EducacionIT · dic. 2021</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- Botón Ver Menos -->
+    <div class="button-container">
+        <button class="about-button" id="verMenosButton">Ver Menos</button>
+    </div>
+</div>
+
+
+
 
 <!-- Sección de Trabajos -->
 <section id="trabajos" class="trabajos-section">
