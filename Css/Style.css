@@ -685,6 +685,45 @@ html {
     max-width: 1200px;
     margin: 0 auto;
 }
+/* GRID DE TRABAJOS */
+.trabajos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* TABLET */
+@media (max-width: 992px) {
+    .trabajos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* MOBILE */
+@media (max-width: 576px) {
+    .trabajos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trabajo-card {
+        margin: 0 auto;
+    }
+
+    .trabajo-content h3 {
+        font-size: 1.3rem;
+    }
+
+    .trabajo-content p {
+        font-size: 0.95rem;
+    }
+
+    .trabajo-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
 
 /* CARD */
 .trabajo-card {
