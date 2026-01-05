@@ -296,10 +296,16 @@
         </a>
     </div>
 
-    <!-- Derechos reservados -->
-    <div class="footer-copyright" style="margin-bottom: 20px;">
-        &copy; 2024 Todos los derechos reservados a Sergio's Life.
-    </div>
+   <!-- Derechos reservados -->
+<div class="footer-copyright" style="margin-bottom: 20px;">
+    &copy; <span id="year"></span> Todos los derechos reservados a Sergio's Life.
+</div>
+
+<script>
+  // Obtiene el año actual y lo inserta en el span
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
 
     <!-- Información de contacto -->
     <div class="footer-contact" style="font-size: 14px;">
