@@ -346,13 +346,13 @@ html {
     display: flex;
     flex-direction: column; /* Organizar imagen y texto en columna */
     align-items: center;
-    max-width: 1200px;
+    max-width: 1850px;
     width: 100%;
     margin-left: 0;
 }
 
 .about-photo {
-    width: 300px;
+    width: 450px;
     height: auto;
     border-radius: 10px;
     margin-bottom: 20px; /* Espaciado debajo de la imagen */
