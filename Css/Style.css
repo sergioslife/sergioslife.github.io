@@ -755,6 +755,33 @@ html {
     
 }
 
+.trabajo-tag {
+    display: inline-block;
+    font-size: 0.7rem;      /* bien chiquito */
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+/* Colores */
+.trabajo-tag.rosa {
+    background-color: #E6135A;
+    color: #fff;
+}
+
+.trabajo-tag.verde {
+    background-color: #69C0AF;
+    color: #0f2f2a;
+}
+
+.trabajo-tag.rojo {
+    background-color: #FDC415;
+    color: #3a2a00;
+}
 
 /* Adaptaciones para dispositivos móviles */
 @media (max-width: 768px) {
