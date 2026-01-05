@@ -865,3 +865,55 @@ html {
         font-size: 1rem;
     }
 }
+
+.social-category {
+    margin: 60px 0 25px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.social-card {
+    border-radius: 18px;
+    padding: 30px;
+    color: white;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.social-card .icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.social-card h4 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.social-card p {
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+/* Colores */
+.instagram-art { background: linear-gradient(135deg, #E1306C, #F77737); }
+.behance { background: linear-gradient(135deg, #1769FF, #003ECB); }
+.artstation { background: linear-gradient(135deg, #13AFF0, #0A3E5F); }
+.youtube { background: linear-gradient(135deg, #FF0000, #B31217); }
+.vimeo { background: linear-gradient(135deg, #1AB7EA, #0077A2); }
+.tiktok { background: linear-gradient(135deg, #000000, #69C9D0); }
+.linkedin { background: linear-gradient(135deg, #0077B5, #004471); }
+.email { background: linear-gradient(135deg, #333, #000); }
