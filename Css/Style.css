@@ -505,8 +505,8 @@ html {
 /* Ajuste en móvil */
 @media screen and (max-width: 480px) {
     .certifications__img-wrapper {
-        width: 64px;
-        height: 64px;
+        width: 280px;
+        height: 280px;
     }
 }
 
