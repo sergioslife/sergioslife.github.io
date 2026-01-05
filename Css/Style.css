@@ -212,7 +212,7 @@ html {
 
 /* Sección Principal */
 .container {
-    height: 100vh;
+    height: 90vh;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -251,6 +251,55 @@ html {
     text-align: left;
     padding-left: 20px;
 }
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 48px;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.scroll-indicator span {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    margin-top: 8px;
+    animation: scrollDown 1.6s infinite;
+}
+
+@keyframes scrollDown {
+    0% {
+        opacity: 0;
+        transform: translateY(0);
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+}
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+    .scroll-indicator {
+        bottom: 1.5rem;
+        width: 28px;
+        height: 42px;
+    }
+}
+
 
 /* Estilos para los botones */
 .button {
