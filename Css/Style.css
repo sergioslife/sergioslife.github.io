@@ -411,6 +411,56 @@ html {
     padding: 20px; /* Añadir padding para respetar los márgenes */
 }
 
+.certifications__container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* PC: 3 columnas */
+    gap: 1.5rem;
+}
+
+/* Laptop / tablets grandes */
+@media screen and (max-width: 1024px) {
+    .certifications__container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Tablets */
+@media screen and (max-width: 768px) {
+    .certifications__container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 480px) {
+    .certifications__container {
+        grid-template-columns: 1fr;
+    }
+}
+.certifications__img-wrapper {
+    width: 380px;
+    height: 380px;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* 🔑 evita desbordes */
+}
+
+.certifications__img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 🔑 mantiene proporción */
+}
+
+/* Ajuste en móvil */
+@media screen and (max-width: 480px) {
+    .certifications__img-wrapper {
+        width: 64px;
+        height: 64px;
+    }
+}
+
 /* Sección "Trabajos" */
 .trabajos-section {
     padding: 100px 20px;
