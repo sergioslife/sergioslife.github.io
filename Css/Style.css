@@ -8,6 +8,13 @@ body {
     overflow-x: hidden; /* Evita el desplazamiento horizontal */
 }
 
+a {
+    color: #69C0AF;
+    text-decoration: none;
+    transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+
 /* Scroll suave */
 html {
     scroll-behavior: smooth;
