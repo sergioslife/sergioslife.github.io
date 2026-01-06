@@ -484,11 +484,14 @@ a:focus-visible {
 }
 
 .about-photo {
-    width: 450px;
+    width: 100%;
+    max-width: 450px;
     height: auto;
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
+    display: block;
 }
+
 
 .about-text {
     max-width: 800px;
