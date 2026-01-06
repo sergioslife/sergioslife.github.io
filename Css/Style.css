@@ -345,6 +345,13 @@ a:focus-visible {
     }
 }
 
+@media (max-width: 768px) {
+    .seccion-inicio {
+        background-size: 220% auto;
+        animation-duration: 30s;
+    }
+}
+
 
 
 /* ==================================================
