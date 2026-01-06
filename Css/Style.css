@@ -329,25 +329,18 @@ a:focus-visible {
 
     background-image: url("/Recursos/FONDO.svg");
     background-repeat: repeat;
-    background-size: 300px auto;
-    background-position: 0px 0px;
+    background-size: 180% auto;
+    background-position: 100% 0%;
 
     animation: fondoDiagonal 40s linear infinite;
 }
 
 @keyframes fondoDiagonal {
     from {
-        background-position: 0px 0px;
+        background-position: 100% 0%;
     }
     to {
-        background-position: -600px 600px;
-    }
-}
-
-@media (max-width: 768px) {
-    .seccion-inicio {
-        background-size: 220px auto;
-        animation-duration: 30s;
+        background-position: 0% 100%;
     }
 }
 
