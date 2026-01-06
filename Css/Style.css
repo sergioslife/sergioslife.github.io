@@ -140,6 +140,7 @@ html {
     font-size: 2rem;
     cursor: pointer;
     color: white;
+    
 }
 
 /* Estilos responsivos para el menú hamburguesa */
@@ -224,7 +225,7 @@ html {
 
 /* Sección Principal */
 .container {
-    height: 90vh;
+    height: 80vh;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -250,7 +251,7 @@ html {
 
 /* Sección de Inicio */
 .seccion-inicio {
-    height: 100vh;
+    height: 80vh;
     background-image: url('/Recursos/FONDO.svg');
     background-size: cover;
     background-position: center;
@@ -266,7 +267,7 @@ html {
 
 .scroll-indicator {
     position: absolute;
-    bottom: 2rem;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     width: 32px;
