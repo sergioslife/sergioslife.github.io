@@ -314,7 +314,6 @@ a:focus-visible {
 /* ==================================================
    2. Sección Inicio (Background)
 ================================================== */
-
 .seccion-inicio {
     height: 90vh;
     min-height: 90vh;
@@ -330,27 +329,28 @@ a:focus-visible {
 
     background-image: url("/Recursos/FONDO.svg");
     background-repeat: repeat;
-    background-size: 150% auto; /* clave */
-    background-position: 0% 0%;
+    background-size: 300px auto;
+    background-position: 0px 0px;
 
     animation: fondoDiagonal 40s linear infinite;
 }
 
 @keyframes fondoDiagonal {
-    0% {
-        background-position: 100% 0%;
+    from {
+        background-position: 0px 0px;
     }
-    100% {
-        background-position: 0% 100%;
+    to {
+        background-position: -600px 600px;
     }
 }
 
 @media (max-width: 768px) {
     .seccion-inicio {
-        background-size: 220% auto;
+        background-size: 220px auto;
         animation-duration: 30s;
     }
 }
+
 
 
 
