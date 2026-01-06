@@ -317,6 +317,7 @@ a:focus-visible {
 
 .seccion-inicio {
     height: 90vh;
+    min-height: 90vh;
 
     display: flex;
     align-items: center;
@@ -328,20 +329,22 @@ a:focus-visible {
     color: #fff;
 
     background-image: url("/Recursos/FONDO.svg");
-    background-size: 200% 200%;
     background-repeat: repeat;
+    background-size: 150% auto; /* clave */
     background-position: 0% 0%;
 
     animation: fondoDiagonal 40s linear infinite;
 }
+
 @keyframes fondoDiagonal {
     0% {
-        background-position: 0% 0%;
+        background-position: 100% 0%;
     }
     100% {
-        background-position: 100% 100%;
+        background-position: 0% 100%;
     }
 }
+
 
 
 /* ==================================================
