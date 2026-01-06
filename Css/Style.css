@@ -1,12 +1,30 @@
-/* Estilos globales */ 
+/* ==================================================
+   1. Reset & configuración base
+================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    background-color: black;
-    color: white;
-    font-family: "Oswald", sans-serif;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Evita el desplazamiento horizontal */
+    overflow-x: hidden;
+    background-color: #000;
+    color: #fff;
+    font-family: "Oswald", sans-serif;
 }
+
+
+/* ==================================================
+   2. Enlaces globales
+================================================== */
 
 a {
     color: #69C0AF;
@@ -15,31 +33,37 @@ a {
 }
 
 a:hover,
-a:focus {
+a:focus-visible {
     color: #ffffff;
     opacity: 0.9;
 }
 
-/* Scroll suave */
-html {
-    scroll-behavior: smooth;
-}
 
-/* Navegación */
+/* ==================================================
+   3. Navegación principal
+================================================== */
+
 .navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: black;
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 10;
+
     width: 100%;
     padding: 10px 20px;
-    z-index: 10;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: #000;
 }
 
-/* Contenedores de menú */
+
+/* ==================================================
+   4. Contenedores de menú
+================================================== */
+
 .left-menu,
 .right-menu {
     display: flex;
@@ -47,21 +71,29 @@ html {
 }
 
 .right-menu {
-    margin-right: 20px; /* Espaciado entre los elementos del menú derecho y el borde */
+    margin-right: 20px;
 }
 
-/* Estilo para el logo */
+
+/* ==================================================
+   5. Logo
+================================================== */
+
 .logo {
-    margin: 0 20px; /* Espacio entre el logo y los enlaces de navegación */
+    margin: 0 20px;
 }
 
-/* Enlaces de navegación */
+
+/* ==================================================
+   6. Listas de navegación
+================================================== */
+
 .nav-links,
 .contact-link {
     display: flex;
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 .nav-links li,
@@ -69,33 +101,44 @@ html {
     margin-right: 20px;
 }
 
-/* Estilos generales para los enlaces */
+
+/* ==================================================
+   7. Enlaces de navegación
+================================================== */
+
 .nav-links a,
 .contact-link a {
-    color: white;
-    text-decoration: none;
     position: relative;
+    color: #fff;
     font-family: "Oswald", sans-serif;
 }
 
-/* Efectos hover y líneas de color */
-.inicio::after,
-.sobre-mi::after,
-.trabajos::after,
-.contacto::after {
-    content: '';
+
+/* ==================================================
+   8. Subrayado animado (hover)
+================================================== */
+
+.nav-links a::after {
+    content: "";
     position: absolute;
+    left: 0;
+    bottom: -5px;
+
     width: 100%;
     height: 3px;
-    bottom: -5px;
-    left: 0;
+
     transform: scaleX(0);
+    transform-origin: left;
     transition: transform 0.3s ease;
 }
 
-/* Colores específicos para cada enlace */
+
+/* ==================================================
+   9. Colores por sección
+================================================== */
+
 .inicio::after {
-    background-color: #E6135a;
+    background-color: #E6135A;
 }
 
 .sobre-mi::after {
@@ -110,16 +153,17 @@ html {
     background-color: lightgray;
 }
 
-/* Efectos hover para enlaces */
-.inicio:hover::after,
-.sobre-mi:hover::after,
-.trabajos:hover::after,
-.contacto:hover::after {
+
+/* ==================================================
+   10. Estados hover
+================================================== */
+
+.nav-links a:hover::after {
     transform: scaleX(1);
 }
 
 .inicio:hover {
-    color: #E6135a;
+    color: #E6135A;
 }
 
 .sobre-mi:hover {
@@ -134,25 +178,45 @@ html {
     color: lightgray;
 }
 
-/* Menú hamburguesa visible en móviles */
+/* ==================================================
+   1. Menú hamburguesa (base)
+================================================== */
+
 .menu-icon {
-    display: none;
+    display: none;               /* Visible solo en móvil */
     font-size: 2rem;
     cursor: pointer;
-    color: white;
-    
+    color: #fff;
 }
 
-/* Estilos responsivos para el menú hamburguesa */
+
+/* ==================================================
+   2. Responsive: Tablets y móviles
+================================================== */
+
 @media (max-width: 768px) {
+
+    /* ----- Navegación ----- */
+
+    .navigation {
+        padding: 10px 0;
+    }
+
+    /* ----- Menú principal ----- */
+
     .nav-links {
-        display: none;
-        flex-direction: column;
         position: absolute;
         top: 60px;
         right: 0;
+
         width: 100%;
-        background-color: black;
+        padding: 0;
+
+        display: none;
+        flex-direction: column;
+        align-items: center;
+
+        background-color: #000;
         text-align: center;
     }
 
@@ -160,27 +224,39 @@ html {
         display: flex;
     }
 
-    .contact-link {
-        display: none; /* Ocultar el enlace de contacto en móvil si el menú está desplegado */
-    }
-
     .nav-links li {
         margin: 10px 0;
     }
 
-    .menu-icon {
-        display: block;
-        margin-left: auto; /* Asegura que el icono esté alineado a la derecha */
-        margin-right: 10px; /* Espacio a la derecha para evitar que se pegue al borde */
+    /* Ocultar contacto cuando el menú móvil está activo */
+    .contact-link {
+        display: none;
     }
 
-    .navigation {
-        padding: 10px 0; /* Reduce el padding para más espacio */
+    /* ----- Icono hamburguesa ----- */
+
+    .menu-icon {
+        display: block;
+        margin-left: auto;
+        margin-right: 10px;
     }
+
+    /* ----- Layout general ----- */
 
     .container {
         padding: 0 20px;
     }
+
+    .left-menu {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .logo {
+        margin: 0;
+    }
+
+    /* ----- Tipografía y botones ----- */
 
     .name {
         font-size: 3rem;
@@ -194,21 +270,15 @@ html {
     .hello {
         font-size: 1.2rem;
     }
-
-    /* Centramos el logo en móviles */
-    .left-menu {
-        justify-content: center;
-        width: 100%;
-    }
-
-    /* Ocultamos el margen del logo en móvil */
-    .logo {
-        margin: 0;
-    }
 }
 
-/* Ajustes para pantallas más pequeñas */
+
+/* ==================================================
+   3. Responsive: Móviles pequeños
+================================================== */
+
 @media (max-width: 480px) {
+
     .name {
         font-size: 2rem;
     }
@@ -223,19 +293,47 @@ html {
     }
 }
 
-/* Sección Principal */
+/* ==================================================
+   1. Contenedor principal (Hero)
+================================================== */
+
 .container {
+    position: relative;
+    width: 100%;
     height: 80vh;
+
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    text-align: left;
+
     padding-left: 20px;
-    position: relative;
-    width: 100%;
+    text-align: left;
 }
 
-/* Estilo para el nombre y el saludo */
+
+/* ==================================================
+   2. Sección Inicio (Background)
+================================================== */
+
+.seccion-inicio {
+    height: 90vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding-left: 20px;
+    text-align: left;
+
+    color: #fff;
+    background: url("/Recursos/FONDO.svg") center / cover no-repeat fixed;
+}
+
+
+/* ==================================================
+   3. Tipografía principal
+================================================== */
+
 .name {
     font-size: 5rem;
     font-weight: 700;
@@ -245,38 +343,30 @@ html {
 .hello {
     font-size: 2rem;
     font-weight: 300;
-    margin: 0 0 20px 0;
-    text-align: left;
+    margin: 0 0 20px;
 }
 
-/* Sección de Inicio */
-.seccion-inicio {
-    height: 80vh;
-    background-image: url('/Recursos/FONDO.svg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    padding-left: 20px;
-}
+
+/* ==================================================
+   4. Indicador de scroll
+================================================== */
 
 .scroll-indicator {
     position: absolute;
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
+
     width: 32px;
     height: 48px;
-    border: 2px solid #fff;
-    border-radius: 20px;
+
     display: flex;
     justify-content: center;
     align-items: flex-start;
+
+    border: 2px solid #fff;
+    border-radius: 20px;
+
     cursor: pointer;
     opacity: 0.85;
 }
@@ -284,12 +374,17 @@ html {
 .scroll-indicator span {
     width: 6px;
     height: 6px;
-    background: #fff;
-    border-radius: 50%;
+
     margin-top: 8px;
+
+    background-color: #fff;
+    border-radius: 50%;
+
     animation: scrollDown 1.6s infinite;
 }
 
+
+/* Animación scroll */
 @keyframes scrollDown {
     0% {
         opacity: 0;
@@ -304,8 +399,60 @@ html {
     }
 }
 
-/* Mobile */
-@media screen and (max-width: 768px) {
+
+/* ==================================================
+   5. Botones
+================================================== */
+
+.button {
+    margin-top: 20px;
+    padding: 15px 30px;
+
+    font-size: 1rem;
+    font-weight: 500;
+
+    color: #fff;
+    background-color: #1e90ff;
+
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button:hover {
+    background-color: #555;
+    transform: translateY(-2px);
+}
+
+/* Botón Descargar CV */
+.descargar-cv {
+    background-color: #fff;
+    color: #000;
+    border: 2px solid #000;
+}
+
+.descargar-cv:hover {
+    background-color: #555;
+    color: #fff;
+}
+
+
+/* ==================================================
+   6. Responsive
+================================================== */
+
+@media (max-width: 768px) {
+
+    .name {
+        font-size: 3rem;
+    }
+
+    .hello {
+        font-size: 1.4rem;
+    }
+
     .scroll-indicator {
         bottom: 1.5rem;
         width: 28px;
@@ -313,69 +460,40 @@ html {
     }
 }
 
-
-/* Estilos para los botones */
-.button {
-    background-color: #1e90ff;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s;
-    border-radius: 5px;
-}
-
-.button:hover {
-    background-color: #555;
-}
-
-/* Botón Descargar CV */
-.descargar-cv {
-    background-color: white;
-    color: black;
-    border: 2px solid black;
-}
-
-.descargar-cv:hover {
-    background-color: #555;
-    color: white;
-
     
-}/* Sección Sobre Mi */
+/* ==================================================
+   SECCIÓN SOBRE MÍ
+================================================== */
 .about-section {
     display: flex;
-    flex-direction: column; /* Para poder centrar tanto horizontal como verticalmente */
+    flex-direction: column;
     align-items: center;
-    justify-content: center; /* Centrado vertical */
+    justify-content: center;
+    min-height: 100vh;
     padding: 100px 20px;
     background-color: #ffffff;
-    color: black;
-    min-height: 100vh;
+    color: #000;
 }
 
 .about-content {
     display: flex;
-    flex-direction: column; /* Organizar imagen y texto en columna */
+    flex-direction: column;
     align-items: center;
     max-width: 1850px;
     width: 100%;
-    margin-left: 0;
 }
 
 .about-photo {
     width: 450px;
     height: auto;
     border-radius: 10px;
-    margin-bottom: 20px; /* Espaciado debajo de la imagen */
+    margin-bottom: 20px;
 }
 
 .about-text {
-    max-width: 70%; /* Ajusta el ancho máximo al 70% del contenedor */
-    text-align: left; /* Alinear el texto a la izquierda */
-    margin-left: 15%; /* Margen izquierdo del 15% para respetar los bordes */
-    margin-right: 15%; /* Asegura simetría también en el margen derecho */
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
 }
 
 .about-title {
@@ -386,103 +504,202 @@ html {
 .about-description {
     font-size: 1.2rem;
     line-height: 1.8;
-    margin-bottom: 20px;
-    text-align: justify; /* Justificar el texto para una mejor lectura */
+    margin-bottom: 10px;
+    text-align: justify;
 }
 
+/* Botón */
 .button-container {
     text-align: center;
     margin-top: 20px;
 }
 
 .about-button {
+    display: block;
+    margin: 0 auto;
     padding: 10px 20px;
     font-size: 1rem;
     background-color: #69C0AF;
     border: none;
-    color: white;
+    color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    display: block;
-    margin: 0 auto;
 }
 
 .about-button:hover {
     background-color: #4d897d;
 }
 
-/* Ajustes para pantallas pequeñas */
-@media (min-width: 768px) {
-    .about-content {
-        flex-direction: row; /* En pantallas grandes, organizamos la imagen y el texto en fila */
-        align-items: center;
-        margin-left: 40px;
-    }
-
-    .about-photo {
-        margin-right: 40px;
-        margin-bottom: 0; /* Eliminamos el margen inferior */
-    }
-
-    .about-text {
-        max-width: 70%; /* Mantener el 70% del ancho también en pantallas grandes */
-        margin-left: 15%; /* Margen del 15% en pantallas grandes */
-        margin-right: 15%;
-        text-align: left; /* Alineación a la izquierda */
-    }
-}
-
-/* Certificaciones, Experiencia y Educación */
+/* ==================================================
+   CERTIFICACIONES / EXPERIENCIA / EDUCACIÓN
+================================================== */
 .certification-box,
 .experience-box,
 .education-box {
-    background-color: #f0f4f8;
-    border-radius: 10px;
     padding: 20px;
     margin: 10px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    border-radius: 10px;
+    background-color: #000;
     border-top: 5px solid transparent;
-    border-left: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .certification-box {
-    background-color: #000000; 
-    border-top-color: #E6135a; 
+    border-top-color: #E6135a;
 }
 
 .experience-box {
-    background-color: #000000;
     border-top-color: #69C0AF;
 }
 
 .education-box {
-    background-color: #000000;
     border-top-color: #FDC415;
 }
 
 .qualification__content {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     align-items: flex-start;
 }
 
 .education-container,
 .experience-container,
 .certifications-container {
+    padding: 20px;
     margin-bottom: 20px;
-    padding: 20px; /* Añadir padding para respetar los márgenes */
 }
 
+/* Grid certificaciones */
 .certifications__container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* PC: 3 columnas */
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
 }
 
-/* Laptop / tablets grandes */
-@media screen and (max-width: 1024px) {
-    .certifications__container {
-        grid-template-columns: repeat(3, 1fr);
+.certifications__img-wrapper {
+    width: 380px;
+    height: 380px;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.certifications__img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.about-button.secondary {
+    background-color: transparent;
+    color: #69C0AF;
+    border: 2px solid #69C0AF;
+}
+
+.about-button.secondary:hover {
+    background-color: #69C0AF;
+    color: #fff;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ==================================================
+   SECCIÓN TRABAJOS
+================================================== */
+.trabajos-section {
+    padding: 100px 20px;
+    background-color: #000;
+    color: #fff;
+}
+
+.trabajos-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.trabajos-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trabajos-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.trabajo-item {
+    width: calc(33.33% - 40px);
+    margin: 20px;
+    padding: 10px;
+    text-align: center;
+    background-color: #1c1c1c;
+    border: 3px solid #FDC415;
+    border-radius: 10px;
+    position: relative;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.trabajo-item:hover {
+    transform: scale(1.05);
+    border-color: #b19216;
+}
+
+.trabajo-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.trabajo-titulo {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.ver-mas-button {
+    padding: 10px 20px;
+    background-color: #FDC415;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.ver-mas-button:hover {
+    background-color: #e0b711;
+}
+
+/* ==================================================
+   MEDIA QUERIES
+================================================== */
+
+/* Tablets y desktop */
+@media (min-width: 768px) {
+    .about-content {
+        flex-direction: row;
+        align-items: center;
+        margin-left: 40px;
+    }
+
+    .about-photo {
+        margin-right: 40px;
+        margin-bottom: 0;
+    }
+
+    .about-text {
+        max-width: 70%;
+        margin-left: 15%;
+        margin-right: 15%;
+        text-align: left;
     }
 }
 
@@ -498,35 +715,19 @@ html {
     .certifications__container {
         grid-template-columns: 1fr;
     }
-}
-.certifications__img-wrapper {
-    width: 380px;
-    height: 380px;
-    margin: 0 auto 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden; /* 🔑 evita desbordes */
-}
 
-.certifications__img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* 🔑 mantiene proporción */
-}
-
-/* Ajuste en móvil */
-@media screen and (max-width: 480px) {
     .certifications__img-wrapper {
         width: 280px;
         height: 280px;
     }
 }
 
-/* Sección "Trabajos" */
+/* ==================================================
+   SECCIÓN TRABAJOS
+================================================== */
 .trabajos-section {
     padding: 100px 20px;
-    background-color: #000; 
+    background-color: #000;
     color: #fff;
 }
 
@@ -534,7 +735,6 @@ html {
     text-align: center;
     font-size: 3rem;
     margin-bottom: 40px;
-    color: #ffffff;
 }
 
 .trabajos-container {
@@ -543,178 +743,196 @@ html {
     align-items: center;
 }
 
-.trabajos-row {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.trabajo-item {
-    width: calc(33.33% - 40px);
-    margin: 20px;
-    text-align: center;
-    border: 3px solid #FDC415; /* Borde de color */
-    border-radius: 10px;
-    padding: 10px;
-    background-color: #1c1c1c;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    position: relative;
-}
-
-.trabajo-item:hover {
-    transform: scale(1.05);
-    border-color: #b19216;
-}
-
-.trabajo-img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.trabajo-titulo {
-    font-size: 1.5rem;
-    color: #fff;
-}
-
-.ver-mas-button {
-    padding: 10px 20px;
-    background-color: #FDC415;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.ver-mas-button:hover {
-    background-color: #e0b711;
-}
-
-
-
-/* Ajustes para pantallas pequeñas */
-@media (min-width: 768px) {
-    .about-content {
-        flex-direction: row; /* En pantallas grandes, organizamos la imagen y el texto en fila */
-        align-items: center;
-        margin-left: 40px; /* Añadimos de nuevo el margen izquierdo en pantallas más grandes */
-    }
-
-    .about-photo {
-        margin-right: 40px;
-        margin-bottom: 0; /* Eliminamos el margen inferior */
-    }
-
-    .about-text {
-        text-align: left;
-    }
-}
-
-/* Estilos para la sección "Trabajos" */
-.trabajos-section {
-    padding: 100px 20px;
-    background-color: #000; /* Fondo negro */
-    color: #fff;
-}
-
-.trabajos-title {
-    text-align: center;
-    font-size: 3rem;
-    margin-bottom: 40px;
-    color: #ffffff;
-}
-
-.trabajos-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.trabajos-row {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.trabajo-item {
-    width: calc(33.33% - 40px);
-    margin: 20px;
-    text-align: center;
-    border: 3px solid #FDC415; /* Marco */
-    border-radius: 10px;
-    padding: 10px;
-    background-color: #1c1c1c; /* Fondo oscuro */
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    position: relative;
-}
-
-.trabajo-item:hover {
-    transform: scale(1.05);
-    border-color: #b19216;
-}
-
-.trabajo-img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.trabajo-titulo {
-    font-size: 1.5rem;
-    color: #fff;
-}
-
-.hidden {
-    display: none;
-}
-
-.ver-mas-button {
-    padding: 10px 20px;
-    background-color: #FDC415;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.ver-mas-button:hover {
-    background-color: #e0b711;
-}
-
-.button-container {
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* GRID */
-.trabajos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-/* GRID DE TRABAJOS */
+/* ==================================================
+   GRID DE TRABAJOS
+================================================== */
 .trabajos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     width: 100%;
     max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* TABLET */
+/* ==================================================
+   ITEM / CARD CLÁSICA (versión antigua)
+================================================== */
+.trabajos-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.trabajo-item {
+    width: calc(33.33% - 40px);
+    margin: 20px;
+    padding: 10px;
+    text-align: center;
+    background-color: #1c1c1c;
+    border: 3px solid #FDC415;
+    border-radius: 10px;
+    position: relative;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.trabajo-item:hover {
+    transform: scale(1.05);
+    border-color: #b19216;
+}
+
+.trabajo-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.trabajo-titulo {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+/* ==================================================
+   CARD MODERNA
+================================================== */
+.trabajo-card {
+    background-color: #1c1c1c;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #2a2a2a;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.trabajo-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Imagen */
+.trabajo-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Contenido */
+.trabajo-content {
+    padding: 1.2rem;
+}
+
+.trabajo-content h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.trabajo-content p {
+    font-size: 0.95rem;
+    color: #cfcfcf;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+/* ==================================================
+   BOTONES
+================================================== */
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.ver-mas-button {
+    padding: 10px 20px;
+    background-color: #FDC415;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.ver-mas-button:hover {
+    background-color: #e0b711;
+}
+
+.trabajo-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.trabajo-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* Variantes de color */
+.trabajo-btn.rojo {
+    background-color: #E6135A;
+}
+
+.trabajo-btn.verde {
+    background-color: #69C0AF;
+}
+
+.trabajo-btn.amarillo {
+    background-color: #FDC415;
+}
+
+/* ==================================================
+   TAGS
+================================================== */
+.trabajo-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+.trabajo-tag.rosa {
+    background-color: #E6135A;
+    color: #fff;
+}
+
+.trabajo-tag.verde {
+    background-color: #69C0AF;
+    color: #0f2f2a;
+}
+
+.trabajo-tag.amarillo {
+    background-color: #FDC415;
+    color: #3a2a00;
+}
+
+/* ==================================================
+   UTILIDADES
+================================================== */
+.hidden {
+    display: none;
+}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+/* Tablets */
 @media (max-width: 992px) {
     .trabajos-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* MOBILE */
+/* Mobile */
 @media (max-width: 576px) {
     .trabajos-grid {
         grid-template-columns: 1fr;
@@ -738,138 +956,7 @@ html {
     }
 }
 
-
-/* CARD */
-.trabajo-card {
-    background-color: #1c1c1c;
-    border-radius: 14px;
-    overflow: hidden;
-    border: 2px solid #2a2a2a;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.trabajo-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-
-/* IMAGEN */
-.trabajo-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-/* CONTENIDO */
-.trabajo-content {
-    padding: 1.2rem;
-}
-
-.trabajo-content h3 {
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
-    color: #fff;
-}
-
-.trabajo-content p {
-    font-size: 0.95rem;
-    color: #cfcfcf;
-    margin-bottom: 1rem;
-    line-height: 1.4;
-}
-
-/* BOTÓN */
-.trabajo-btn {
-    display: inline-block;
-    padding: 10px 18px;
-    border-radius: 6px;
-    color: #fff;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.trabajo-btn:hover {
-    transform: scale(1.05);
-    opacity: 0.9;
-}
-
-.trabajo-btn.rojo {
-    background-color: #E6135A;
-}
-
-.trabajo-btn.verde {
-    background-color: #69C0AF;
-    
-}
-
-.trabajo-btn.amarillo {
-    background-color: #FDC415;
-    
-}
-
-.trabajo-tag {
-    display: inline-block;
-    font-size: 0.7rem;      /* bien chiquito */
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 4px 8px;
-    border-radius: 999px;
-    margin-bottom: 8px;
-    opacity: 0.9;
-}
-
-/* Colores */
-.trabajo-tag.rosa {
-    background-color: #E6135A;
-    color: #fff;
-}
-
-.trabajo-tag.verde {
-    background-color: #69C0AF;
-    color: #0f2f2a;
-}
-
-.trabajo-tag.amarillo {
-    background-color: #FDC415;
-    color: #3a2a00;
-}
-
-/* Adaptaciones para dispositivos móviles */
-@media (max-width: 768px) {
-    .about-content {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .about-photo {
-        margin-bottom: 1rem;
-        margin-right: 0;
-    }
-
-    .qualification__content,
-    .services__data {
-        padding: 1.5rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .services__container {
-        grid-template-columns: 1fr;
-    }
-
-    .about-title {
-        font-size: 1.5rem;
-    }
-
-    .about-description {
-        font-size: 0.9rem;
-    }
-}
-
-/* Responsivo: ajusta el tamaño en pantallas pequeñas */
+/* Ajustes generales mobile */
 @media (max-width: 768px) {
     .name {
         font-size: 4rem;
@@ -880,250 +967,24 @@ html {
     }
 }
 
-
-/* Sección de contacto */
+/* ==================================================
+   SECCIÓN CONTACTO
+================================================== */
 .contact-section {
     padding: 100px 20px;
-    background-color: white;
-    color: black;
+    background-color: #fff;
+    color: #000;
     text-align: center;
 }
 
 .contact-title {
     font-size: 3rem;
-    color: #000000;
     margin-bottom: 40px;
 }
 
-.contact-form {
-    max-width: 600px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 0 20px; /* Añadimos padding en los lados del formulario */
-}
-
-.form-group {
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: black;
-}
-
-.form-group input,
-.form-group textarea {
-    width: calc(100% - 20px); /* Ajustamos el ancho para evitar que se desborde y respetar el padding */
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 2px solid #E6135a;
-    background-color: #f9f9f9;
-    color: black;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: #69C0AF;
-    outline: none;
-}
-
-.submit-button {
-    padding: 12px 20px;
-    font-size: 1.2rem;
-    background-color: #E6135a;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.submit-button:hover {
-    background-color: #C11248;
-}
-
-/* Responsividad */
-@media (max-width: 768px) {
-    .contact-section {
-        padding: 50px 20px;
-    }
-
-    .contact-title {
-        font-size: 2rem;
-    }
-
-    .contact-form {
-        padding: 0 15px; /* Reducimos el padding en pantallas más pequeñas */
-        width: 100%; /* Aseguramos que el formulario ocupe todo el ancho disponible en pantallas pequeñas */
-    }
-
-    .form-group input,
-    .form-group textarea {
-        width: calc(100% - 30px); /* Ajustamos el ancho para respetar el padding en móviles */
-    }
-
-    .submit-button {
-        padding: 10px 15px;
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .contact-title {
-        font-size: 1.5rem;
-    }
-
-    .contact-form {
-        padding: 0 10px; /* Reducimos aún más el padding en pantallas muy pequeñas */
-    }
-
-    .form-group input,
-    .form-group textarea {
-        width: calc(100% - 20px); /* Ajustamos el ancho en pantallas más pequeñas */
-    }
-
-    .submit-button {
-        padding: 8px 12px;
-        font-size: 1rem;
-    }
-
-    .form-group label {
-        font-size: 1rem;
-    }
-
-    .form-group input,
-    .form-group textarea {
-        font-size: 0.9rem;
-    }
-}
-
-/* Estilos para pantallas grandes (desktop) */
-@media (min-width: 1024px) {
-    .container,
-    .about-section,
-    .trabajos-section,
-    .contact-section {
-        padding: 100px 40px; /* Más espaciado en pantallas grandes */
-    }
-}
-
-/* Estilos para tablets (768px a 1024px) */
-@media (max-width: 1024px) {
-    .nav-links,
-    .contact-link {
-        margin-right: 10px;
-    }
-
-    .about-content {
-        flex-direction: column;
-    }
-
-    .about-photo {
-        margin: 0 0 20px 0; /* Centra la foto en pantallas más pequeñas */
-    }
-
-    .trabajos-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .trabajo-item {
-        width: 80%; /* Más ancho en tablets */
-    }
-}
-
-/* Estilos para móviles (menor a 768px) */
-@media (max-width: 768px) {
-    .nav-links.show-menu {
-        position: absolute;
-        right: 0;
-        background-color: rgba(0, 0, 0, 0.9); /* Más transparente para mejor visualización */
-        width: 100%; /* Ocupa todo el ancho */
-        padding: 20px 0;
-    }
-
-    .nav-links li {
-        margin: 15px 0;
-    }
-
-    .trabajos-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-    }
-
-    .trabajo-item {
-        width: 90%; /* Más ancho para que los trabajos ocupen más espacio */
-    }
-
-    .about-text,
-    .about-photo {
-        width: 100%; /* Ajusta las secciones sobre mí en pantallas pequeñas */
-    }
-
-    .about-title {
-        font-size: 2.5rem;
-    }
-
-    .about-description {
-        font-size: 1rem;
-    }
-}
-
-/* Estilos para móviles muy pequeños (menor a 480px) */
-@media (max-width: 480px) {
-    .container,
-    .about-section,
-    .trabajos-section,
-    .contact-section {
-        padding: 50px 20px; /* Reduce el padding en móviles */
-    }
-
-    .trabajos-title,
-    .contact-title {
-        font-size: 2rem;
-    }
-
-    .trabajo-item {
-        width: 95%; /* Aumenta el ancho en móviles */
-    }
-
-    .about-title {
-        font-size: 2rem;
-    }
-
-    .about-description {
-        font-size: 0.9rem;
-    }
-
-    .about-photo {
-        width: 100%; /* Foto más pequeña para móviles */
-    }
-
-    .hello {
-        font-size: 1rem;
-    }
-
-    .name {
-        font-size: 2rem;
-    }
-
-    .social-icons a {
-        font-size: 1.2rem;
-    }
-
-    .submit-button {
-        padding: 8px 16px; /* Botón más pequeño */
-        font-size: 1rem;
-    }
-}
-
+/* ==================================================
+   REDES SOCIALES
+================================================== */
 .social-category {
     margin: 60px 0 25px;
     font-size: 2rem;
@@ -1139,16 +1000,16 @@ html {
 }
 
 .social-card {
-    border-radius: 18px;
     padding: 30px;
-    color: white;
+    border-radius: 18px;
+    color: #fff;
     text-decoration: none;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .social-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .social-card .icon {
@@ -1166,12 +1027,133 @@ html {
     opacity: 0.85;
 }
 
-/* Colores */
+/* ==================================================
+   COLORES DE REDES
+================================================== */
 .instagram-art { background: linear-gradient(135deg, #E1306C, #F77737); }
-.behance { background: linear-gradient(135deg, #1769FF, #003ECB); }
-.artstation { background: linear-gradient(135deg, #13AFF0, #0A3E5F); }
-.youtube { background: linear-gradient(135deg, #FF0000, #B31217); }
-.vimeo { background: linear-gradient(135deg, #1AB7EA, #0077A2); }
-.tiktok { background: linear-gradient(135deg, #000000, #69C9D0); }
-.linkedin { background: linear-gradient(135deg, #0077B5, #004471); }
-.email { background: linear-gradient(135deg, #333, #000); }
+.behance        { background: linear-gradient(135deg, #1769FF, #003ECB); }
+.artstation     { background: linear-gradient(135deg, #13AFF0, #0A3E5F); }
+.youtube        { background: linear-gradient(135deg, #FF0000, #B31217); }
+.vimeo          { background: linear-gradient(135deg, #1AB7EA, #0077A2); }
+.tiktok         { background: linear-gradient(135deg, #000000, #69C9D0); }
+.linkedin       { background: linear-gradient(135deg, #0077B5, #004471); }
+.email          { background: linear-gradient(135deg, #333, #000); }
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .contact-form {
+        padding: 0 15px;
+    }
+
+    .about-content {
+        flex-direction: column;
+    }
+
+    .about-photo {
+        margin-bottom: 20px;
+    }
+
+    .trabajo-item {
+        width: 80%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .contact-section {
+        padding: 50px 20px;
+    }
+
+    .contact-title {
+        font-size: 2rem;
+    }
+
+    .contact-form {
+        width: 100%;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: calc(100% - 30px);
+    }
+
+    .submit-button {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+
+    .about-title {
+        font-size: 2.5rem;
+    }
+
+    .about-description {
+        font-size: 1rem;
+    }
+}
+
+/* Mobile pequeño */
+@media (max-width: 480px) {
+    .contact-title {
+        font-size: 1.5rem;
+    }
+
+    .form-group label {
+        font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 0.9rem;
+        width: calc(100% - 20px);
+    }
+
+    .submit-button {
+        padding: 8px 12px;
+    }
+}
+/* ==================================================
+   FOOTER
+================================================== */
+.site-footer {
+    padding: 40px 20px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+}
+
+/* ==================================================
+   REDES SOCIALES
+================================================== */
+.footer-social ul {
+    margin: 20px 0;
+    padding: 0;
+    list-style: none;
+
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.footer-social a {
+    color: #fff;
+    font-size: 1.8rem;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.footer-social a:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+/* ==================================================
+   CONTACTO FOOTER
+================================================== */
+.footer-contact a {
+    color: #fff;
+    font-size: 0.9rem;
+    text-decoration: none;
+}

@@ -35,238 +35,257 @@
   gtag('config', 'G-M8HS9F12SG');
 </script>
 <body>
-    <div class="navigation">
-        <!-- Menú de navegación -->
+    <nav class="navigation">
+        <!-- Lado izquierdo -->
         <div class="left-menu">
+            <!-- Logo -->
             <div class="logo">
                 <img src="Recursos/logo.png" alt="Logo Sergio's Life" width="50">
             </div>
+    
+            <!-- Enlaces principales -->
             <ul class="nav-links" id="nav-links">
                 <li><a href="#inicio" class="inicio">Inicio</a></li>
                 <li><a href="#sobre-mi" class="sobre-mi">Sobre Mi</a></li>
                 <li><a href="#trabajos" class="trabajos">Trabajos</a></li>
             </ul>
         </div>
+    
+        <!-- Lado derecho -->
         <div class="right-menu">
+            <!-- Contacto -->
             <ul class="contact-link">
                 <li><a href="#contacto" class="contacto">Contacto</a></li>
             </ul>
-            <div class="menu-icon" id="menu-icon">
+    
+            <!-- Menú hamburguesa (mobile) -->
+            <div class="menu-icon" id="menu-icon" aria-label="Abrir menú">
                 <i class="fas fa-bars"></i>
             </div>
         </div>
-    </div>
+    </nav>
     
-    <!-- Sección principal de inicio -->
-    <section id="inicio" class="container seccion-inicio">
-        <div class="content">
-            <p class="hello" id="hello-text">HELLO!!</p>
-            <h1 class="name" id="name-text">Sergio Andres</h1>
-            <!-- El botón ahora tiene un enlace para descargar el archivo PDF -->
-            <a href="Recursos/PDF/CV_SERGIO_231115.pdf" download="CV_SERGIO_231115.pdf">
-                <button class="about-button descargar-cv">DESCARGAR CV</button>
-            </a>
-            <!-- Indicador de scroll -->
-<a href="#sobre-mi" class="scroll-indicator" aria-label="Bajar a la siguiente sección">
-    <span></span>
-</a>
+    
+  <!-- Sección principal de inicio -->
+<section id="inicio" class="container seccion-inicio">
+    <div class="content">
+        <!-- Saludo -->
+        <p class="hello" id="hello-text">HELLO!!</p>
 
-        </div>
-    </section>
-    
-<!-- Sección "Sobre Mi" -->
-<section id="sobre-mi" class="about-section">
-    <div class="about-content">
-        <img src="Recursos/SergiosLife.png" alt="Foto de Sergio" class="about-photo">
-        <div class="about-text">
-            <h2 class="about-title">Sobre Mi</h2>
-            <p class="about-description">
-                Soy <strong>Sergio Andrés</strong>, animador <strong>2D</strong> e ilustrador con formación en 
-        <strong>Ingeniería en Multimedia y Sistemas</strong>. Me especializo en 
-        <strong>diseño de personajes</strong>, <strong>animación digital</strong> y 
-        <strong>narrativa visual</strong>, enfocado en la creación de proyectos para 
-        <strong>series</strong>, <strong>películas animadas</strong> y medios audiovisuales.
-            </p>
-            <p class="about-description">
-                 Me interesa construir experiencias visuales con <strong>identidad</strong>, explorando estilos 
-        que van desde lo <strong>cartoon</strong> hasta lo <strong>oscuro y experimental</strong>. 
-        Disfruto llevar ideas desde el <strong>concepto inicial</strong> hasta su 
-        <strong>desarrollo visual</strong>, combinando creatividad, técnica y 
-        <strong>storytelling</strong>.
-            </p>
-            <div class="button-container">
-                <button class="about-button" id="verMasButton">Ver Más</button>
-            </div>
-        </div>
+        <!-- Nombre -->
+        <h1 class="name" id="name-text">Sergio Andres</h1>
+
+        <!-- Descargar CV -->
+        <a href="Recursos/PDF/CV_SERGIO_231115.pdf" download="CV_SERGIO_231115.pdf">
+            <button class="about-button descargar-cv">
+                DESCARGAR CV
+            </button>
+        </a>
+
+        <!-- Indicador de scroll -->
+        <a href="#sobre-mi" class="scroll-indicator" aria-label="Bajar a la siguiente sección">
+            <span></span>
+        </a>
     </div>
 </section>
 
-<!-- Sección de Calificaciones -->
-<div id="additional-sections" class="hidden">
-    <section class="qualification section bd-container">
-        <h2 class="trabajos-title">Más Sobre Mi</h2>
-        <div class="qualification__container bd-grid">
-            <div class="qualification__container bd-grid">
-                <!-- Experiencia laboral -->
-<div class="qualification__content experience-box">
-    <h3 class="qualification__title">Experiencia Laboral</h3>
+    
+<!-- Sección "Sobre Mí" -->
+<section 
+    id="sobre-mi" 
+    class="about-section" 
+    aria-labelledby="about-title"
+>
+    <div class="about-content">
+        <!-- Imagen con SEO y accesibilidad -->
+        <img 
+            src="Recursos/SergiosLife.png"
+            alt="Retrato de Sergio Andrés, animador 2D e ilustrador especializado en diseño de personajes"
+            class="about-photo"
+            loading="lazy"
+            width="400"
+            height="400"
+        >
 
-    <!-- Civiltronic -->
-    <article class="experience-item">
-        <h4 class="experience-role">
-            Gestor multimedia y medios digitales
-        </h4>
+        <!-- Contenido textual -->
+        <article class="about-text">
+            <h2 id="about-title" class="about-title">
+                Sobre Mí
+            </h2>
 
-        <a href="https://civiltronic.com" target="_blank" class="experience-company">
-            Civiltronic
-        </a>
+            <p class="about-description">
+                Soy <strong>Sergio Andrés</strong>, <strong>animador 2D</strong> e 
+                <strong>ilustrador profesional</strong> con formación en 
+                <strong>Ingeniería en Multimedia y Sistemas</strong>. Me especializo en 
+                <strong>diseño de personajes</strong>, <strong>animación digital</strong> y 
+                <strong>narrativa visual</strong>, enfocado en la creación de proyectos para 
+                <strong>series animadas</strong>, <strong>películas animadas</strong> y 
+                <strong>contenidos audiovisuales</strong>.
+            </p>
 
-        <span class="experience-date">
-            oct. 2025 – dic. 2025 · 3 meses
-        </span>
+            <p class="about-description">
+                Me interesa construir experiencias visuales con <strong>identidad artística</strong>, 
+                explorando estilos que van desde lo <strong>cartoon</strong> hasta lo 
+                <strong>oscuro y experimental</strong>. Disfruto llevar ideas desde el 
+                <strong>concepto inicial</strong> hasta su <strong>desarrollo visual</strong>, 
+                combinando creatividad, técnica y <strong>storytelling visual</strong>.
+            </p>
 
-        <small class="experience-type">
-            Contrato de prácticas
-        </small>
+            <!-- Acción -->
+            <div class="button-container">
+                <button 
+                    class="about-button" 
+                    id="verMasButton" 
+                    aria-expanded="false"
+                    aria-controls="more-about"
+                >
+                    Ver más sobre mi
+                </button>
+            </div>
+        </article>
+    </div>
+</section>
 
-        <ul class="experience-tasks">
-            <li>Gestión de contenidos multimedia para medios digitales</li>
-            <li>Apoyo en diseño gráfico y material visual corporativo</li>
-            <li>Optimización de contenido para plataformas web</li>
-        </ul>
-    </article>
 
-    <!-- Metajuego Company -->
-    <article class="experience-item">
-        <h4 class="experience-role">
-            Chief Marketing Officer (CMO)
-        </h4>
+<!-- Sección adicional: Experiencia, Educación y Certificaciones -->
+<section 
+    id="additional-sections" 
+    class="qualification section bd-container hidden"
+    aria-labelledby="more-about-title"
+>
+    <h2 id="more-about-title" class="trabajos-title">
+        Más sobre mí
+    </h2>
 
-        <a href="https://metajuego.com.co/" target="_blank" class="experience-company">
-            Metajuego Company
-        </a>
+    <div class="qualification__container bd-grid">
 
-        <span class="experience-date">
-            mar. 2025 – Actualmente
-        </span>
+        <!-- ================= EXPERIENCIA LABORAL ================= -->
+        <section class="qualification__content experience-box" aria-labelledby="experience-title">
+            <h3 id="experience-title" class="qualification__title">
+                Experiencia laboral en animación, multimedia y marketing digital
+            </h3>
 
-        <small class="experience-type">
-            Autónomo · En remoto
-        </small>
+            <!-- Civiltronic -->
+            <article class="experience-item">
+                <h4 class="experience-role">Gestor multimedia y medios digitales</h4>
 
-        <ul class="experience-tasks">
-            <li>Dirección creativa y estrategia de marketing digital</li>
-            <li>Gestión de marca, redes sociales y campañas promocionales</li>
-            <li>Producción de contenido visual y audiovisual</li>
-        </ul>
-    </article>
+                <a href="https://civiltronic.com" target="_blank" rel="noopener noreferrer" class="experience-company">
+                    Civiltronic
+                </a>
 
-    <!-- Marpe Cosmetics -->
-    <article class="experience-item">
-        <h4 class="experience-role">
-            Desarrollador de página web
-        </h4>
+                <time class="experience-date" datetime="2025-10">
+                    oct. 2025 – dic. 2025 · 3 meses
+                </time>
 
-        <a href="https://marpecosmetics.com" target="_blank" class="experience-company">
-            Marpe Cosmetics
-        </a>
+                <small class="experience-type">Contrato de prácticas</small>
 
-        <span class="experience-date">
-            feb. 2025 – jun. 2025 · 5 meses
-        </span>
+                <ul class="experience-tasks">
+                    <li>Gestión de contenidos multimedia para plataformas digitales</li>
+                    <li>Diseño gráfico y material visual corporativo</li>
+                    <li>Optimización de contenido web con enfoque en experiencia de usuario</li>
+                </ul>
+            </article>
 
-        <small class="experience-type">
-            Contrato de prácticas
-        </small>
+            <!-- Metajuego Company -->
+            <article class="experience-item">
+                <h4 class="experience-role">Chief Marketing Officer (CMO)</h4>
 
-        <ul class="experience-tasks">
-            <li>Desarrollo y mantenimiento de sitio web corporativo</li>
-            <li>Implementación de diseño responsive</li>
-            <li>Optimización visual y estructural del contenido</li>
-        </ul>
-    </article>
+                <a href="https://metajuego.com.co/" target="_blank" rel="noopener noreferrer" class="experience-company">
+                    Metajuego Company
+                </a>
 
-    <!-- Producciones Wiiim -->
-    <article class="experience-item">
-        <h4 class="experience-role">
-            Animador 2D
-        </h4>
+                <time class="experience-date" datetime="2025-03">
+                    mar. 2025 – Actualmente
+                </time>
 
-        <a href="https://www.instagram.com/prod_wiiim/" target="_blank" class="experience-company">
-            Producciones Wiiim
-        </a>
+                <small class="experience-type">Autónomo · En remoto</small>
 
-        <span class="experience-date">
-            nov. 2023 – ene. 2024 · 3 meses
-        </span>
+                <ul class="experience-tasks">
+                    <li>Dirección creativa y estrategia de marketing digital</li>
+                    <li>Gestión de marca y campañas en redes sociales</li>
+                    <li>Producción de contenido visual y audiovisual</li>
+                </ul>
+            </article>
 
-        <small class="experience-type">
-            Contrato temporal · Híbrido
-        </small>
+            <!-- Marpe Cosmetics -->
+            <article class="experience-item">
+                <h4 class="experience-role">Desarrollador web</h4>
 
-        <ul class="experience-tasks">
-            <li>Animación 2D de personajes</li>
-            <li>Apoyo en producción audiovisual</li>
-            <li>Trabajo con Adobe Photoshop y pipelines de animación</li>
-        </ul>
+                <a href="https://marpecosmetics.com" target="_blank" rel="noopener noreferrer" class="experience-company">
+                    Marpe Cosmetics
+                </a>
 
-        <small class="experience-skills">
-            Aptitudes: Animación 2D · Animación de personajes · Animación por computadora · Adobe Photoshop
-        </small>
-    </article>
-</div>
+                <time class="experience-date" datetime="2025-02">
+                    feb. 2025 – jun. 2025 · 5 meses
+                </time>
 
-           <!-- Educación -->
-<div class="qualification__content education-box">
-    <h3 class="qualification__title">Educación</h3>
+                <small class="experience-type">Contrato de prácticas</small>
 
-    <!-- Ingeniería de Sistemas -->
-    <article class="education-item">
-        <h4 class="education-degree">
-            Ingeniería de Sistemas
-        </h4>
+                <ul class="experience-tasks">
+                    <li>Desarrollo y mantenimiento de sitio web corporativo</li>
+                    <li>Implementación de diseño responsive</li>
+                    <li>Optimización visual y estructural del contenido</li>
+                </ul>
+            </article>
 
-        <span class="education-institution">
-            Universidad de Boyacá
-        </span>
+            <!-- Producciones Wiiim -->
+            <article class="experience-item">
+                <h4 class="experience-role">Animador 2D</h4>
 
-        <span class="education-date">
-            ene. 2018 – Actualmente
-        </span>
+                <a href="https://www.instagram.com/prod_wiiim/" target="_blank" rel="noopener noreferrer" class="experience-company">
+                    Producciones Wiiim
+                </a>
 
-        <ul class="education-focus">
-            <li>Fundamentos de programación y lógica computacional</li>
-            <li>Desarrollo de software y estructuras de datos</li>
-            <li>Gestión de proyectos tecnológicos</li>
-            <li>Bases de datos y sistemas de información</li>
-            <li>Introducción a ciberseguridad y entornos digitales</li>
-        </ul>
-    </article>
+                <time class="experience-date" datetime="2023-11">
+                    nov. 2023 – ene. 2024 · 3 meses
+                </time>
 
-    <!-- Ingeniería Multimedia -->
-    <article class="education-item">
-        <h4 class="education-degree">
-            Ingeniería Multimedia
-        </h4>
+                <small class="experience-type">Contrato temporal · Híbrido</small>
 
-        <span class="education-institution">
-            Universidad de Boyacá
-        </span>
+                <ul class="experience-tasks">
+                    <li>Animación 2D de personajes</li>
+                    <li>Producción audiovisual</li>
+                    <li>Uso de Adobe Photoshop y pipelines de animación</li>
+                </ul>
 
-        <span class="education-date">
-            2021 – Actualmente
-        </span>
+                <small class="experience-skills">
+                    Aptitudes: Animación 2D · Diseño de personajes · Adobe Photoshop
+                </small>
+            </article>
+        </section>
 
-        <ul class="education-focus">
-            <li>Animación 2D y fundamentos de motion graphics</li>
-            <li>Ilustración digital y diseño de personajes</li>
-            <li>Narrativa visual aplicada a medios digitales</li>
-            <li>Producción audiovisual y contenidos interactivos</li>
-            <li>Diseño de experiencias visuales para plataformas digitales</li>
-        </ul>
-    </article>
-</div>
+        <!-- ================= EDUCACIÓN ================= -->
+        <section class="qualification__content education-box" aria-labelledby="education-title">
+            <h3 id="education-title" class="qualification__title">
+                Formación académica en ingeniería y multimedia
+            </h3>
 
+            <article class="education-item">
+                <h4 class="education-degree">Ingeniería de Sistemas</h4>
+                <span class="education-institution">Universidad de Boyacá</span>
+                <time class="education-date" datetime="2018-01">2018 – Actualmente</time>
+
+                <ul class="education-focus">
+                    <li>Programación y lógica computacional</li>
+                    <li>Desarrollo de software y estructuras de datos</li>
+                    <li>Gestión de proyectos tecnológicos</li>
+                    <li>Bases de datos y sistemas de información</li>
+                </ul>
+            </article>
+
+            <article class="education-item">
+                <h4 class="education-degree">Ingeniería Multimedia</h4>
+                <span class="education-institution">Universidad de Boyacá</span>
+                <time class="education-date" datetime="2021-01">2021 – Actualmente</time>
+
+                <ul class="education-focus">
+                    <li>Animación 2D y motion graphics</li>
+                    <li>Ilustración digital y diseño de personajes</li>
+                    <li>Narrativa visual aplicada</li>
+                    <li>Producción audiovisual</li>
+                </ul>
+            </article>
+        </section>
 
             <!-- Certificaciones destacadas -->
            <div class="qualification__content certification-box">
@@ -311,12 +330,19 @@
 </div>
 
     </section>
-
-    <!-- Botón Ver Menos -->
-    <div class="button-container">
-        <button class="about-button" id="verMenosButton">Ver Menos</button>
-    </div>
 </div>
+<div class="button-container">
+    <button 
+        class="about-button secondary hidden"
+        id="cerrarSobreMi"
+        aria-label="Cerrar sección sobre mí y volver al inicio"
+    >
+        Volver arriba
+    </button>
+</div>
+
+
+</section>
 
 
 
@@ -637,134 +663,215 @@
     </div>
 </section>
 
+<!-- Sección de contacto y redes profesionales -->
+<section 
+    id="contacto" 
+    class="contact-section"
+    aria-labelledby="contact-title"
+>
+    <!-- Título principal -->
+    <h2 id="contact-title" class="contact-title">
+        Contacto y redes profesionales de Sergio Andrés
+    </h2>
 
-
- <section id="contacto" class="contact-section">
-    <h2 class="contact-title">Mis Redes y Contactos</h2>
+    <!-- Descripción SEO -->
     <p class="contact-text">
-        Ilustración · Animación · Video · Contenido creativo
+        Ilustración · Animación 2D · Video · Contenido creativo y multimedia
     </p>
 
-    <!-- ARTE -->
-    <h3 class="social-category">Arte & Proyectos</h3>
-<div class="social-grid">
-    <a href="https://www.instagram.com/sergio.s_life_" target="_blank" class="social-card instagram-art">
-        <div class="icon"><i class="fa-brands fa-instagram"></i></div>
-        <h4>Instagram · Arte</h4>
-        <p>Ilustraciones, procesos y piezas finales</p>
-    </a>
+    <!-- ================= ARTE ================= -->
+    <section class="social-group" aria-labelledby="art-social-title">
+        <h3 id="art-social-title" class="social-category">
+            Arte, ilustración y proyectos creativos
+        </h3>
 
-    <a href="https://www.behance.net/sergioslife" target="_blank" class="social-card behance">
-        <div class="icon"><i class="fa-brands fa-behance"></i></div>
-        <h4>Behance</h4>
-        <p>Casos de estudio y proyectos completos</p>
-    </a>
+        <div class="social-grid">
+            <a 
+                href="https://www.instagram.com/sergio.s_life_" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card instagram-art"
+                aria-label="Instagram de arte e ilustración de Sergio Andrés"
+            >
+                <div class="icon"><i class="fa-brands fa-instagram"></i></div>
+                <h4>Instagram · Arte</h4>
+                <p>Ilustraciones, procesos creativos y piezas finales</p>
+            </a>
 
-    <a href="https://www.artstation.com/sergioalife" target="_blank" class="social-card artstation">
-        <div class="icon"><i class="fa-brands fa-artstation"></i></div>
-        <h4>ArtStation</h4>
-        <p>Portfolio profesional</p>
-    </a>
-</div>
+            <a 
+                href="https://www.behance.net/sergioslife" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card behance"
+                aria-label="Portafolio en Behance de Sergio Andrés"
+            >
+                <div class="icon"><i class="fa-brands fa-behance"></i></div>
+                <h4>Behance</h4>
+                <p>Casos de estudio y proyectos completos</p>
+            </a>
 
+            <a 
+                href="https://www.artstation.com/sergioalife" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card artstation"
+                aria-label="Portafolio profesional en ArtStation"
+            >
+                <div class="icon"><i class="fa-brands fa-artstation"></i></div>
+                <h4>ArtStation</h4>
+                <p>Portfolio profesional de ilustración y animación</p>
+            </a>
+        </div>
+    </section>
 
-    <!-- VIDEO -->
-    <h3 class="social-category">Video & Animación</h3>
-<div class="social-grid">
-    <a href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw" target="_blank" class="social-card youtube">
-        <div class="icon"><i class="fa-brands fa-youtube"></i></div>
-        <h4>YouTube</h4>
-        <p>Animaciones, proyectos y contenido largo</p>
-    </a>
+    <!-- ================= VIDEO ================= -->
+    <section class="social-group" aria-labelledby="video-social-title">
+        <h3 id="video-social-title" class="social-category">
+            Video, animación y motion graphics
+        </h3>
 
-    <a href="https://vimeo.com/user179129330" target="_blank" class="social-card vimeo">
-        <div class="icon"><i class="fa-brands fa-vimeo-v"></i></div>
-        <h4>Vimeo</h4>
-        <p>Reel y trabajos profesionales</p>
-    </a>
+        <div class="social-grid">
+            <a 
+                href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card youtube"
+                aria-label="Canal de YouTube de animación y proyectos de Sergio Andrés"
+            >
+                <div class="icon"><i class="fa-brands fa-youtube"></i></div>
+                <h4>YouTube</h4>
+                <p>Animaciones, proyectos y contenido audiovisual</p>
+            </a>
 
-    <a href="https://www.tiktok.com/@sergio.s_life?lang=es" target="_blank" class="social-card tiktok">
-        <div class="icon"><i class="fa-brands fa-tiktok"></i></div>
-        <h4>TikTok</h4>
-        <p>Clips cortos, procesos y tendencias</p>
-    </a>
-</div>
+            <a 
+                href="https://vimeo.com/user179129330" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card vimeo"
+                aria-label="Vimeo profesional con reels y trabajos audiovisuales"
+            >
+                <div class="icon"><i class="fa-brands fa-vimeo-v"></i></div>
+                <h4>Vimeo</h4>
+                <p>Reel profesional y trabajos audiovisuales</p>
+            </a>
 
+            <a 
+                href="https://www.tiktok.com/@sergio.s_life?lang=es" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card tiktok"
+                aria-label="TikTok con clips creativos y procesos de animación"
+            >
+                <div class="icon"><i class="fa-brands fa-tiktok"></i></div>
+                <h4>TikTok</h4>
+                <p>Clips cortos, procesos creativos y tendencias</p>
+            </a>
+        </div>
+    </section>
 
-    <!-- PROFESIONAL -->
-    <h3 class="social-category">Profesional</h3>
-<div class="social-grid">
-    <a href="https://www.linkedin.com/in/sergios-life/" target="_blank" class="social-card linkedin">
-        <div class="icon"><i class="fa-brands fa-linkedin-in"></i></div>
-        <h4>LinkedIn</h4>
-        <p>Perfil profesional y experiencia</p>
-    </a>
+    <!-- ================= PROFESIONAL ================= -->
+    <section class="social-group" aria-labelledby="professional-social-title">
+        <h3 id="professional-social-title" class="social-category">
+            Contacto profesional y networking
+        </h3>
 
-    <a
-      href="https://mail.google.com/mail/?view=cm&fs=1&to=sergioalife@gmail.com"
-      target="_blank"
-      class="social-card email"
-    >
-        <div class="icon"><i class="fa-solid fa-envelope"></i></div>
-        <h4>Email</h4>
-        <p>Contacto directo para trabajos</p>
-    </a>
-</div>
+        <div class="social-grid">
+            <a 
+                href="https://www.linkedin.com/in/sergios-life/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-card linkedin"
+                aria-label="Perfil profesional de Sergio Andrés en LinkedIn"
+            >
+                <div class="icon"><i class="fa-brands fa-linkedin-in"></i></div>
+                <h4>LinkedIn</h4>
+                <p>Perfil profesional, experiencia y proyectos</p>
+            </a>
 
+            <a
+                href="mailto:sergioalife@gmail.com"
+                class="social-card email"
+                aria-label="Enviar correo a Sergio Andrés para trabajos creativos"
+            >
+                <div class="icon"><i class="fa-solid fa-envelope"></i></div>
+                <h4>Email</h4>
+                <p>Contacto directo para proyectos y colaboraciones</p>
+            </a>
+        </div>
+    </section>
 </section>
 
 
 
 
-    <!-- Footer -->
-<footer style="background-color: black; color: white; padding: 20px; text-align: center; margin-top: 50px;">
-    <!-- Logo -->
-    <div class="footer-logo">
-        <img src="Recursos/logo.png" alt="Logo Sergio's Life" style="width: 100px; margin-bottom: 20px;">
+<!-- Footer -->
+<footer class="site-footer" role="contentinfo">
+  
+    <!-- Logo / Marca -->
+    <div class="footer-brand">
+      <img 
+        src="Recursos/logo.png" 
+        alt="Sergio's Life - Ilustración, Animación y Multimedia"
+        width="100"
+        height="100"
+        loading="lazy"
+      >
     </div>
-
-    <!-- Iconos de redes sociales -->
-    <div class="footer-social-icons" style="margin-bottom: 20px;">
-        <a href="https://www.instagram.com/sergio.s_life_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" style="color: white; margin: 0 10px;">
-            <i class="fab fa-instagram fa-2x"></i>
-        </a>
-        <a href="https://www.linkedin.com/in/sergios-life/" target="_blank" style="color: white; margin: 0 10px;">
-            <i class="fab fa-linkedin fa-2x"></i>
-        </a>
-        <a href="https://www.behance.net/sergioslife" target="_blank" style="color: white; margin: 0 10px;">
-            <i class="fab fa-behance fa-2x"></i>
-        </a>
-        <a href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw?sub_confirmation=1" target="_blank" style="color: white; margin: 0 10px;">
-            <i class="fab fa-youtube fa-2x"></i>
-        </a>
-        <a href="https://vimeo.com/user179129330" target="_blank" style="color: white; margin: 0 10px;">
-            <i class="fab fa-vimeo fa-2x"></i>
-        </a>
+  
+    <!-- Navegación social -->
+    <nav class="footer-social" aria-label="Redes sociales de Sergio's Life">
+      <ul>
+        <li>
+          <a href="https://www.instagram.com/sergio.s_life_" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Sergio's Life">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/sergios-life/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Sergio's Life">
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.behance.net/sergioslife" target="_blank" rel="noopener noreferrer" aria-label="Behance de Sergio's Life">
+            <i class="fab fa-behance"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" aria-label="YouTube de Sergio's Life">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://vimeo.com/user179129330" target="_blank" rel="noopener noreferrer" aria-label="Vimeo de Sergio's Life">
+            <i class="fab fa-vimeo"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  
+    <!-- Información legal -->
+    <div class="footer-legal">
+      <p>
+        &copy; <span id="year"></span> Sergio's Life. Todos los derechos reservados.
+      </p>
     </div>
-
-   <!-- Derechos reservados -->
-<div class="footer-copyright" style="margin-bottom: 20px;">
-    &copy; <span id="year"></span> Todos los derechos reservados a Sergio's Life.
-</div>
-
-<script>
-  // Obtiene el año actual y lo inserta en el span
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
-
-    <!-- Información de contacto -->
-    <div class="footer-contact" style="font-size: 14px;">
-        <a href="mailto:sergioalife@gmail.com" style="color: white; text-decoration: none;">
-            <i class="fas fa-envelope"></i> sergioalife@gmail.com
-        </a>
-    </div>
-</footer>
-
-
-    <div class="line"></div>
-
-    <script src="main.js"></script>
-    
+  
+    <!-- Contacto -->
+    <address class="footer-contact">
+      <a href="mailto:sergioalife@gmail.com" aria-label="Enviar correo a Sergio's Life">
+        <i class="fas fa-envelope"></i> sergioalife@gmail.com
+      </a>
+    </address>
+  
+  </footer>
+  
+  <div class="line"></div>
+  
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  
+  <script src="main.js" defer></script>
+  
 </body>
 </html>
