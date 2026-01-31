@@ -315,8 +315,8 @@ a:focus-visible {
    2. Sección Inicio (Background)
 ================================================== */
 .seccion-inicio {
-    height: 90vh;
-    min-height: 90vh;
+    min-height: 100svh; /* SOLUCIÓN REAL PARA MÓVIL */
+    height: auto;
 
     display: flex;
     align-items: center;
@@ -328,7 +328,7 @@ a:focus-visible {
 
     background-image: url("/Recursos/FONDO.svg");
     background-repeat: repeat;
-    background-size: 160% auto;
+    background-size: auto 160%; /* 👈 PRIORIDAD A ALTURA */
     background-position: 100% 0%;
 
     animation: fondoDiagonal 40s linear infinite;
@@ -345,29 +345,24 @@ a:focus-visible {
 
 @media (max-width: 768px) {
     .seccion-inicio {
-        background-size: cover;
-        background-position: center;
-        animation: fondoMobile 60s linear infinite;
+        padding-left: 16px;
+
+        background-size: auto 200%;
+        background-position: 50% 0%;
+
+        animation: fondoMobile 80s linear infinite;
     }
 }
 
 @keyframes fondoMobile {
     from {
-        background-position: center top;
+        background-position: 50% 0%;
     }
     to {
-        background-position: center bottom;
+        background-position: 50% 100%;
     }
 }
 
-@keyframes fondoMobile {
-    from {
-        background-position: 0% 50%;
-    }
-    to {
-        background-position: 100% 50%;
-    }
-}
 
 
 /* ==================================================
