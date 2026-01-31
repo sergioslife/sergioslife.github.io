@@ -315,7 +315,6 @@ a:focus-visible {
    2. Sección Inicio (Background)
 ================================================== */
 .seccion-inicio {
-    position: relative;
     height: 90vh;
     min-height: 90vh;
 
@@ -325,73 +324,27 @@ a:focus-visible {
 
     padding-left: 20px;
     text-align: left;
+
     color: #fff;
 
-    background-image: url("Recursos/FONDO.svg");
+    background-image: url("/Recursos/FONDO.svg");
     background-repeat: repeat;
     background-size: 180% auto;
     background-position: 100% 0%;
 
     animation: fondoDiagonal 40s linear infinite;
-    will-change: background-position;
 }
-
 
 @keyframes fondoDiagonal {
-    from { background-position: 100% 0%; }
-    to   { background-position: 0% 100%; }
-}
-
-
-@media (max-width: 768px) {
-    .seccion-inicio {
-        height: 100svh;
-        min-height: 100svh;
-        background: none;
-        overflow: hidden;
-    }
-
-    .seccion-inicio::before {
-        content: "";
-        position: absolute;
-
-        top: -300px;
-        left: -300px;
-        width: calc(100% + 600px);
-        height: calc(100% + 600px);
-
-        background-image: url("Recursos/FONDO.svg");
-        background-repeat: repeat;
-        background-size: 240% auto;
-
-        animation: fondoMobileSeguro 60s linear infinite;
-        will-change: transform;
-        transform: translate3d(0, 0, 0);
-        z-index: 0;
-    }
-
-    .seccion-inicio > * {
-        position: relative;
-        z-index: 1;
-    }
-}
-
-@keyframes fondoMobileSeguro {
     from {
-        transform: translate3d(0, 0, 0);
+        background-position: 100% 0%;
     }
     to {
-        transform: translate3d(-120px, -120px, 0);
+        background-position: 0% 100%;
     }
 }
 
 
-@media (prefers-reduced-motion: reduce) {
-    .seccion-inicio,
-    .seccion-inicio::before {
-        animation: none !important;
-    }
-}
 
 
 /* ==================================================
