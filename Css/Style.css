@@ -324,12 +324,11 @@ a:focus-visible {
 
     padding-left: 20px;
     text-align: left;
-
     color: #fff;
 
     background-image: url("/Recursos/FONDO.svg");
     background-repeat: repeat;
-    background-size: 180% auto;
+    background-size: 160% auto;
     background-position: 100% 0%;
 
     animation: fondoDiagonal 40s linear infinite;
@@ -344,7 +343,31 @@ a:focus-visible {
     }
 }
 
+@media (max-width: 768px) {
+    .seccion-inicio {
+        background-size: cover;
+        background-position: center;
+        animation: fondoMobile 60s linear infinite;
+    }
+}
 
+@keyframes fondoMobile {
+    from {
+        background-position: center top;
+    }
+    to {
+        background-position: center bottom;
+    }
+}
+
+@keyframes fondoMobile {
+    from {
+        background-position: 0% 50%;
+    }
+    to {
+        background-position: 100% 50%;
+    }
+}
 
 
 /* ==================================================
