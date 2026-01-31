@@ -348,7 +348,7 @@ a:focus-visible {
         padding-left: 16px;
 
         background-size: auto 200%;
-        background-position: 50% 0%;
+        background-position: 50% 100%;
 
         animation: fondoMobile 80s linear infinite;
     }
@@ -356,12 +356,13 @@ a:focus-visible {
 
 @keyframes fondoMobile {
     from {
-        background-position: 50% 0%;
-    }
-    to {
         background-position: 50% 100%;
     }
+    to {
+        background-position: 50% 0%;
+    }
 }
+
 
 
 
