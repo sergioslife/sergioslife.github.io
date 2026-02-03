@@ -47,42 +47,58 @@
 </script>
 <body>
     <nav class="navigation">
-        <!-- Lado izquierdo -->
-        <div class="left-menu">
-            <!-- Logo -->
-            <div class="logo">
-    <a href="index.html" aria-label="Ir al inicio">
-        <img 
-            src="Recursos/logo.png" 
-            alt="Sergio's Life – Ilustración y Animación"
-            width="50"
-            height="50"
-        >
-    </a>
-</div>
+    <!-- Lado izquierdo -->
+    <div class="left-menu">
+        <!-- Logo -->
+        <div class="logo">
+            <a href="index.html" aria-label="Ir al inicio">
+                <img 
+                    src="Recursos/logo.png" 
+                    alt="Sergio's Life – Ilustración y Animación"
+                    width="50"
+                    height="50"
+                >
+            </a>
+        </div>
 
-    
-            <!-- Enlaces principales -->
-            <ul class="nav-links" id="nav-links">
-                <li><a href="#inicio" class="inicio">Inicio</a></li>
-                <li><a href="#sobre-mi" class="sobre-mi">Sobre Mi</a></li>
-                <li><a href="#trabajos" class="trabajos">Trabajos</a></li>
-            </ul>
+        <!-- Enlaces principales -->
+        <ul class="nav-links" id="nav-links">
+            <li>
+                <a href="#inicio" class="inicio" data-i18n="nav.home">
+                    Inicio
+                </a>
+            </li>
+            <li>
+                <a href="#sobre-mi" class="sobre-mi" data-i18n="nav.about">
+                    Sobre Mi
+                </a>
+            </li>
+            <li>
+                <a href="#trabajos" class="trabajos" data-i18n="nav.work">
+                    Trabajos
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Lado derecho -->
+    <div class="right-menu">
+        <!-- Contacto -->
+        <ul class="contact-link">
+            <li>
+                <a href="#contacto" class="contacto" data-i18n="nav.contact">
+                    Contacto
+                </a>
+            </li>
+        </ul>
+
+        <!-- Menú hamburguesa (mobile) -->
+        <div class="menu-icon" id="menu-icon" aria-label="Abrir menú">
+            <i class="fas fa-bars"></i>
         </div>
-    
-        <!-- Lado derecho -->
-        <div class="right-menu">
-            <!-- Contacto -->
-            <ul class="contact-link">
-                <li><a href="#contacto" class="contacto">Contacto</a></li>
-            </ul>
-    
-            <!-- Menú hamburguesa (mobile) -->
-            <div class="menu-icon" id="menu-icon" aria-label="Abrir menú">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
-    </nav>
+    </div>
+</nav>
+
     
     
   <!-- Sección principal de inicio -->
