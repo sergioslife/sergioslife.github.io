@@ -24,68 +24,119 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+/* =========================
+       GALERÍA — LIGHTBOX
+    ========================= */
 
-    /* ==================================================
-       TRABAJOS — VER TODOS (AISLADO)
-    ================================================== */
-    const verMasTrabajosBtn = document.getElementById('ver-mas');
-    const trabajosRows = document.querySelectorAll('.trabajos-row');
+    const items = document.querySelectorAll(".galeria-item");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxContent = document.querySelector(".lightbox-content");
+    const lightboxImg = document.querySelector(".lightbox-img");
+    const cerrar = document.querySelector(".cerrar");
+    const embedContainer = document.getElementById("lb-embed");
 
-    if (trabajosRows.length) {
-        trabajosRows.forEach((row, index) => {
-            if (index > 0) {
-                row.classList.add('hidden');
-            }
-        });
-    }
+    const lbTitle = document.getElementById("lb-title");
+    const lbCategory = document.getElementById("lb-category");
+    const lbYear = document.getElementById("lb-year");
+    const lbDescription = document.getElementById("lb-description");
+    const lbLink = document.getElementById("lb-link");
 
-    if (verMasTrabajosBtn && trabajosRows.length) {
-        verMasTrabajosBtn.addEventListener('click', () => {
-            trabajosRows.forEach(row => row.classList.remove('hidden'));
-            verMasTrabajosBtn.style.display = 'none';
-        });
-    }
+    items.forEach(item => {
+        item.addEventListener("click", () => {
 
-    /* ==================================================
-       SOBRE MÍ — VER MÁS / VER MENOS (CONTROL ÚNICO)
-    ================================================== */
-    const verMasBtn = document.getElementById('verMasButton');
-    const additionalSection = document.getElementById('additional-sections');
-    const sobreMiSection = document.getElementById('sobre-mi');
+            const img = item.querySelector("img");
+            const type = item.dataset.type;
+            const instagramURL = item.dataset.instagram;
 
-    if (verMasBtn && additionalSection) {
+            lightbox.style.display = "flex";
+            document.body.style.overflow = "hidden";
 
-        // Estado inicial forzado
-        additionalSection.classList.add('hidden');
-        verMasBtn.setAttribute('aria-expanded', 'false');
-        verMasBtn.textContent = 'Ver más sobre mí';
+            embedContainer.innerHTML = "";
+            lightboxImg.style.display = "block";
 
-        verMasBtn.addEventListener('click', () => {
-            const expanded = verMasBtn.getAttribute('aria-expanded') === 'true';
+            lbTitle.textContent = item.dataset.title || "";
+            lbCategory.textContent = item.dataset.category || "";
+            lbYear.textContent = item.dataset.year || "";
+            lbDescription.textContent = item.dataset.description || "";
 
-            if (!expanded) {
-                // ABRIR
-                additionalSection.classList.remove('hidden');
-                verMasBtn.textContent = 'Ver menos';
-                verMasBtn.setAttribute('aria-expanded', 'true');
+            if (type === "instagram" && instagramURL) {
+
+                lightboxImg.style.display = "none";
+                lbLink.href = instagramURL;
+                lbLink.style.display = "inline-block";
+
+                embedContainer.innerHTML = `
+                    <blockquote class="instagram-media"
+                        data-instgrm-permalink="${instagramURL}"
+                        data-instgrm-version="14"
+                        style="max-width:540px; margin:auto;">
+                    </blockquote>
+                `;
+
+                if (window.instgrm) {
+                    window.instgrm.Embeds.process();
+                }
+
             } else {
-                // CERRAR
-                additionalSection.classList.add('hidden');
-                verMasBtn.textContent = 'Ver más sobre mí';
-                verMasBtn.setAttribute('aria-expanded', 'false');
 
-                sobreMiSection?.scrollIntoView({ behavior: 'smooth' });
+                lightboxImg.src = img ? img.src : "";
+
+                const link = item.dataset.link;
+
+                if (link && link.trim() !== "") {
+                    lbLink.href = link;
+                    lbLink.style.display = "inline-block";
+                } else {
+                    lbLink.removeAttribute("href");
+                    lbLink.style.display = "none";
+                }
             }
-        });
-    }
 
-    /* ==================================================
-       COLORES CÍCLICOS EN TRABAJOS
-    ================================================== */
-    const colores = ['#69C0AF', '#FDC415', '#E6135a'];
-    document.querySelectorAll('.trabajo-item').forEach((item, index) => {
-        item.style.borderColor = colores[index % colores.length];
+        });
     });
 
-});
+    cerrar.addEventListener("click", cerrarLightbox);
 
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") cerrarLightbox();
+    });
+
+    lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) cerrarLightbox();
+    });
+
+    function cerrarLightbox() {
+        lightbox.style.display = "none";
+        document.body.style.overflow = "auto";
+        embedContainer.innerHTML = "";
+    }
+
+    /* ==================================================
+       GALERÍA — FILTROS
+    ================================================== */
+    const filtros = document.querySelectorAll(".filtro");
+    const proyectos = document.querySelectorAll(".galeria-item");
+
+    if (filtros.length && proyectos.length) {
+        filtros.forEach(btn => {
+            btn.addEventListener("click", () => {
+
+                const activo = document.querySelector(".filtro.activo");
+                if (activo) activo.classList.remove("activo");
+
+                btn.classList.add("activo");
+
+                const filter = btn.getAttribute("data-filter");
+
+                proyectos.forEach(item => {
+                    if (filter === "all" || item.classList.contains(filter)) {
+                        item.style.display = "block";
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+            });
+        });
+    }
+
+});
