@@ -236,5 +236,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     }
+    /* ==================================================
+   VER MÁS SOBRE MI
+================================================== */
+
+const verMasButton = document.getElementById("verMasButton");
+const moreSection = document.getElementById("additional-sections");
+
+if (verMasButton && moreSection){
+
+    verMasButton.addEventListener("click", () => {
+
+        moreSection.classList.toggle("hidden");
+
+        const expanded = verMasButton.getAttribute("aria-expanded") === "true";
+
+        verMasButton.setAttribute("aria-expanded", !expanded);
+
+    });
+
+}
 
 });
