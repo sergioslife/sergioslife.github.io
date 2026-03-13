@@ -1351,7 +1351,6 @@ a:focus-visible {
 .lb-button:hover {
     opacity: 0.8;
 }
-
 /* =========================
    CAROUSEL WRAPPER
 ========================= */
@@ -1387,13 +1386,19 @@ a:focus-visible {
     scrollbar-width: none;
 }
 
+/* SOLO cuando hay carrusel */
+
+.trabajos-carousel .trabajo-card{
+    flex:0 0 320px;
+}
+
 
 /* =========================
    CARD PROYECTO
 ========================= */
 
 .trabajo-card{
-    flex: 0 0 320px;
+    width:100%;
     position: relative;
     border-radius: 12px;
     overflow: hidden;
@@ -1519,4 +1524,40 @@ a:focus-visible {
 .btn-galeria:hover{
     transform:translateY(-2px);
     box-shadow:0 6px 16px rgba(0,0,0,.25);
+}
+
+
+/* =========================
+   GRID DE PROYECTOS
+   (cuando NO hay carrusel)
+========================= */
+
+.proyectos-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:25px;
+    margin-top:40px;
+}
+
+
+.proyectos-filtros{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+margin-bottom:40px;
+}
+
+.filtro-btn{
+padding:8px 16px;
+border:none;
+background:#1e1e1e;
+color:white;
+cursor:pointer;
+border-radius:20px;
+font-size:14px;
+}
+
+.filtro-btn.active{
+background:#07B0F2;
 }

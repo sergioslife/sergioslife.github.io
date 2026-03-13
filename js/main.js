@@ -10,11 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (carousel) {
 
-        /* duplicar contenido para efecto infinito */
-
         carousel.innerHTML += carousel.innerHTML;
-
-        /* BOTONES */
 
         nextBtn?.addEventListener("click", () => {
             carousel.scrollBy({
@@ -30,16 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        /* AUTOPLAY */
-
         setInterval(() => {
 
             carousel.scrollBy({
                 left: 340,
                 behavior: "smooth"
             });
-
-            /* reinicio invisible */
 
             if (carousel.scrollLeft >= carousel.scrollWidth / 2) {
 
@@ -74,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ================================================== */
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+
         anchor.addEventListener('click', e => {
 
             e.preventDefault();
@@ -81,12 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = document.querySelector(anchor.getAttribute('href'));
 
             if (target) {
+
                 target.scrollIntoView({
                     behavior: 'smooth'
                 });
+
             }
 
         });
+
     });
 
 
@@ -179,6 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function cerrarLightbox() {
 
+        if (!lightbox) return;
+
         lightbox.style.display = "none";
         document.body.style.overflow = "auto";
 
@@ -205,12 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
        GALERÍA — FILTROS
     ================================================== */
 
-    const filtros = document.querySelectorAll(".filtro");
-    const proyectos = document.querySelectorAll(".galeria-item");
+    const filtrosGaleria = document.querySelectorAll(".filtro");
+    const proyectosGaleria = document.querySelectorAll(".galeria-item");
 
-    if (filtros.length && proyectos.length) {
+    if (filtrosGaleria.length && proyectosGaleria.length) {
 
-        filtros.forEach(btn => {
+        filtrosGaleria.forEach(btn => {
 
             btn.addEventListener("click", () => {
 
@@ -221,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const filter = btn.getAttribute("data-filter");
 
-                proyectos.forEach(item => {
+                proyectosGaleria.forEach(item => {
 
                     if (filter === "all" || item.classList.contains(filter)) {
                         item.style.display = "block";
@@ -236,25 +234,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     }
+
+
     /* ==================================================
-   VER MÁS SOBRE MI
-================================================== */
+       PROYECTOS — FILTRO
+    ================================================== */
 
-const verMasButton = document.getElementById("verMasButton");
-const moreSection = document.getElementById("additional-sections");
+    const filtrosProyectos = document.querySelectorAll(".filtro-btn");
+    const proyectos = document.querySelectorAll(".trabajo-card");
 
-if (verMasButton && moreSection){
+    if (filtrosProyectos.length && proyectos.length) {
 
-    verMasButton.addEventListener("click", () => {
+        filtrosProyectos.forEach(btn => {
 
-        moreSection.classList.toggle("hidden");
+            btn.addEventListener("click", () => {
 
-        const expanded = verMasButton.getAttribute("aria-expanded") === "true";
+                const activo = document.querySelector(".filtro-btn.active");
+                if (activo) activo.classList.remove("active");
 
-        verMasButton.setAttribute("aria-expanded", !expanded);
+                btn.classList.add("active");
 
-    });
+                const filtro = btn.dataset.filter;
 
-}
+                proyectos.forEach(proyecto => {
+
+                    if (filtro === "all" || proyecto.classList.contains(filtro)) {
+                        proyecto.style.display = "block";
+                    } else {
+                        proyecto.style.display = "none";
+                    }
+
+                });
+
+            });
+
+        });
+
+    }
+
+
+    /* ==================================================
+       VER MÁS SOBRE MI
+    ================================================== */
+
+    const verMasButton = document.getElementById("verMasButton");
+    const moreSection = document.getElementById("additional-sections");
+
+    if (verMasButton && moreSection){
+
+        verMasButton.addEventListener("click", () => {
+
+            moreSection.classList.toggle("hidden");
+
+            const expanded = verMasButton.getAttribute("aria-expanded") === "true";
+
+            verMasButton.setAttribute("aria-expanded", !expanded);
+
+        });
+
+    }
 
 });
