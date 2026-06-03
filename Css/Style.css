@@ -1021,6 +1021,10 @@ a:focus-visible {
    logos experiencia
 ================================================== */
 
+.experience-item{
+    margin-bottom: 3rem;
+}
+
 .experience-header{
     display:flex;
     align-items:center;
