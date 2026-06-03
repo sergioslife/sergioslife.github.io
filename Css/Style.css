@@ -1018,6 +1018,42 @@ a:focus-visible {
 }
 
 /* ==================================================
+   logos experiencia
+================================================== */
+
+.experience-header{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:.75rem;
+}
+
+.experience-logo{
+    width:60px;
+    height:60px;
+    object-fit:contain;
+    flex-shrink:0;
+
+    border-radius:12px;
+    background:#fff;
+    padding:4px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.experience-company-info{
+    display:flex;
+    flex-direction:column;
+}
+
+.experience-role{
+    margin:0;
+}
+
+.experience-company{
+    margin-top:.3rem;
+}
+/* ==================================================
    SECCIÓN CONTACTO
 ================================================== */
 .contact-section {
@@ -1562,35 +1598,3 @@ font-size:14px;
 background:#07B0F2;
 }
 
-.experience-header{
-    display:flex;
-    align-items:center;
-    gap:1rem;
-    margin-bottom:.75rem;
-}
-
-.experience-logo{
-    width:60px;
-    height:60px;
-    object-fit:contain;
-    flex-shrink:0;
-
-    border-radius:12px;
-    background:#fff;
-    padding:4px;
-
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.experience-company-info{
-    display:flex;
-    flex-direction:column;
-}
-
-.experience-role{
-    margin:0;
-}
-
-.experience-company{
-    margin-top:.3rem;
-}
