@@ -609,7 +609,10 @@ a:focus-visible {
 .qualification__content {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+}
+
+.certifications__container{
+    align-self:center;
 }
 
 .education-container,
