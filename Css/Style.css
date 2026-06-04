@@ -620,6 +620,8 @@ a:focus-visible {
 }
 
 /* Grid certificaciones */
+
+
 .certifications__container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
