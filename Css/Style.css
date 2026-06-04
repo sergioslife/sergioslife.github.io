@@ -1018,6 +1018,29 @@ a:focus-visible {
 }
 
 /* ==================================================
+   logos educacion
+================================================== */
+
+
+.education-header{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+}
+
+.education-logo{
+    width:60px;
+    height:60px;
+    object-fit:contain;
+
+    background:#fff;
+    border-radius:12px;
+    padding:4px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+/* ==================================================
    logos experiencia
 ================================================== */
 
@@ -1606,20 +1629,3 @@ background:#07B0F2;
 
 
 
-.education-header{
-    display:flex;
-    align-items:center;
-    gap:1rem;
-}
-
-.education-logo{
-    width:60px;
-    height:60px;
-    object-fit:contain;
-
-    background:#fff;
-    border-radius:12px;
-    padding:4px;
-
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
