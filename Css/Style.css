@@ -57,6 +57,10 @@ a:hover, a:focus-visible {
     align-items: center;
 }
 
+.left-menu {
+    flex: 1;
+}
+
 .right-menu {
     margin-right: 20px;
 }
@@ -70,10 +74,15 @@ a:hover, a:focus-visible {
     list-style: none;
     margin: 0;
     padding: 0;
+    width: 100%;
 }
 
 .nav-links li, .contact-link li {
     margin-right: 20px;
+}
+
+.nav-links li:last-child {
+    margin-left: auto;
 }
 
 .nav-links a, .contact-link a {
@@ -112,10 +121,17 @@ a:hover, a:focus-visible {
    MOBILE NAV
 ================================================== */
 .menu-icon {
-    display: none;
     font-size: 2rem;
     cursor: pointer;
     color: #fff;
+    background-color: #69C0AF;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (max-width: 768px) {
@@ -149,7 +165,7 @@ a:hover, a:focus-visible {
     }
 
     .menu-icon {
-        display: block;
+        display: flex;
         margin-left: auto;
         margin-right: 10px;
     }

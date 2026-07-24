@@ -75,12 +75,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <li><a href="${basePath}index.html#inicio" class="inicio">Inicio</a></li>
                                 <li><a href="${basePath}index.html#sobre-mi" class="sobre-mi">Sobre Mi</a></li>
                                 <li><a href="${basePath}galeria.html" class="trabajos">Trabajos</a></li>
+                                <li><a href="${basePath}contacto.html" class="contacto">Contacto</a></li>
                             </ul>
                         </div>
                         <div class="right-menu">
-                            <ul class="contact-link">
-                                <li><a href="${basePath}contacto.html" class="contacto">Contacto</a></li>
-                            </ul>
                             <button class="menu-icon" id="menu-icon" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links"><i class="fas fa-bars"></i></button>
                         </div>
                     </nav>
