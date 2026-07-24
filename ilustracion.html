@@ -339,6 +339,24 @@
     <script src="js/includes.js"></script>
     <script src="js/typewriter.js"></script>
     <script async src="//www.instagram.com/embed.js"></script>
+    <script>
+      (function() {
+        function addInstagramTitles() {
+          document.querySelectorAll('.instagram-media iframe').forEach(function(iframe) {
+            if (!iframe.getAttribute('title')) {
+              iframe.setAttribute('title', 'Publicación de Instagram de Sergio\'s Life');
+            }
+          });
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(addInstagramTitles, 1500);
+          });
+        } else {
+          setTimeout(addInstagramTitles, 1500);
+        }
+      })();
+    </script>
 
     <div class="lang-switcher" aria-label="Language selector">
         <button class="lang-btn active" data-lang="es" aria-label="Español" onclick="window.setLanguage('es')">ES</button>

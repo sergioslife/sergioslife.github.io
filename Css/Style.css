@@ -307,7 +307,7 @@ a:hover, a:focus-visible {
 }
 
 .descargar-cv:hover {
-    background-color: #555;
+    background-color: #000;
     color: #fff;
 }
 
@@ -321,6 +321,7 @@ a:hover, a:focus-visible {
     margin: 0 auto;
     padding: 10px 20px;
     font-size: 1rem;
+    font-weight: 700;
     background-color: #69C0AF;
     border: none;
     color: #fff;
@@ -691,7 +692,7 @@ a:hover, a:focus-visible {
     padding: 10px 18px;
     border-radius: 6px;
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
@@ -708,7 +709,7 @@ a:hover, a:focus-visible {
 .trabajo-tag {
     display: inline-block;
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     padding: 4px 8px;
@@ -836,7 +837,7 @@ a:hover, a:focus-visible {
     display: inline-block;
     padding: 12px 30px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     color: white;
     background: #FDC415;

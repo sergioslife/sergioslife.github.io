@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <ul class="contact-link">
                                 <li><a href="${basePath}contacto.html" class="contacto">Contacto</a></li>
                             </ul>
-                            <div class="menu-icon" id="menu-icon" aria-label="Abrir menú"><i class="fas fa-bars"></i></div>
+                            <button class="menu-icon" id="menu-icon" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-links"><i class="fas fa-bars"></i></button>
                         </div>
                     </nav>
                 `);
