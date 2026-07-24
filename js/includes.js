@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                         <div class="right-menu">
                             <ul class="contact-link">
-                                <li><a href="${basePath}index.html#contacto" class="contacto">Contacto</a></li>
+                                <li><a href="${basePath}contacto.html" class="contacto">Contacto</a></li>
                             </ul>
                             <div class="menu-icon" id="menu-icon" aria-label="Abrir menú"><i class="fas fa-bars"></i></div>
                         </div>
