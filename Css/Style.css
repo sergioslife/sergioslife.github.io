@@ -160,6 +160,10 @@ a:hover, a:focus-visible {
         margin: 10px 0;
     }
 
+    .nav-links li:last-child {
+        margin-left: 0;
+    }
+
     .contact-link {
         display: none;
     }
