@@ -11,7 +11,7 @@
           <meta name="keywords" content="galería de proyectos, portafolio animación, animación 2D, animación 3D, modelado 3D, diseño de personajes, videojuegos Unreal Engine, ilustración digital, branding creativo, trabajos de animación">
           <meta name="author" content="Sergio Andrés Acevedo Mendivelso">
           <meta name="robots" content="index, follow">
-          <link rel="canonical" href="https://sergioslife.github.io/galeria.html">
+          <link rel="canonical" href="https://sergioslife.github.io/Page/galeria.html">
     
         <!-- Verificación Google -->
         <meta name="google-site-verification" content="61DiDm6vonCszSMPL7YmzS-bCnXB_57mQJd4Bk8z6TI">
@@ -27,6 +27,8 @@
 
     
         <!-- Fuentes -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
         <!-- Iconos -->
@@ -46,79 +48,27 @@
   gtag('config', 'G-M8HS9F12SG');
 </script>
 <body>
-<nav class="navigation">
-    <!-- Lado izquierdo -->
-    <div class="left-menu">
-        <!-- Logo -->
-        <div class="logo">
-            <a href="../index.html" aria-label="Ir al inicio">
-                <img 
-                    src="../Recursos/logo.png" 
-                    alt="Sergio's Life – Ilustración y Animación"
-                    width="50"
-                    height="50"
-                >
-            </a>
-        </div>
-
-        <!-- Enlaces principales -->
-        <ul class="nav-links" id="nav-links">
-            <li>
-                <a href="https://sergioslife.github.io/#inicio" class="inicio" data-i18n="nav.home">
-                    Inicio
-                </a>
-            </li>
-            <li>
-                <a href="https://sergioslife.github.io/#sobre-mi" class="sobre-mi" data-i18n="nav.about">
-                    Sobre Mi
-                </a>
-            </li>
-            <li>
-                <a href="../Page/" class="trabajos" data-i18n="nav.work">
-                    Trabajos
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Lado derecho -->
-    <div class="right-menu">
-        <!-- Contacto -->
-        <ul class="contact-link">
-            <li>
-                <a href="https://sergioslife.github.io/#contacto" class="contacto" data-i18n="nav.contact">
-                    Contacto
-                </a>
-            </li>
-        </ul>
-
-        <!-- Menú hamburguesa (mobile) -->
-        <div class="menu-icon" id="menu-icon" aria-label="Abrir menú">
-            <i class="fas fa-bars"></i>
-        </div>
-    </div>
-</nav>
-
-
+    <div id="nav-placeholder"></div>
+    <main id="main-content">
     
 <!-- ================= PROYECTOS ================= -->
 <section id="proyectos" class="trabajos-section">
 
-<h2 class="trabajos-title">Proyectos</h2>
+<h2 class="trabajos-title" data-i18n="gallery.title">Proyectos</h2>
 
 <div class="proyectos-filtros">
 
-<button class="filtro-btn active" data-filter="all">Todos</button>
+<button class="filtro-btn active" data-filter="all" data-i18n="gallery.filter_all">Todos</button>
 
-<button class="filtro-btn" data-filter="animacion">Animación</button>
+<button class="filtro-btn" data-filter="animacion" data-i18n="gallery.filter_animation">Animación</button>
 
-<button class="filtro-btn" data-filter="personaje">Personaje</button>
+<button class="filtro-btn" data-filter="personaje" data-i18n="gallery.filter_character">Personaje</button>
 
-<button class="filtro-btn" data-filter="narrativa">Narrativa</button>
+<button class="filtro-btn" data-filter="narrativa" data-i18n="gallery.filter_narrative">Narrativa</button>
 
-<button class="filtro-btn" data-filter="branding">Branding</button>
+<button class="filtro-btn" data-filter="branding" data-i18n="gallery.filter_branding">Branding</button>
 
-<button class="filtro-btn" data-filter="ilustracion">Ilustración</button>
+<button class="filtro-btn" data-filter="ilustracion" data-i18n="gallery.filter_illustration">Ilustración</button>
 
 </div>
 
@@ -128,7 +78,7 @@
 <!-- PROYECTO 1 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo1.png"
 alt="Al borde del Misterio animación 2D y mixed media con narrativa visual de suspenso"
 loading="lazy"
@@ -139,15 +89,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="gallery.card_1.tag">
 Animación · Mixed Media
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_1.title">
 Al borde del Misterio
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_1.desc">
 Proyecto de animación 2D y mixed media con atmósfera oscura y enfoque en narrativa visual cinematográfica.
 </p>
 
@@ -157,6 +107,7 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_1.btn"
 >
 Ver proyecto
 </a>
@@ -169,7 +120,7 @@ Ver proyecto
 <!-- PROYECTO 2 -->
 <article class="trabajo-card personaje" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo2.jpg"
 alt="Un Mundo Desconocido proyecto de diseño de personajes para universo fantástico animado"
 loading="lazy"
@@ -180,15 +131,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="gallery.card_2.tag">
 Diseño de Personaje
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_2.title">
 Un Mundo Desconocido
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_2.desc">
 Proyecto de desarrollo visual enfocado en diseño de personajes y construcción de un universo fantástico animado.
 </p>
 
@@ -198,6 +149,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_2.btn"
 >
 Ver proyecto
 </a>
@@ -210,7 +162,7 @@ Ver proyecto
 <!-- PROYECTO 3 -->
 <article class="trabajo-card narrativa" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo3.jpg"
 alt="Made in Hell proyecto experimental de narrativa visual oscura"
 loading="lazy"
@@ -221,15 +173,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="gallery.card_3.tag">
 Narrativa Visual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_3.title">
 Made in Hell
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_3.desc">
 Proyecto experimental enfocado en dirección artística, atmósfera oscura y storytelling visual.
 </p>
 
@@ -239,6 +191,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_3.btn"
 >
 Ver proyecto
 </a>
@@ -251,7 +204,7 @@ Ver proyecto
 <!-- PROYECTO 4 -->
 <article class="trabajo-card branding web" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo-civiltronic.jpg"
 alt="Civiltronic branding y rediseño web enfocado en identidad corporativa y experiencia digital"
 loading="lazy"
@@ -262,15 +215,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="gallery.card_4.tag">
 Branding · Web Design
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_4.title">
 Civiltronic Branding & Web
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_4.desc">
 Rediseño de identidad visual y propuesta de interfaz web para mejorar la presencia digital de la empresa.
 </p>
 
@@ -280,6 +233,7 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_4.btn"
 >
 Ver proyecto
 </a>
@@ -292,7 +246,7 @@ Ver proyecto
 <!-- PROYECTO 5 -->
 <article class="trabajo-card branding web" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo5.jpg"
 alt="Outside Devastation ilustración conceptual postapocalíptica"
 loading="lazy"
@@ -303,15 +257,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="gallery.card_5.tag">
 Ilustración Conceptual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_5.title">
 Outside Devastation
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_5.desc">
 Ilustración conceptual postapocalíptica centrada en diseño de ambiente y narrativa visual.
 </p>
 
@@ -321,6 +275,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_5.btn"
 >
 Ver proyecto
 </a>
@@ -331,7 +286,7 @@ Ver proyecto
 <!-- PROYECTO 6 - wired -->
 <article class="trabajo-card narrativa" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo13.png"
 alt="Wire Beyond Astralis videojuego conceptual Unreal Engine arte y GDD"
 loading="lazy"
@@ -342,15 +297,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="gallery.card_6.tag">
 Videojuego / Desarrollo Visual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_6.title">
 Wire: Beyond Astralis
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_6.desc">
 Proyecto de videojuego desarrollado en Unreal Engine enfocado en la creación del Game Design Document (GDD), diseño de arte conceptual y desarrollo de elementos visuales dentro del entorno de juego. Incluye interfaz (UI), narrativa visual y construcción de la identidad estética del universo.
 </p>
 
@@ -360,6 +315,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_6.btn"
 >
 Ver proyecto
 </a>
@@ -370,7 +326,7 @@ Ver proyecto
 <!-- PROYECTO 6 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo14.jpg"
 alt="Mysterious Dungeon animación y modelado 3D en Blender entorno fantástico"
 loading="lazy"
@@ -381,15 +337,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="gallery.card_7.tag">
 Animación 3D / Modelado
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_7.title">
 Mysterious Dungeon
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_7.desc">
 Proyecto de animación y modelado 3D desarrollado en Blender, centrado en la creación de un entorno fantástico tipo dungeon. Incluye diseño de escenarios, iluminación, texturizado y construcción de una atmósfera visual inmersiva.
 </p>
 
@@ -399,6 +355,7 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_7.btn"
 >
 Ver proyecto
 </a>
@@ -409,7 +366,7 @@ Ver proyecto
 <!-- PROYECTO 7 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo7.jpg"
 alt="Interpretación visual still feel half alive rotoscopia animación"
 loading="lazy"
@@ -420,15 +377,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="gallery.card_8.tag">
 Animación / Rotoscopia
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_8.title">
 Interpretación Visual de "still feel."
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_8.desc">
 Proyecto de animación en rotoscopia desarrollado con fines académicos, basado en la canción "still feel." de half·alive. Se trabajó la interpretación visual del significado y emociones de la pieza musical, trasladándolas a un lenguaje narrativo animado que busca transmitir su esencia de manera expresiva.
 </p>
 
@@ -438,6 +395,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_8.btn"
 >
 Ver proyecto
 </a>
@@ -448,7 +406,7 @@ Ver proyecto
 <!-- PROYECTO 8 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo4.jpg"
 alt="Two Time Tribute animación inspirada en la canción Two Time de Jack Stauber"
 loading="lazy"
@@ -459,15 +417,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="gallery.card_9.tag">
 Animación
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_9.title">
 Two Time Tribute
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_9.desc">
 Proyecto de animación inspirado en la canción "Two Time" de Jack Stauber. Se desarrolló una pieza visual que traduce el ritmo y la estética peculiar de la canción en una narrativa animada, destacando su energía, estilo y carácter expresivo.
 </p>
 
@@ -477,6 +435,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_9.btn"
 >
 Ver proyecto
 </a>
@@ -486,7 +445,7 @@ Ver proyecto
 <!-- PROYECTO 9 -->
 <article class="trabajo-card branding web" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo6.jpg"
 alt="BrandBook Sergio's Life identidad visual diseño de logo y branding"
 loading="lazy"
@@ -497,15 +456,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="gallery.card_10.tag">
 Branding / Identidad Visual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_10.title">
 BrandBook: Sergio's Life
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_10.desc">
 Desarrollo de identidad visual personal a través de la creación de un brandbook completo. El proyecto incluye diseño de logotipo, construcción de sistema gráfico, definición de paleta cromática, tipografías y lineamientos de uso para garantizar coherencia en la comunicación visual de la marca.
 </p>
 
@@ -515,6 +474,7 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_10.btn"
 >
 Ver proyecto
 </a>
@@ -524,7 +484,7 @@ Ver proyecto
 <!-- PROYECTO 10 -->
 <article class="trabajo-card ilustracion" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo8.jpg"
 alt="Bogotá Horror Film Festival diseño de póster cine de terror Colombia"
 loading="lazy"
@@ -535,15 +495,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="gallery.card_11.tag">
 Diseño de Póster / Ilustración
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_11.title">
 Bogotá Horror Film Festival
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_11.desc">
 Diseño de póster inspirado en la identidad del Bogotá Horror Film Festival, enfocado en capturar la esencia del cine de terror y su impacto en Latinoamérica. La propuesta visual busca transmitir una atmósfera inquietante y atractiva, alineada con la misión del festival de promover y posicionar el género a nivel cultural.
 </p>
 
@@ -553,6 +513,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_11.btn"
 >
 Ver proyecto
 </a>
@@ -562,7 +523,7 @@ Ver proyecto
 <!-- PROYECTO 11 -->
 <article class="trabajo-card personaje" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo9.jpg"
 alt="C y N personajes Cartoon Network diseño de personajes para marcas"
 loading="lazy"
@@ -573,15 +534,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="gallery.card_12.tag">
 Diseño de Personajes / Branding
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_12.title">
 C y N: Embajadores Animados
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_12.desc">
 Diseño de personajes para marca inspirado en la identidad de Cartoon Network. C y N representan dos personalidades opuestas pero complementarias, creadas para reflejar la esencia visual y narrativa del canal. El proyecto explora la construcción de personajes aplicados a branding, destacando creatividad, expresividad y coherencia estética.
 </p>
 
@@ -591,6 +552,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_12.btn"
 >
 Ver proyecto
 </a>
@@ -600,7 +562,7 @@ Ver proyecto
 <!-- PROYECTO 12 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo10.jpg"
 alt="Principios de la animación ejercicios 2D frame a frame Photoshop"
 loading="lazy"
@@ -611,15 +573,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="gallery.card_13.tag">
 Animación 2D
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_13.title">
 Principios de la Animación
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_13.desc">
 Ejercicios de animación 2D desarrollados en Photoshop mediante técnica frame a frame a 10 fps. El proyecto explora los principios fundamentales de la animación, aplicando conceptos clave como timing, squash & stretch y anticipación para dar vida a movimientos expresivos.
 </p>
 
@@ -629,6 +591,7 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_13.btn"
 >
 Ver proyecto
 </a>
@@ -639,7 +602,7 @@ Ver proyecto
 <!-- PROYECTO 13 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo11.jpg"
 alt="Stop motion Alicia en el País de las Maravillas animación con cartas"
 loading="lazy"
@@ -650,15 +613,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="gallery.card_14.tag">
 Animación / Stop Motion
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_14.title">
 Stop Motion: Alice in the Wonderland
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_14.desc">
 Proyecto de animación stop motion inspirado en "Alicia en el País de las Maravillas". Se diseñaron personajes y elementos gráficos en Adobe Illustrator, posteriormente recortados para su uso como títeres físicos. La pieza reinterpreta una escena icónica mediante una animación breve que captura su esencia mágica y nostálgica.
 </p>
 
@@ -668,6 +631,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_14.btn"
 >
 Ver proyecto
 </a>
@@ -678,7 +642,7 @@ Ver proyecto
 <!-- PROYECTO 14 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/trabajo12.jpg"
 alt="Ciclo de caminado Bellota animación 2D After Effects Illustrator"
 loading="lazy"
@@ -689,15 +653,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="gallery.card_15.tag">
 Animación 2D
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_15.title">
 Ciclo de Caminado - Bellota
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_15.desc">
 Proyecto de animación 2D enfocado en la creación de un ciclo de caminado del personaje Bellota. Se trabajó con herramientas mixtas, desarrollando el diseño y adaptación del entorno en Adobe Illustrator y la animación en After Effects, explorando movimiento, ritmo y construcción de acciones poco habituales del personaje.
 </p>
 
@@ -707,6 +671,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_15.btn"
 >
 Ver proyecto
 </a>
@@ -717,7 +682,7 @@ Ver proyecto
 <!-- PROYECTO 15 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/pokemondance.png"
 alt="colaboración 100 artistas animación pokemondance gix art"
 loading="lazy"
@@ -728,15 +693,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="gallery.card_16.tag">
 Animación / Colaboración
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_16.title">
 PokemoDance Collab
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_16.desc">
 Participación en una colaboración artística junto a más de 100 artistas, organizada por Gix_art. El proyecto se inspira en la tendencia PokemoDance, donde cada participante aporta su estilo visual en una pieza animada, explorando movimiento, ritmo y creatividad colectiva dentro de un formato colaborativo.
 </p>
 
@@ -746,6 +711,7 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_16.btn"
 >
 Ver proyecto
 </a>
@@ -755,7 +721,7 @@ Ver proyecto
 <!-- PROYECTO 16 -->
 <article class="trabajo-card animacion mixed" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/musica y vida.png"
 alt="Animación 2D documental Música y vida proyecto audiovisual experimental"
 loading="lazy"
@@ -766,15 +732,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="gallery.card_17.tag">
 Animación 2D / Producción Audiovisual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_17.title">
 Música y Vida
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_17.desc">
 Participación como animador 2D en el documental experimental "Música y Vida", un proyecto que explora el impacto de la música a través de una propuesta visual y narrativa. La producción ha sido seleccionada en distintos espacios, integrando animación como recurso para enriquecer la experiencia audiovisual.
 </p>
 
@@ -784,6 +750,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_17.btn"
 >
 Ver proyecto
 </a>
@@ -794,7 +761,7 @@ Ver proyecto
 <!-- PROYECTO 17 -->
 <article class="trabajo-card branding web" itemscope itemtype="https://schema.org/CreativeWork">
 
-<img 
+<img loading="lazy" 
 src="../Recursos/exploracion/Digitalfest.png"
 alt="Poster promocional Digital Fest 3.0 diseñado para Metajuego y utilizado por Boyacá Radio"
 loading="lazy"
@@ -805,15 +772,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="gallery.card_18.tag">
 Diseño Gráfico
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="gallery.card_18.title">
 Poster Digital Fest 3.0
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="gallery.card_18.desc">
 Diseño de pieza promocional realizada para Metajuego con motivo del evento Digital Fest 3.0 en Tunja. El afiche fue creado para comunicar la identidad visual del festival, integrando elementos de tecnología, videojuegos y cultura geek. Posteriormente, la pieza fue utilizada por Boyacá Radio como imagen principal en la publicación oficial que anunció el evento al público.
 </p>
 
@@ -823,6 +790,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="gallery.card_18.btn"
 >
 Ver publicación
 </a>
@@ -835,81 +803,22 @@ Ver publicación
 </section>
 
     
-<!-- Footer -->
-<footer class="site-footer" role="contentinfo">
-  
-    <!-- Logo / Marca -->
-<div class="footer-brand">
-    <a href="../index.html" aria-label="Ir al inicio">
-        <img 
-            src="../Recursos/logo.png" 
-            alt="Sergio's Life – Ilustración, Animación y Multimedia"
-            width="100"
-            height="100"
-            loading="lazy"
-        >
-    </a>
-</div>
+</main>
+<div id="footer-placeholder"></div>
 
-  
-    <!-- Navegación social -->
-    <nav class="footer-social" aria-label="Redes sociales de Sergio's Life">
-      <ul>
-        <li>
-          <a href="https://www.instagram.com/sergio.s_life_" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Sergio's Life">
-            <i class="fab fa-instagram"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.linkedin.com/in/sergios-life/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Sergio's Life">
-            <i class="fab fa-linkedin"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.behance.net/sergioslife" target="_blank" rel="noopener noreferrer" aria-label="Behance de Sergio's Life">
-            <i class="fab fa-behance"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" aria-label="YouTube de Sergio's Life">
-            <i class="fab fa-youtube"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://vimeo.com/user179129330" target="_blank" rel="noopener noreferrer" aria-label="Vimeo de Sergio's Life">
-            <i class="fab fa-vimeo"></i>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  
-    <!-- Información legal -->
-    <div class="footer-legal">
-      <p>
-        &copy; <span id="year"></span> Sergio's Life. Todos los derechos reservados.
-      </p>
-    </div>
-  
-    <!-- Contacto -->
-    <address class="footer-contact">
-      <a href="mailto:sergioalife@gmail.com" aria-label="Enviar correo a Sergio's Life">
-        <i class="fas fa-envelope"></i> sergioalife@gmail.com
-      </a>
-    </address>
-  
-  </footer>
-  
   <div class="line"></div>
   
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-  
   <script src="../js/main.js" defer></script>
+  <script src="../js/i18n.js"></script>
   <script src="../js/includes.js"></script>
   <script src="../js/typewriter.js"></script>
   <script async src="//www.instagram.com/embed.js"></script>
 
+  <!-- Language Switcher -->
+  <div class="lang-switcher" aria-label="Language selector">
+    <button class="lang-btn active" data-lang="es" aria-label="Español" onclick="window.setLanguage('es')">ES</button>
+    <button class="lang-btn" data-lang="en" aria-label="English" onclick="window.setLanguage('en')">EN</button>
+  </div>
 
 </body>
 </html>

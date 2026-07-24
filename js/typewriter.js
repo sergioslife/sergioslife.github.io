@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!textElement) return;
 
-    const texts = ["HELLO!!", "YO SOY"];
+    const defaultTexts = ["HELLO!!", "YO SOY"];
     let textIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
@@ -12,8 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const deletingSpeed = 60;
     const delayBetweenTexts = 1500;
 
+    function getTexts() {
+        if (window.typewriterTranslations && document.documentElement.lang) {
+            return window.typewriterTranslations[document.documentElement.lang] || defaultTexts;
+        }
+        return defaultTexts;
+    }
+
     function typeEffect() {
-        const currentText = texts[textIndex];
+        const texts = getTexts();
+        const currentText = texts[textIndex % texts.length];
 
         if (!isDeleting) {
             textElement.textContent = currentText.substring(0, charIndex + 1);

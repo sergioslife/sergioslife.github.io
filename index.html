@@ -11,29 +11,21 @@
         <meta name="keywords" content="animador 2D, ilustrador de personajes, animación digital, narrativa visual, portafolio creativo, Sergio Andrés, Sergio's Life">
         <meta name="author" content="Sergio Andrés Acevedo Mendivelso">
         <meta name="robots" content="index, follow">
-        <link rel="canonical" href="https://sergioslife.github.io/">
+    <link rel="canonical" href="https://sergioslife.github.io/">
     
-        <!-- Verificación Google -->
-        <meta name="google-site-verification" content="61DiDm6vonCszSMPL7YmzS-bCnXB_57mQJd4Bk8z6TI">
+    <!-- SEO extra -->
+    <meta name="theme-color" content="#000000">
     
-       <!-- Favicon -->
-        <link rel="icon" href="favicon.ico" sizes="any">
-
-        <link rel="icon" type="image/svg+xml" href="favicon.svg" media="(prefers-color-scheme: light)">
-        <link rel="icon" type="image/svg+xml" href="favicon-dark.svg" media="(prefers-color-scheme: dark)">
-
-        <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-        <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
-
+    <!-- Fuentes con font-display swap explícito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
-        <!-- Fuentes -->
-        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-        <!-- Iconos -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-        <!-- Estilos -->
-        <link rel="stylesheet" href="Css/Style.css">
+    <!-- Estilos -->
+    <link rel="stylesheet" href="Css/Style.css">
     </head>
     
 <!-- Google tag (gtag.js) -->
@@ -46,62 +38,8 @@
   gtag('config', 'G-M8HS9F12SG');
 </script>
 <body>
-    <nav class="navigation">
-    <!-- Lado izquierdo -->
-    <div class="left-menu">
-        <!-- Logo -->
-        <div class="logo">
-            <a href="index.html" aria-label="Ir al inicio">
-                <img 
-                    src="Recursos/logo.png" 
-                    alt="Sergio's Life – Ilustración y Animación"
-                    width="50"
-                    height="50"
-                >
-            </a>
-        </div>
-
-        <!-- Enlaces principales -->
-        <ul class="nav-links" id="nav-links">
-            <li>
-                <a href="#inicio" class="inicio" data-i18n="nav.home">
-                    Inicio
-                </a>
-            </li>
-            <li>
-                <a href="#sobre-mi" class="sobre-mi" data-i18n="nav.about">
-                    Sobre Mi
-                </a>
-            </li>
-            <li>
-                <a href="../Page/galeria.html" class="trabajos" data-i18n="nav.work">
-                    Trabajos
-                </a>
-            </li>
-               
-        </ul>
-    </div>
-
-    <!-- Lado derecho -->
-    <div class="right-menu">
-        <!-- Contacto -->
-        <ul class="contact-link">
-            <li>
-                <a href="#contacto" class="contacto" data-i18n="nav.contact">
-                    Contacto
-                </a>
-            </li>
-        </ul>
-
-        <!-- Menú hamburguesa (mobile) -->
-        <div class="menu-icon" id="menu-icon" aria-label="Abrir menú">
-            <i class="fas fa-bars"></i>
-        </div>
-    </div>
-</nav>
-
-    
-    
+    <div id="nav-placeholder"></div>
+    <main id="main-content">
   <!-- Sección principal de inicio -->
 <section id="inicio" class="container seccion-inicio">
     <div class="content">
@@ -113,14 +51,14 @@
 
         <!-- Descargar CV -->
         <a href="Recursos/PDF/CV_Sergio_Andres_Acevedo_Mendivelso_ 2026.pdf" download="CV_SERGIO_231115.pdf">
-            <button class="about-button descargar-cv">
+            <button class="about-button descargar-cv" data-i18n="hero.download_cv">
                 DESCARGAR CV
             </button>
         </a>
 
         <!-- Indicador de scroll -->
         <a href="#sobre-mi" class="scroll-indicator" aria-label="Bajar a la siguiente sección">
-            <span></span>
+            <span data-i18n="hero.scroll_indicator"></span>
         </a>
     </div>
 </section>
@@ -145,25 +83,25 @@
 
         <!-- Contenido textual -->
         <article class="about-text">
-            <h2 id="about-title" class="about-title">
+            <h2 id="about-title" class="about-title" data-i18n="about.title">
                 Sobre Mí
             </h2>
 
-            <p class="about-description">
-                Soy <strong>Sergio Andrés</strong>, <strong>animador 2D</strong> e 
-                <strong>ilustrador profesional</strong> con formación en 
-                <strong>Ingeniería en Multimedia y Sistemas</strong>. Me especializo en 
-                <strong>diseño de personajes</strong>, <strong>animación digital</strong> y 
-                <strong>narrativa visual</strong>, enfocado en la creación de proyectos para 
-                <strong>series animadas</strong>, <strong>películas animadas</strong> y 
+            <p class="about-description" data-i18n="about.desc_1">
+                Soy <strong>Sergio Andrés</strong>, <strong>animador 2D</strong> e
+                <strong>ilustrador profesional</strong> con formación en
+                <strong>Ingeniería en Multimedia y Sistemas</strong>. Me especializo en
+                <strong>diseño de personajes</strong>, <strong>animación digital</strong> y
+                <strong>narrativa visual</strong>, enfocado en la creación de proyectos para
+                <strong>series animadas</strong>, <strong>películas animadas</strong> y
                 <strong>contenidos audiovisuales</strong>.
             </p>
 
-            <p class="about-description">
-                Me interesa construir experiencias visuales con <strong>identidad artística</strong>, 
-                explorando estilos que van desde lo <strong>cartoon</strong> hasta lo 
-                <strong>oscuro y experimental</strong>. Disfruto llevar ideas desde el 
-                <strong>concepto inicial</strong> hasta su <strong>desarrollo visual</strong>, 
+            <p class="about-description" data-i18n="about.desc_2">
+                Me interesa construir experiencias visuales con <strong>identidad artística</strong>,
+                explorando estilos que van desde lo <strong>cartoon</strong> hasta lo
+                <strong>oscuro y experimental</strong>. Disfruto llevar ideas desde el
+                <strong>concepto inicial</strong> hasta su <strong>desarrollo visual</strong>,
                 combinando creatividad, técnica y <strong>storytelling visual</strong>.
             </p>
 
@@ -172,8 +110,9 @@
                 <button 
                     class="about-button" 
                     id="verMasButton" 
+                    data-i18n="about.ver_mas"
                     aria-expanded="false"
-                    aria-controls="more-about"
+                    aria-controls="additional-sections"
                 >
                     Ver más sobre mi
                 </button>
@@ -189,7 +128,7 @@
     class="qualification section bd-container hidden"
     aria-labelledby="more-about-title"
 >
-    <h2 id="more-about-title" class="trabajos-title">
+    <h2 id="more-about-title" class="trabajos-title" data-i18n="more.title">
         Más sobre mí
     </h2>
 
@@ -197,7 +136,7 @@
 
         <!-- ================= EXPERIENCIA LABORAL ================= -->
         <section class="qualification__content experience-box" aria-labelledby="experience-title">
-            <h3 id="experience-title" class="qualification__title">
+            <h3 id="experience-title" class="qualification__title" data-i18n="exp.title">
                 Experiencia laboral en animación, multimedia y marketing digital
             </h3>
 
@@ -214,34 +153,35 @@
         >
 
         <div class="experience-company-info">
-            <h4 class="experience-role">Docente de Diseño Gráfico e Ilustración</h4>
+            <h4 class="experience-role" data-i18n="exp.cotel.role">Docente de Diseño Gráfico e Ilustración</h4>
 
             <a href="https://www.instagram.com/cotel_tunja_edu/?hl=es-la"
                target="_blank"
                rel="noopener noreferrer"
-               class="experience-company">
+               class="experience-company"
+               data-i18n="exp.cotel.company">
                 Instituto Técnico Cotel - Tunja
             </a>
         </div>
 
     </div>
 
-    <time class="experience-date" datetime="2026-04">
+    <time class="experience-date" datetime="2026-04" data-i18n="exp.cotel.date">
         abr. 2026 – Actualmente
     </time>
 
-    <small class="experience-type">
+    <small class="experience-type" data-i18n="exp.cotel.type">
         Docencia presencial
     </small>
 
-    <ul class="experience-tasks">
+    <ul class="experience-tasks" data-i18n="exp.cotel.tasks">
         <li>Planeación y desarrollo de clases para programas de Diseño Gráfico</li>
         <li>Formación en ilustración tradicional, ilustración digital e ilustración vectorial</li>
         <li>Enseñanza de diseño y producción de piezas gráficas para medios impresos y digitales</li>
         <li>Acompañamiento académico y desarrollo de proyectos creativos estudiantiles</li>
     </ul>
 
-    <small class="experience-skills">
+    <small class="experience-skills" data-i18n="exp.cotel.skills">
         Aptitudes: Docencia · Ilustración tradicional · Ilustración digital · Ilustración vectorial · Adobe Illustrator · Diseño gráfico · Comunicación visual
     </small>
 </article>
@@ -258,34 +198,35 @@
         >
 
         <div class="experience-company-info">
-            <h4 class="experience-role">
+            <h4 class="experience-role" data-i18n="exp.civiltronic.role">
                 Gestor multimedia y medios digitales
             </h4>
 
             <a href="https://civiltronic.com"
                target="_blank"
                rel="noopener noreferrer"
-               class="experience-company">
+               class="experience-company"
+               data-i18n="exp.civiltronic.company">
                 Civiltronic
             </a>
         </div>
 
     </div>
-    <time class="experience-date" datetime="2025-10">
+    <time class="experience-date" datetime="2025-10" data-i18n="exp.civiltronic.date">
         oct. 2025 – ene. 2026 · 4 meses
     </time>
 
-    <small class="experience-type">
+    <small class="experience-type" data-i18n="exp.civiltronic.type">
         Contrato de prácticas (3 meses) · Freelancer (ene. 2026)
     </small>
 
-    <ul class="experience-tasks">
+    <ul class="experience-tasks" data-i18n="exp.civiltronic.tasks">
         <li>Gestión de contenidos multimedia para plataformas digitales</li>
         <li>Diseño gráfico y material visual corporativo</li>
         <li>Optimización de contenido web con enfoque en experiencia de usuario</li>
     </ul>
 
-    <small class="experience-skills">
+    <small class="experience-skills" data-i18n="exp.civiltronic.skills">
         Aptitudes: Gestión de contenidos digitales · Diseño gráfico · Producción multimedia · Diseño web · UX/UI · Adobe Creative Suite · Comunicación visual
     </small>
 </article>
@@ -303,33 +244,34 @@
         >
 
         <div class="experience-company-info">
-            <h4 class="experience-role">
+            <h4 class="experience-role" data-i18n="exp.metajuego.role">
                 Chief Marketing Officer (CMO)
             </h4>
 
             <a href="https://metajuego.com.co/"
                target="_blank"
                rel="noopener noreferrer"
-               class="experience-company">
+               class="experience-company"
+               data-i18n="exp.metajuego.company">
                 Metajuego Company
             </a>
         </div>
 
     </div>
 
-    <time class="experience-date" datetime="2025-03">
+    <time class="experience-date" datetime="2025-03" data-i18n="exp.metajuego.date">
         mar. 2025 – Actualmente
     </time>
 
-    <small class="experience-type">Autónomo · En remoto</small>
+    <small class="experience-type" data-i18n="exp.metajuego.type">Autónomo · En remoto</small>
 
-    <ul class="experience-tasks">
+    <ul class="experience-tasks" data-i18n="exp.metajuego.tasks">
         <li>Dirección creativa y estrategia de marketing digital</li>
         <li>Gestión de marca y campañas en redes sociales</li>
         <li>Producción de contenido visual y audiovisual</li>
     </ul>
 
-    <small class="experience-skills">
+    <small class="experience-skills" data-i18n="exp.metajuego.skills">
         Aptitudes: Marketing digital · Dirección creativa · Branding · Gestión de redes sociales · Diseño gráfico · Producción audiovisual · Creación de contenido · Estrategia de marca
     </small>
 </article>
@@ -346,14 +288,15 @@
         >
 
         <div class="experience-company-info">
-            <h4 class="experience-role">
+            <h4 class="experience-role" data-i18n="exp.marpe.role">
                 Desarrollador web
             </h4>
 
             <a href="https://marpecosmetics.com"
                target="_blank"
                rel="noopener noreferrer"
-               class="experience-company">
+               class="experience-company"
+               data-i18n="exp.marpe.company">
                 Marpe Cosmetics
             </a>
         </div>
@@ -361,19 +304,19 @@
     </div>
 
 
-    <time class="experience-date" datetime="2025-02">
+    <time class="experience-date" datetime="2025-02" data-i18n="exp.marpe.date">
         feb. 2025 – jun. 2025 · 5 meses
     </time>
 
-    <small class="experience-type">Contrato de prácticas</small>
+    <small class="experience-type" data-i18n="exp.marpe.type">Contrato de prácticas</small>
 
-    <ul class="experience-tasks">
+    <ul class="experience-tasks" data-i18n="exp.marpe.tasks">
         <li>Desarrollo y mantenimiento de sitio web corporativo</li>
         <li>Implementación de diseño responsive</li>
         <li>Optimización visual y estructural del contenido</li>
     </ul>
 
-    <small class="experience-skills">
+    <small class="experience-skills" data-i18n="exp.marpe.skills">
         Aptitudes: Desarrollo web · HTML5 · CSS3 · JavaScript · Diseño responsive · UX/UI · Optimización web · Gestión de contenido digital
     </small>
 </article>
@@ -390,14 +333,15 @@
         >
 
         <div class="experience-company-info">
-            <h4 class="experience-role">
+            <h4 class="experience-role" data-i18n="exp.wiim.role">
                 Animador 2D
             </h4>
 
             <a href="https://www.instagram.com/prod_wiiim/"
                target="_blank"
                rel="noopener noreferrer"
-               class="experience-company">
+               class="experience-company"
+               data-i18n="exp.wiim.company">
                 Producciones Wiiim
             </a>
         </div>
@@ -412,19 +356,19 @@
 
     </div>
 
-    <time class="experience-date" datetime="2023-11">
+    <time class="experience-date" datetime="2023-11" data-i18n="exp.wiim.date">
         nov. 2023 – ene. 2024 · 3 meses
     </time>
 
-    <small class="experience-type">Contrato temporal · Híbrido</small>
+    <small class="experience-type" data-i18n="exp.wiim.type">Contrato temporal · Híbrido</small>
 
-    <ul class="experience-tasks">
+    <ul class="experience-tasks" data-i18n="exp.wiim.tasks">
         <li>Animación 2D de personajes</li>
         <li>Producción audiovisual</li>
         <li>Uso de Adobe Photoshop y pipelines de animación</li>
     </ul>
 
-    <small class="experience-skills">
+    <small class="experience-skills" data-i18n="exp.wiim.skills">
         Aptitudes: Animación 2D · Diseño de personajes · Storytelling visual · Producción audiovisual · Adobe Photoshop · Ilustración digital · Trabajo en equipo · Pipeline de animación
     </small>
 </article>
@@ -432,7 +376,7 @@
 
         <!-- ================= EDUCACIÓN ================= -->
         <section class="qualification__content education-box" aria-labelledby="education-title">
-            <h3 id="education-title" class="qualification__title">
+            <h3 id="education-title" class="qualification__title" data-i18n="edu.title">
                 Formación académica en ingeniería y multimedia
             </h3>
 
@@ -448,8 +392,8 @@
         >
 
         <div>
-            <h4 class="education-degree">Ingeniería de Sistemas</h4>
-            <span class="education-institution">Universidad de Boyacá</span>
+            <h4 class="education-degree" data-i18n="edu.udb1.degree">Ingeniería de Sistemas</h4>
+            <span class="education-institution" data-i18n="edu.udb1.school">Universidad de Boyacá</span>
         </div>
 
     </div>
@@ -458,7 +402,7 @@
         2018 – Actualmente
     </time>
 
-                <ul class="education-focus">
+                <ul class="education-focus" data-i18n="edu.udb1.focus">
                     <li>Programación y lógica computacional</li>
                     <li>Desarrollo de software y estructuras de datos</li>
                     <li>Gestión de proyectos tecnológicos</li>
@@ -478,14 +422,14 @@
         >
 
         <div>
-            <h4 class="education-degree">Ingeniería en Multimedia</h4>
-            <span class="education-institution">Universidad de Boyacá</span>
+            <h4 class="education-degree" data-i18n="edu.udb2.degree">Ingeniería en Multimedia</h4>
+            <span class="education-institution" data-i18n="edu.udb2.school">Universidad de Boyacá</span>
         </div>
 
     </div>
                 <time class="education-date" datetime="2021-01">2021 – Actualmente</time>
 
-                <ul class="education-focus">
+                <ul class="education-focus" data-i18n="edu.udb2.focus">
                     <li>Animación 2D y motion graphics</li>
                     <li>Ilustración digital y diseño de personajes</li>
                     <li>Narrativa visual aplicada</li>
@@ -496,7 +440,7 @@
 
             <!-- Certificaciones destacadas -->
            <div class="qualification__content certification-box">
-    <h3 class="qualification__title">Certificaciones Destacadas</h3>
+    <h3 class="qualification__title" data-i18n="cert.title">Certificaciones Destacadas</h3>
 
     <div class="certifications__container">
         
@@ -504,9 +448,9 @@
             <div class="certifications__img-wrapper">
              <img src="Recursos/certificados/Competencias digitales para profesionales.png" alt="Google Actívate" class="certifications__img">
             </div>
-             <h3 class="certifications__title">Competencias Digitales para Profesionales</h3>
-            <p class="certifications__meta">Google Actívate · nov. 2023</p>
-            <p class="certifications__id">ID 224040559</p>
+             <h3 class="certifications__title" data-i18n="cert.1.title">Competencias Digitales para Profesionales</h3>
+            <p class="certifications__meta" data-i18n="cert.1.meta">Google Actívate · nov. 2023</p>
+            <p class="certifications__id" data-i18n="cert.1.id">ID 224040559</p>
         </div>
 
         <div class="certifications__card">
@@ -516,11 +460,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.2.title">
         Nominación – Mejor Ilustración
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.2.meta">
         CEMM Awards · Universidad de Boyacá · sep. 2023
     </p>
 </div>
@@ -532,11 +476,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.3.title">
         Nominación – Mejor creación de personaje con técnicas digitales
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.3.meta">
         CEMM Awards · Universidad de Boyacá · sep. 2023
     </p>
 </div>
@@ -545,16 +489,16 @@
             <div class="certifications__img-wrapper">
                 <img src="Recursos/certificados/Introducción_a_la_ilustración_digital.png" alt="Crehana" class="certifications__img">
             </div>
-                <h3 class="certifications__title">Introducción a la Ilustración Digital</h3>
-            <p class="certifications__meta">Crehana · sept. 2022</p>
+                <h3 class="certifications__title" data-i18n="cert.4.title">Introducción a la Ilustración Digital</h3>
+            <p class="certifications__meta" data-i18n="cert.4.meta">Crehana · sept. 2022</p>
         </div>
 
         <div class="certifications__card">
             <div class="certifications__img-wrapper">
                 <img src="Recursos/certificados/Dibujo a Lápiz.png" alt="Crehana" class="certifications__img">
             </div>
-                <h3 class="certifications__title">Dibujo a Lápiz: De Principiante a Experto</h3>
-            <p class="certifications__meta">Crehana · jun. 2022</p>
+                <h3 class="certifications__title" data-i18n="cert.5.title">Dibujo a Lápiz: De Principiante a Experto</h3>
+            <p class="certifications__meta" data-i18n="cert.5.meta">Crehana · jun. 2022</p>
         </div>
 
 
@@ -565,11 +509,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.6.title">
         Introducción al guión cinematográfico
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.6.meta">
         Crehana · nov. 2022
     </p>
 </div>
@@ -581,11 +525,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.7.title">
         Protege tu Negocio: Ciberseguridad en el Teletrabajo
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.7.meta">
         Google Activate · ene. 2022
     </p>
 </div>
@@ -597,11 +541,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.8.title">
         Digitaliza paso a paso tu negocio con herramientas de Google
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.8.meta">
         Google Activate · ene. 2022
     </p>
 </div>
@@ -610,8 +554,8 @@
             <div class="certifications__img-wrapper">
                 <img src="Recursos/certificados/Fundamentos del Diseño Grafico.png" alt="Crehana" class="certifications__img">
             </div>
-                <h3 class="certifications__title">Fundamentos del Diseño Gráfico</h3>
-            <p class="certifications__meta">EducacionIT · dic. 2021</p>
+                <h3 class="certifications__title" data-i18n="cert.9.title">Fundamentos del Diseño Gráfico</h3>
+            <p class="certifications__meta" data-i18n="cert.9.meta">EducacionIT · dic. 2021</p>
         </div>
 
         <div class="certifications__card">
@@ -621,11 +565,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.10.title">
         Expositor – XXVI Feria Empresarial
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.10.meta">
         Universidad de Boyacá · sep. 2019
     </p>
 </div>
@@ -637,11 +581,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.11.title">
         Seminario Internacional de Ciencia, Tecnología e Innovación
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.11.meta">
         Universidad de Boyacá · may. 2018
     </p>
 </div>
@@ -653,11 +597,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.12.title">
         Certificate of Participation – 10th English Drama Contest
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.12.meta">
         Institución Educativa Julius Sieber & Education Secretariat, Tunja · oct. 2017
     </p>
 </div>
@@ -671,11 +615,11 @@
              class="certifications__img">
     </div>
 
-    <h3 class="certifications__title">
+    <h3 class="certifications__title" data-i18n="cert.13.title">
         The Hour of Code
     </h3>
 
-    <p class="certifications__meta">
+    <p class="certifications__meta" data-i18n="cert.13.meta">
         Code.org · Ciencias de la Computación
     </p>
 </div>
@@ -692,6 +636,7 @@
     <button 
         class="about-button secondary hidden"
         id="cerrarSobreMi"
+        data-i18n="about.cerrar"
         aria-label="Cerrar sección sobre mí y volver al inicio"
     >
         Volver arriba
@@ -707,7 +652,7 @@
 <!-- ================= PROYECTOS ================= -->
 <section id="trabajos" class="trabajos-section">
 
-<h2 class="trabajos-title">Trabajos</h2>
+<h2 class="trabajos-title" data-i18n="work.title">Trabajos</h2>
 
 <div class="carousel-wrapper">
 
@@ -730,15 +675,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag amarillo" itemprop="genre">
+<span class="trabajo-tag amarillo" itemprop="genre" data-i18n="work.card_1.tag">
 Animación · Mixed Media
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="work.card_1.title">
 Al borde del Misterio
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="work.card_1.desc">
 Proyecto de animación 2D y mixed media con atmósfera oscura y enfoque en narrativa visual cinematográfica.
 </p>
 
@@ -748,12 +693,15 @@ class="trabajo-btn amarillo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="work.card_1.btn"
 >
 Ver proyecto
 </a>
 
 </div>
 </article>
+
+
 
 
 
@@ -771,15 +719,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="work.card_2.tag">
 Diseño de Personaje
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="work.card_2.title">
 Un Mundo Desconocido
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="work.card_2.desc">
 Proyecto de desarrollo visual enfocado en diseño de personajes y construcción de un universo fantástico animado.
 </p>
 
@@ -789,6 +737,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="work.card_2.btn"
 >
 Ver proyecto
 </a>
@@ -812,15 +761,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag rosa" itemprop="genre">
+<span class="trabajo-tag rosa" itemprop="genre" data-i18n="work.card_3.tag">
 Narrativa Visual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="work.card_3.title">
 Made in Hell
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="work.card_3.desc">
 Proyecto experimental enfocado en dirección artística, atmósfera oscura y storytelling visual.
 </p>
 
@@ -830,6 +779,7 @@ class="trabajo-btn rojo"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="work.card_3.btn"
 >
 Ver proyecto
 </a>
@@ -853,15 +803,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="work.card_4.tag">
 Branding · Web Design
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="work.card_4.title">
 Civiltronic Branding & Web
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="work.card_4.desc">
 Rediseño de identidad visual y propuesta de interfaz web para mejorar la presencia digital de la empresa.
 </p>
 
@@ -871,6 +821,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="work.card_4.btn"
 >
 Ver proyecto
 </a>
@@ -894,15 +845,15 @@ itemprop="image"
 
 <div class="trabajo-content">
 
-<span class="trabajo-tag verde" itemprop="genre">
+<span class="trabajo-tag verde" itemprop="genre" data-i18n="work.card_5.tag">
 Ilustración Conceptual
 </span>
 
-<h3 itemprop="name">
+<h3 itemprop="name" data-i18n="work.card_5.title">
 Outside Devastation
 </h3>
 
-<p itemprop="description">
+<p itemprop="description" data-i18n="work.card_5.desc">
 Ilustración conceptual postapocalíptica centrada en diseño de ambiente y narrativa visual.
 </p>
 
@@ -912,6 +863,7 @@ class="trabajo-btn verde"
 target="_blank"
 rel="noopener noreferrer"
 itemprop="url"
+data-i18n="work.card_5.btn"
 >
 Ver proyecto
 </a>
@@ -951,18 +903,18 @@ ver más trabajos
     aria-labelledby="contact-title"
 >
     <!-- Título principal -->
-    <h2 id="contact-title" class="contact-title">
+    <h2 id="contact-title" class="contact-title" data-i18n="contact.title">
         Contacto y redes profesionales de Sergio Andrés
     </h2>
 
     <!-- Descripción SEO -->
-    <p class="contact-text">
+    <p class="contact-text" data-i18n="contact.desc">
         Ilustración · Animación 2D · Video · Contenido creativo y multimedia
     </p>
 
     <!-- ================= ARTE ================= -->
     <section class="social-group" aria-labelledby="art-social-title">
-        <h3 id="art-social-title" class="social-category">
+        <h3 id="art-social-title" class="social-category" data-i18n="contact.art.title">
             Arte, ilustración y proyectos creativos
         </h3>
 
@@ -975,8 +927,8 @@ ver más trabajos
                 aria-label="Instagram de arte e ilustración de Sergio Andrés"
             >
                 <div class="icon"><i class="fa-brands fa-instagram"></i></div>
-                <h4>Instagram · Arte</h4>
-                <p>Ilustraciones, procesos creativos y piezas finales</p>
+                <h4 data-i18n="contact.art.instagram_title">Instagram · Arte</h4>
+                <p data-i18n="contact.art.instagram_desc">Ilustraciones, procesos creativos y piezas finales</p>
             </a>
 
             <a 
@@ -987,8 +939,8 @@ ver más trabajos
                 aria-label="Portafolio en Behance de Sergio Andrés"
             >
                 <div class="icon"><i class="fa-brands fa-behance"></i></div>
-                <h4>Behance</h4>
-                <p>Casos de estudio y proyectos completos</p>
+                <h4 data-i18n="contact.art.behance_title">Behance</h4>
+                <p data-i18n="contact.art.behance_desc">Casos de estudio y proyectos completos</p>
             </a>
 
             <a 
@@ -999,15 +951,15 @@ ver más trabajos
                 aria-label="Portafolio profesional en ArtStation"
             >
                 <div class="icon"><i class="fa-brands fa-artstation"></i></div>
-                <h4>ArtStation</h4>
-                <p>Portfolio profesional de ilustración y animación</p>
+                <h4 data-i18n="contact.art.artstation_title">ArtStation</h4>
+                <p data-i18n="contact.art.artstation_desc">Portfolio profesional de ilustración y animación</p>
             </a>
         </div>
     </section>
 
     <!-- ================= VIDEO ================= -->
     <section class="social-group" aria-labelledby="video-social-title">
-        <h3 id="video-social-title" class="social-category">
+        <h3 id="video-social-title" class="social-category" data-i18n="contact.video.title">
             Video, animación y motion graphics
         </h3>
 
@@ -1020,8 +972,8 @@ ver más trabajos
                 aria-label="Canal de YouTube de animación y proyectos de Sergio Andrés"
             >
                 <div class="icon"><i class="fa-brands fa-youtube"></i></div>
-                <h4>YouTube</h4>
-                <p>Animaciones, proyectos y contenido audiovisual</p>
+                <h4 data-i18n="contact.video.youtube_title">YouTube</h4>
+                <p data-i18n="contact.video.youtube_desc">Animaciones, proyectos y contenido audiovisual</p>
             </a>
 
             <a 
@@ -1032,8 +984,8 @@ ver más trabajos
                 aria-label="Vimeo profesional con reels y trabajos audiovisuales"
             >
                 <div class="icon"><i class="fa-brands fa-vimeo-v"></i></div>
-                <h4>Vimeo</h4>
-                <p>Reel profesional y trabajos audiovisuales</p>
+                <h4 data-i18n="contact.video.vimeo_title">Vimeo</h4>
+                <p data-i18n="contact.video.vimeo_desc">Reel profesional y trabajos audiovisuales</p>
             </a>
 
             <a 
@@ -1044,15 +996,15 @@ ver más trabajos
                 aria-label="TikTok con clips creativos y procesos de animación"
             >
                 <div class="icon"><i class="fa-brands fa-tiktok"></i></div>
-                <h4>TikTok</h4>
-                <p>Clips cortos, procesos creativos y tendencias</p>
+                <h4 data-i18n="contact.video.tiktok_title">TikTok</h4>
+                <p data-i18n="contact.video.tiktok_desc">Clips cortos, procesos creativos y tendencias</p>
             </a>
         </div>
     </section>
 
     <!-- ================= PROFESIONAL ================= -->
     <section class="social-group" aria-labelledby="professional-social-title">
-        <h3 id="professional-social-title" class="social-category">
+        <h3 id="professional-social-title" class="social-category" data-i18n="contact.prof.title">
             Contacto profesional y networking
         </h3>
 
@@ -1065,8 +1017,8 @@ ver más trabajos
                 aria-label="Perfil profesional de Sergio Andrés en LinkedIn"
             >
                 <div class="icon"><i class="fa-brands fa-linkedin-in"></i></div>
-                <h4>LinkedIn</h4>
-                <p>Perfil profesional, experiencia y proyectos</p>
+                <h4 data-i18n="contact.prof.linkedin_title">LinkedIn</h4>
+                <p data-i18n="contact.prof.linkedin_desc">Perfil profesional, experiencia y proyectos</p>
             </a>
 
             <a
@@ -1075,90 +1027,30 @@ ver más trabajos
                 aria-label="Enviar correo a Sergio Andrés para trabajos creativos"
             >
                 <div class="icon"><i class="fa-solid fa-envelope"></i></div>
-                <h4>Email</h4>
-                <p>Contacto directo para proyectos y colaboraciones</p>
+                <h4 data-i18n="contact.prof.email_title">Email</h4>
+                <p data-i18n="contact.prof.email_desc">Contacto directo para proyectos y colaboraciones</p>
             </a>
         </div>
     </section>
 </section>
 
 
+</main>
 
+<div id="footer-placeholder"></div>
 
-<!-- Footer -->
-<footer class="site-footer" role="contentinfo">
-  
-    <!-- Logo / Marca -->
-<div class="footer-brand">
-    <a href="index.html" aria-label="Ir al inicio">
-        <img 
-            src="Recursos/logo.png" 
-            alt="Sergio's Life – Ilustración, Animación y Multimedia"
-            width="100"
-            height="100"
-            loading="lazy"
-        >
-    </a>
-</div>
-
-  
-    <!-- Navegación social -->
-    <nav class="footer-social" aria-label="Redes sociales de Sergio's Life">
-      <ul>
-        <li>
-          <a href="https://www.instagram.com/sergio.s_life_" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Sergio's Life">
-            <i class="fab fa-instagram"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.linkedin.com/in/sergios-life/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Sergio's Life">
-            <i class="fab fa-linkedin"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.behance.net/sergioslife" target="_blank" rel="noopener noreferrer" aria-label="Behance de Sergio's Life">
-            <i class="fab fa-behance"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.youtube.com/channel/UCgFbHfY98Y5TGWT6fQaTXIw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" aria-label="YouTube de Sergio's Life">
-            <i class="fab fa-youtube"></i>
-          </a>
-        </li>
-        <li>
-          <a href="https://vimeo.com/user179129330" target="_blank" rel="noopener noreferrer" aria-label="Vimeo de Sergio's Life">
-            <i class="fab fa-vimeo"></i>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  
-    <!-- Información legal -->
-    <div class="footer-legal">
-      <p>
-        &copy; <span id="year"></span> Sergio's Life. Todos los derechos reservados.
-      </p>
-    </div>
-  
-    <!-- Contacto -->
-    <address class="footer-contact">
-      <a href="mailto:sergioalife@gmail.com" aria-label="Enviar correo a Sergio's Life">
-        <i class="fas fa-envelope"></i> sergioalife@gmail.com
-      </a>
-    </address>
-  
-  </footer>
-  
   <div class="line"></div>
   
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-  
   <script src="js/main.js" defer></script>
+  <script src="js/i18n.js"></script>
   <script src="js/includes.js"></script>
   <script src="js/typewriter.js"></script>
 
+  <!-- Language Switcher -->
+  <div class="lang-switcher" aria-label="Language selector">
+    <button class="lang-btn active" data-lang="es" aria-label="Español" onclick="window.setLanguage('es')">ES</button>
+    <button class="lang-btn" data-lang="en" aria-label="English" onclick="window.setLanguage('en')">EN</button>
+  </div>
 
 </body>
 </html>

@@ -1,19 +1,42 @@
 <nav class="navigation">
     <div class="left-menu">
         <div class="logo">
-            <img src="Recursos/logo.png" alt="Logo Sergio's Life" width="50">
+            <a href="index.html" aria-label="Ir al inicio">
+                <img 
+                    src="Recursos/logo.png" 
+                    alt="Sergio's Life – Ilustración y Animación"
+                    width="50"
+                    height="50"
+                >
+            </a>
         </div>
 
         <ul class="nav-links" id="nav-links">
-            <li><a href="#inicio">Inicio</a></li>
-            <li><a href="#sobre-mi">Sobre Mí</a></li>
-            <li><a href="#trabajos">Trabajos</a></li>
+            <li>
+                <a href="index.html#inicio" class="inicio" data-i18n="nav.home">
+                    Inicio
+                </a>
+            </li>
+            <li>
+                <a href="index.html#sobre-mi" class="sobre-mi" data-i18n="nav.about">
+                    Sobre Mi
+                </a>
+            </li>
+            <li>
+                <a href="Page/galeria.html" class="trabajos" data-i18n="nav.work">
+                    Trabajos
+                </a>
+            </li>
         </ul>
     </div>
 
     <div class="right-menu">
         <ul class="contact-link">
-            <li><a href="#contacto">Contacto</a></li>
+            <li>
+                <a href="index.html#contacto" class="contacto" data-i18n="nav.contact">
+                    Contacto
+                </a>
+            </li>
         </ul>
 
         <div class="menu-icon" id="menu-icon" aria-label="Abrir menú">

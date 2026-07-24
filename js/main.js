@@ -278,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ================================================== */
 
     const verMasButton = document.getElementById("verMasButton");
+    const cerrarSobreMi = document.getElementById("cerrarSobreMi");
     const moreSection = document.getElementById("additional-sections");
 
     if (verMasButton && moreSection){
@@ -286,9 +287,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             moreSection.classList.toggle("hidden");
 
-            const expanded = verMasButton.getAttribute("aria-expanded") === "true";
+            const isHidden = moreSection.classList.contains("hidden");
 
-            verMasButton.setAttribute("aria-expanded", !expanded);
+            verMasButton.setAttribute("aria-expanded", !isHidden);
+
+            const lang = window.i18n?.currentLang || document.documentElement.lang || 'es';
+            const t = window.i18n?.translations?.[lang] || {};
+
+            verMasButton.textContent = isHidden
+                ? (t['about.ver_mas'] || 'Ver más sobre mi')
+                : (t['about.ver_menos'] || 'Ver menos sobre mi');
+
+            if (cerrarSobreMi) {
+                cerrarSobreMi.classList.toggle('hidden', isHidden);
+            }
+
+        });
+
+    }
+
+    if (cerrarSobreMi && moreSection) {
+
+        cerrarSobreMi.addEventListener("click", () => {
+
+            moreSection.classList.add("hidden");
+
+            verMasButton.setAttribute("aria-expanded", "false");
+
+            const lang = window.i18n?.currentLang || document.documentElement.lang || 'es';
+            const t = window.i18n?.translations?.[lang] || {};
+
+            verMasButton.textContent = t['about.ver_mas'] || 'Ver más sobre mi';
+
+            cerrarSobreMi.classList.add("hidden");
 
         });
 
