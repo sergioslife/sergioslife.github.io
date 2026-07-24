@@ -48,21 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* ==================================================
-       MENÚ RESPONSIVE
-    ================================================== */
-
-    const navLinks = document.getElementById('nav-links');
-    const menuIcon = document.getElementById('menu-icon');
-
-    if (menuIcon && navLinks) {
-        menuIcon.addEventListener('click', () => {
-            navLinks.classList.toggle('show-menu');
-        });
-    }
-
-
-    /* ==================================================
-       SCROLL SUAVE
+        SCROLL SUAVE
     ================================================== */
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

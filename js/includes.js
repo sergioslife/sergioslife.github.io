@@ -33,6 +33,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const setupMobileMenu = () => {
+        const navLinks = document.getElementById('nav-links');
+        const menuIcon = document.getElementById('menu-icon');
+
+        if (menuIcon && navLinks) {
+            menuIcon.addEventListener('click', () => {
+                navLinks.classList.toggle('show-menu');
+            });
+
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('show-menu');
+                });
+            });
+        }
+    };
+
     const injectNav = () => {
         return fetch(basePath + "nav.html")
             .then(response => {
@@ -41,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(data => {
                 document.getElementById("nav-placeholder").innerHTML = adjustPaths(data);
+                setupMobileMenu();
                 loadLang();
                 updateYear();
             })
@@ -67,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                     </nav>
                 `);
+                setupMobileMenu();
                 loadLang();
                 updateYear();
             });
