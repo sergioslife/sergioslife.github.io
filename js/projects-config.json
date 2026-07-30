@@ -1,0 +1,211 @@
+{
+  "categories": [
+    { "id": "animacion", "label": "Animación", "color": "#FDC415" },
+    { "id": "personaje", "label": "Personaje", "color": "#69C0AF" },
+    { "id": "narrativa", "label": "Narrativa", "color": "#E6135A" },
+    { "id": "branding", "label": "Branding", "color": "#07B0F2" },
+    { "id": "ilustracion", "label": "Ilustración", "color": "#E6135A" },
+    { "id": "mixed", "label": "Mixed", "color": "#888888" },
+    { "id": "web", "label": "Web", "color": "#69C0AF" }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "image": "trabajo1.png",
+      "alt": "Al borde del Misterio animación 2D y mixed media con narrativa visual de suspenso",
+      "tag": "Animación · Mixed Media",
+      "title": "Al borde del Misterio",
+      "description": "Proyecto de animación 2D y mixed media con atmósfera oscura y enfoque en narrativa visual cinematográfica.",
+      "link": "https://www.behance.net/gallery/229421723/Al-Borde-Del-Misterio",
+      "categories": ["animacion", "mixed", "narrativa"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 2,
+      "image": "trabajo2.jpg",
+      "alt": "Un Mundo Desconocido proyecto de diseño de personajes para universo fantástico animado",
+      "tag": "Diseño de Personaje",
+      "title": "Un Mundo Desconocido",
+      "description": "Proyecto de desarrollo visual enfocado en diseño de personajes y construcción de un universo fantástico animado.",
+      "link": "https://www.behance.net/gallery/183833471/Un-Mundo-Desconocido",
+      "categories": ["personaje", "ilustracion", "narrativa"],
+      "tagColor": "verde"
+    },
+    {
+      "id": 3,
+      "image": "trabajo3.jpg",
+      "alt": "Made in Hell proyecto experimental de narrativa visual oscura",
+      "tag": "Narrativa Visual",
+      "title": "Made in Hell",
+      "description": "Proyecto experimental enfocado en dirección artística, atmósfera oscura y storytelling visual.",
+      "link": "https://www.behance.net/gallery/183831271/Made-in-Hell",
+      "categories":  ["animacion", "ilustracion", "narrativa"],
+      "tagColor": "rosa"
+    },
+    {
+      "id": 4,
+      "image": "trabajo-civiltronic.jpg",
+      "alt": "Civiltronic branding y rediseño web enfocado en identidad corporativa y experiencia digital",
+      "tag": "Branding · Web Design",
+      "title": "Civiltronic Branding & Web",
+      "description": "Rediseño de identidad visual y propuesta de interfaz web para mejorar la presencia digital de la empresa.",
+      "link": "https://www.behance.net/gallery/245268081/Civiltronic-Branding-Web-Redesign",
+      "categories": ["branding", "web"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 5,
+      "image": "trabajo5.jpg",
+      "alt": "Outside Devastation ilustración conceptual postapocalíptica",
+      "tag": "Ilustración Conceptual",
+      "title": "Outside Devastation",
+      "description": "Ilustración conceptual postapocalíptica centrada en diseño de ambiente y narrativa visual.",
+      "link": "https://www.behance.net/gallery/184458349/Outside-Devastation",
+      "categories":  ["mixed", "narrativa", "branding"],
+      "tagColor": "verde"
+    },
+    {
+      "id": 6,
+      "image": "trabajo6.jpg",
+      "alt": "BrandBook Sergio's Life identidad visual diseño de logo y branding",
+      "tag": "Branding / Identidad Visual",
+      "title": "BrandBook: Sergio's Life",
+      "description": "Desarrollo de identidad visual personal a través de la creación de un brandbook completo.",
+      "link": "https://www.behance.net/gallery/185692191/BrandBook-Sergios-Life",
+      "categories": ["branding"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 7,
+      "image": "trabajo7.jpg",
+      "alt": "Proyecto de animación y mixed media",
+      "tag": "Animación · Mixed Media",
+      "title": "Proyecto Animación 7",
+      "description": "Proyecto de animación con técnicas mixtas.",
+      "link": "https://www.behance.net/gallery/example7",
+      "categories": ["animacion", "mixed"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 8,
+      "image": "trabajo4.jpg",
+      "alt": "Proyecto de branding y web",
+      "tag": "Branding · Web",
+      "title": "Proyecto Branding Web 8",
+      "description": "Proyecto de branding y diseño web.",
+      "link": "https://www.behance.net/gallery/example8",
+      "categories": ["branding", "web"],
+      "tagColor": "verde"
+    },
+    {
+      "id": 9,
+      "image": "trabajo8.jpg",
+      "alt": "Two-Time Tribute animación",
+      "tag": "Animación",
+      "title": "Two-Time Tribute",
+      "description": "Proyecto de animación tributo.",
+      "link": "https://www.behance.net/gallery/185692191/Two-Time-Tribute-Dos-Veces-en-Animacion",
+      "categories": ["animacion", "narrativa"],
+      "tagColor": "rosa"
+    },
+    {
+      "id": 10,
+      "image": "trabajo9.jpg",
+      "alt": "Diseño de personaje 3D",
+      "tag": "Diseño de Personaje 3D",
+      "title": "Personaje 3D",
+      "description": "Diseño de personaje en 3D.",
+      "link": "https://www.behance.net/gallery/example10",
+      "categories": ["personaje"],
+      "tagColor": "verde"
+    },
+    {
+      "id": 11,
+      "image": "trabajo10.jpg",
+      "alt": "Proyecto de ilustración",
+      "tag": "Ilustración",
+      "title": "Ilustración 11",
+      "description": "Proyecto de ilustración digital.",
+      "link": "https://www.behance.net/gallery/example11",
+      "categories": ["ilustracion", "narrativa"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 12,
+      "image": "trabajo11.jpg",
+      "alt": "Proyecto de narrativa visual",
+      "tag": "Narrativa Visual",
+      "title": "Narrativa 12",
+      "description": "Proyecto de narrativa visual experimental.",
+      "link": "https://www.behance.net/gallery/example12",
+      "categories": ["narrativa"],
+      "tagColor": "rosa"
+    },
+    {
+      "id": 13,
+      "image": "trabajo12.jpg",
+      "alt": "Proyecto de animación",
+      "tag": "Animación",
+      "title": "Animación 13",
+      "description": "Proyecto de animación 2D.",
+      "link": "https://www.behance.net/gallery/example13",
+      "categories": ["animacion", "narrativa"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 14,
+      "image": "trabajo14.jpg",
+      "alt": "Diseño de personaje",
+      "tag": "Diseño de Personaje",
+      "title": "Personaje 14",
+      "description": "Diseño de personaje para proyecto.",
+      "link": "https://www.behance.net/gallery/example14",
+      "categories": ["personaje"],
+      "tagColor": "verde"
+    },
+    {
+      "id": 15,
+      "image": "trabajo13.png",
+      "alt": "Two-Time Tribute Dos Veces en Animacion",
+      "tag": "Animación",
+      "title": "Two-Time Tribute Dos Veces",
+      "description": "Proyecto de animación tributo Dos Veces.",
+      "link": "https://www.behance.net/gallery/185692191/Two-Time-Tribute-Dos-Veces-en-Animacion",
+      "categories": ["animacion"],
+      "tagColor": "rojo"
+    },
+    {
+      "id": 16,
+      "image": "trabajo16.jpg",
+      "alt": "Proyecto de branding e identidad visual desarrollado por Sergio's Life",
+      "tag": "Proyecto",
+      "title": "Proyecto 16",
+      "description": "Descripción del proyecto 16.",
+      "link": "https://www.behance.net/gallery/example16",
+      "categories": ["branding"],
+      "tagColor": "amarillo"
+    },
+    {
+      "id": 17,
+      "image": "trabajo17.jpg",
+      "alt": "Proyecto adicional 17",
+      "tag": "Proyecto",
+      "title": "Proyecto 17",
+      "description": "Descripción del proyecto 17.",
+      "link": "https://www.behance.net/gallery/example17",
+      "categories": ["web"],
+      "tagColor": "verde"
+    },
+    {
+      "id": 18,
+      "image": "trabajo18.jpg",
+      "alt": "Proyecto adicional 18",
+      "tag": "Proyecto",
+      "title": "Proyecto 18",
+      "description": "Descripción del proyecto 18.",
+      "link": "https://www.behance.net/gallery/example18",
+      "categories": ["ilustracion"],
+      "tagColor": "rosa"
+    }
+  ]
+}

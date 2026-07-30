@@ -235,21 +235,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             btn.addEventListener("click", () => {
 
-                const activo = document.querySelector(".filtro-btn.active");
-                if (activo) activo.classList.remove("active");
-
-                btn.classList.add("active");
-
                 const filtro = btn.dataset.filter;
 
-                proyectos.forEach(proyecto => {
-
-                    if (filtro === "all" || proyecto.classList.contains(filtro)) {
+                if (filtro === "all") {
+                    filtrosProyectos.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    proyectos.forEach(proyecto => {
                         proyecto.style.display = "block";
-                    } else {
-                        proyecto.style.display = "none";
-                    }
+                    });
+                    return;
+                }
 
+                const todosBtn = document.querySelector('.filtro-btn[data-filter="all"]');
+                if (todosBtn && todosBtn.classList.contains("active")) {
+                    todosBtn.classList.remove("active");
+                }
+
+                btn.classList.toggle("active");
+
+                const activos = Array.from(filtrosProyectos)
+                    .filter(b => b.classList.contains("active") && b.dataset.filter !== "all")
+                    .map(b => b.dataset.filter);
+
+                if (activos.length === 0) {
+                    if (todosBtn) todosBtn.classList.add("active");
+                    proyectos.forEach(proyecto => {
+                        proyecto.style.display = "block";
+                    });
+                    return;
+                }
+
+                proyectos.forEach(proyecto => {
+                    const coincide = activos.some(f => proyecto.classList.contains(f));
+                    proyecto.style.display = coincide ? "block" : "none";
                 });
 
             });
