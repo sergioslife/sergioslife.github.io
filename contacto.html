@@ -43,38 +43,6 @@
                 Ilustración · Animación 2D · Video · Contenido creativo y multimedia
             </p>
 
-            <form class="contact-form" action="https://formspree.io/f/maqrznle" method="POST">
-                <input type="hidden" name="_subject" value="Nuevo mensaje desde Sergio's Life">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="text" name="_honeypot" style="display:none" tabindex="-1" autocomplete="off">
-
-                <div data-fs-success></div>
-                <div data-fs-error></div>
-
-                <label>
-                    <span data-i18n="contact.form.name">Nombre</span>
-                    <input type="text" name="name" required data-fs-field>
-                    <span data-fs-error="name"></span>
-                </label>
-                <label>
-                    <span data-i18n="contact.form.email">Email</span>
-                    <input type="email" name="email" required data-fs-field>
-                    <span data-fs-error="email"></span>
-                </label>
-                <label>
-                    <span data-i18n="contact.form.subject">Asunto</span>
-                    <input type="text" name="subject" required data-fs-field>
-                    <span data-fs-error="subject"></span>
-                </label>
-                <label>
-                    <span data-i18n="contact.form.message">Mensaje</span>
-                    <textarea name="message" rows="5" required data-fs-field></textarea>
-                    <span data-fs-error="message"></span>
-                </label>
-                <button type="submit" data-i18n="contact.form.send" data-fs-submit-btn>Enviar mensaje</button>
-                <p class="privacy-note">Al enviar este formulario, aceptás nuestra <a href="politica-de-privacidad.html" target="_blank" rel="noopener noreferrer">Política de Tratamiento de Datos</a>.</p>
-            </form>
-
             <section class="social-group" aria-labelledby="art-social-title">
                 <h2 id="art-social-title" class="social-category" data-i18n="contact.art.title">
                     Arte, ilustración y proyectos creativos
@@ -138,6 +106,47 @@
                     </a>
                 </div>
             </section>
+
+            <section class="contact-cta" aria-labelledby="contact-cta-title">
+                <h2 id="contact-cta-title" class="contact-cta-title" data-i18n="contact.cta.title">
+                    Colaboraciones y oportunidades
+                </h2>
+                <p class="contact-cta-text" data-i18n="contact.cta.text">
+                    Estoy abierto a colaboraciones profesionales, proyectos creativos y oportunidades relacionadas con animación 2D, ilustración, diseño visual, branding, contenido multimedia y narrativa visual. Si tienes una idea, deseas contratar mis servicios o simplemente quieres ponerte en contacto conmigo, estaré encantado de conocer tu proyecto y explorar cómo puedo ayudarte a hacerlo realidad.
+                </p>
+            </section>
+
+            <form class="contact-form" action="https://formspree.io/f/maqrznle" method="POST">
+                <input type="hidden" name="_subject" value="Nuevo mensaje desde Sergio's Life">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="text" name="_honeypot" style="display:none" tabindex="-1" autocomplete="off">
+
+                <div data-fs-success></div>
+                <div data-fs-error></div>
+
+                <label>
+                    <span data-i18n="contact.form.name">Nombre</span>
+                    <input type="text" name="name" required data-fs-field placeholder="Ej: Juan Pérez">
+                    <span data-fs-error="name"></span>
+                </label>
+                <label>
+                    <span data-i18n="contact.form.email">Email</span>
+                    <input type="email" name="email" required data-fs-field placeholder="Ej: juan@empresa.com">
+                    <span data-fs-error="email"></span>
+                </label>
+                <label>
+                    <span data-i18n="contact.form.subject">Asunto</span>
+                    <input type="text" name="subject" required data-fs-field placeholder="Ej: Cotización proyecto de animación 2D">
+                    <span data-fs-error="subject"></span>
+                </label>
+                <label>
+                    <span data-i18n="contact.form.message">Mensaje</span>
+                    <textarea name="message" rows="5" required data-fs-field placeholder="Ej: Hola Sergio, me gustaría contratar tus servicios para..."></textarea>
+                    <span data-fs-error="message"></span>
+                </label>
+                <button type="submit" data-i18n="contact.form.send" data-fs-submit-btn>Enviar mensaje</button>
+                <p class="privacy-note">Al enviar este formulario, aceptás nuestra <a href="politica-de-privacidad.html" target="_blank" rel="noopener noreferrer">Política de Tratamiento de Datos</a>.</p>
+            </form>
         </section>
     </main>
 

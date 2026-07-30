@@ -986,8 +986,8 @@ a:hover, a:focus-visible {
 ================================================== */
 .contact-section {
     padding: 100px 20px;
-    background-color: #fff;
-    color: #000;
+    background-color: #000;
+    color: #fff;
     text-align: center;
 }
 
@@ -1003,6 +1003,27 @@ a:hover, a:focus-visible {
     opacity: 0.9;
 }
 
+.contact-cta {
+    max-width: 800px;
+    margin: 0 auto 60px;
+    padding: 30px;
+    background-color: #111;
+    border-radius: 16px;
+    border: 1px solid #222;
+}
+
+.contact-cta-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.contact-cta-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #ccc;
+}
+
 .contact-form {
     max-width: 600px;
     margin: 0 auto 60px;
@@ -1010,6 +1031,10 @@ a:hover, a:focus-visible {
     flex-direction: column;
     gap: 20px;
     text-align: left;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 16px;
+    color: #000;
 }
 
 .contact-form label {
@@ -1029,15 +1054,21 @@ a:hover, a:focus-visible {
 
 .contact-form input,
 .contact-form textarea {
-    background-color: #000;
-    border: 1px solid #333;
-    color: #fff;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #000;
     padding: 14px 16px;
     border-radius: 12px;
     font-family: "Oswald", sans-serif;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: #888;
+    opacity: 1;
 }
 
 .contact-form input:focus,
