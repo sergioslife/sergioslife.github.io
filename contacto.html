@@ -6,6 +6,20 @@
     <title>Contacto y Redes | Sergio's Life</title>
     <meta name="description" content="Contacto y redes profesionales de Sergio Andrés: Instagram, Behance, ArtStation, YouTube, Vimeo, TikTok, LinkedIn y Email.">
     <link rel="canonical" href="https://sergioslife.github.io/contacto.html">
+    
+    <!-- Open Graph / Compartir -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sergioslife.github.io/contacto.html">
+    <meta property="og:title" content="Contacto y Redes | Sergio's Life">
+    <meta property="og:description" content="Contacto y redes profesionales de Sergio Andrés: Instagram, Behance, ArtStation, YouTube, Vimeo, TikTok, LinkedIn y Email.">
+    <meta property="og:image" content="https://sergioslife.github.io/Recursos/logo.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contacto y Redes | Sergio's Life">
+    <meta name="twitter:description" content="Contacto y redes profesionales de Sergio Andrés.">
+    <meta name="twitter:image" content="https://sergioslife.github.io/Recursos/logo.png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +30,8 @@
     <link rel="icon" type="image/svg+xml" href="favicon-dark.svg" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/png" href="favicon.png">
 </head>
-<body>
+ <body>
+    <a href="#main-content" class="skip-link">Saltar al contenido</a>
     <div id="nav-placeholder"></div>
 
     <main id="main-content">
@@ -27,6 +42,37 @@
             <p class="contact-text" data-i18n="contact.desc">
                 Ilustración · Animación 2D · Video · Contenido creativo y multimedia
             </p>
+
+            <form class="contact-form" action="https://formspree.io/f/maqrznle" method="POST">
+                <input type="hidden" name="_subject" value="Nuevo mensaje desde Sergio's Life">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="text" name="_honeypot" style="display:none" tabindex="-1" autocomplete="off">
+
+                <div data-fs-success></div>
+                <div data-fs-error></div>
+
+                <label>
+                    <span data-i18n="contact.form.name">Nombre</span>
+                    <input type="text" name="name" required data-fs-field>
+                    <span data-fs-error="name"></span>
+                </label>
+                <label>
+                    <span data-i18n="contact.form.email">Email</span>
+                    <input type="email" name="email" required data-fs-field>
+                    <span data-fs-error="email"></span>
+                </label>
+                <label>
+                    <span data-i18n="contact.form.subject">Asunto</span>
+                    <input type="text" name="subject" required data-fs-field>
+                    <span data-fs-error="subject"></span>
+                </label>
+                <label>
+                    <span data-i18n="contact.form.message">Mensaje</span>
+                    <textarea name="message" rows="5" required data-fs-field></textarea>
+                    <span data-fs-error="message"></span>
+                </label>
+                <button type="submit" data-i18n="contact.form.send" data-fs-submit-btn>Enviar mensaje</button>
+            </form>
 
             <section class="social-group" aria-labelledby="art-social-title">
                 <h2 id="art-social-title" class="social-category" data-i18n="contact.art.title">
@@ -102,6 +148,51 @@
     <script src="js/i18n.js"></script>
     <script src="js/includes.js"></script>
     <script src="js/typewriter.js"></script>
+
+    <script>
+        window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+        formspree('initForm', { formElement: '.contact-form', formId: 'maqrznle' });
+    </script>
+    <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+    <script>
+        (function() {
+            const form = document.querySelector('.contact-form');
+            if (!form) return;
+            form.addEventListener('submit', function(e) {
+                let valid = true;
+                form.querySelectorAll('input[required], textarea[required]').forEach(function(el) {
+                    const errorEl = form.querySelector('[data-fs-error="' + el.name + '"]');
+                    if (!el.value.trim()) {
+                        valid = false;
+                        el.style.borderColor = '#E6135A';
+                        if (errorEl) {
+                            errorEl.textContent = 'Este campo es obligatorio';
+                            errorEl.style.display = 'block';
+                        }
+                    } else {
+                        el.style.borderColor = '#333';
+                        if (errorEl) {
+                            errorEl.textContent = '';
+                            errorEl.style.display = 'none';
+                        }
+                    }
+                });
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+            form.querySelectorAll('input, textarea').forEach(function(el) {
+                el.addEventListener('input', function() {
+                    el.style.borderColor = '#333';
+                    const errorEl = form.querySelector('[data-fs-error="' + el.name + '"]');
+                    if (errorEl) {
+                        errorEl.textContent = '';
+                        errorEl.style.display = 'none';
+                    }
+                });
+            });
+        })();
+    </script>
 
     <div class="lang-switcher" aria-label="Language selector">
         <button class="lang-btn active" data-lang="es" aria-label="Español" onclick="window.setLanguage('es')">ES</button>
