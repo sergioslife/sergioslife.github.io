@@ -131,6 +131,7 @@ a:hover, a:focus-visible {
 
 .inicio::after { background-color: #E6135A; }
 .sobre-mi::after { background-color: #69C0AF; }
+.ilustracion::after { background-color: #E6135A; }
 .trabajos::after { background-color: #FDC415; }
 .contacto::after { background-color: lightgray; }
 
@@ -140,6 +141,7 @@ a:hover, a:focus-visible {
 
 .inicio:hover { color: #E6135A; }
 .sobre-mi:hover { color: #69C0AF; }
+.ilustracion:hover { color: #E6135A; }
 .trabajos:hover { color: #FDC415; }
 .contacto:hover { color: lightgray; }
 
@@ -347,13 +349,14 @@ a:hover, a:focus-visible {
 ================================================== */
 
 .descargar-cv {
-    background-color: #fff;
-    color: #000;
-    border: 2px solid #000;
+    background-color: #69C0AF;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
 }
 
 .descargar-cv:hover {
-    background-color: #000;
+    background-color: #4d897d;
     color: #fff;
 }
 
@@ -371,8 +374,13 @@ a:hover, a:focus-visible {
     background-color: #69C0AF;
     border: none;
     color: #fff;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.about-section .about-button {
+    color: #fff;
 }
 
 .about-button:hover {
@@ -383,7 +391,7 @@ a:hover, a:focus-visible {
 
 .about-button.secondary {
     background-color: transparent;
-    color: #69C0AF;
+    color: #fff;
     border: 2px solid #69C0AF;
 }
 
@@ -418,6 +426,10 @@ a:hover, a:focus-visible {
 
 .about-section a {
     color: #000;
+}
+
+.about-section a.about-button {
+    color: #fff;
 }
 
 .about-section a:hover {
@@ -523,6 +535,27 @@ a:hover, a:focus-visible {
 .certification-box { border-top-color: #E6135a; }
 .experience-box { border-top-color: #69C0AF; }
 .education-box { border-top-color: #FDC415; }
+
+.education-box.light {
+    background-color: #ffffff;
+    color: #000;
+}
+
+.education-box.light .qualification__title,
+.education-box.light .education-degree,
+.education-box.light .education-institution,
+.education-box.light time,
+.education-box.light ul {
+    color: #000;
+}
+
+.education-box.light a {
+    color: #000;
+}
+
+.education-box.light a:hover {
+    color: #69C0AF;
+}
 
 .certifications__container {
     align-self: center;
@@ -666,6 +699,54 @@ a:hover, a:focus-visible {
     padding-bottom: 1.5rem;
 }
 
+/* Timeline de experiencia */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #69C0AF;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.65rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #69C0AF;
+    border: 2px solid #000;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-duration {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #69C0AF;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
 .experience-item:last-child,
 .education-item:last-child {
     border-bottom: none;
@@ -765,7 +846,7 @@ a:hover, a:focus-visible {
 }
 
 .trabajo-tag.rosa { background-color: #E6135A; color: #fff; }
-.trabajo-tag.verde { background-color: #69C0AF; color: #0f2f2a; }
+.trabajo-tag.verde { background-color: #69C0AF; color: #fff; }
 .trabajo-tag.amarillo { background-color: #FDC415; color: #3a2a00; }
 
 /* ==================================================

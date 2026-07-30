@@ -61,7 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <ul class="nav-links" id="nav-links">
                         <li><a href="${basePath}index.html#inicio" class="inicio">Inicio</a></li>
-                        <li><a href="${basePath}index.html#sobre-mi" class="sobre-mi">Sobre Mi</a></li>
+                        <li><a href="${basePath}ilustracion.html" class="ilustracion">Ilustración</a></li>
+                        <li><a href="${basePath}sobre-mi.html" class="sobre-mi">Sobre Mi</a></li>
                         <li><a href="${basePath}Page/galeria.html" class="trabajos">Trabajos</a></li>
                         <li><a href="${basePath}contacto.html" class="contacto">Contacto</a></li>
                     </ul>
