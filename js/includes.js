@@ -99,6 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="footer-legal">
                     <p data-i18n="footer.copyright">&copy; <span id="year"></span> Sergio's Life. Todos los derechos reservados.</p>
                 </div>
+                <div class="footer-links">
+                    <a href="politica-de-privacidad.html" target="_blank" rel="noopener noreferrer">Política de Tratamiento de Datos</a>
+                </div>
                 <address class="footer-contact">
                     <a href="mailto:sergioalife@gmail.com" aria-label="Enviar correo a Sergio's Life"><i class="fas fa-envelope"></i> sergioalife@gmail.com</a>
                 </address>
