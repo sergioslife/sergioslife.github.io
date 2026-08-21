@@ -1388,3 +1388,40 @@ select:focus-visible {
 }
 
 
+/* Footer */
+.torneo-footer {
+    text-align: center;
+    padding: 24px 16px;
+    background-color: var(--t-surface);
+    border-top: 1px solid var(--t-border);
+    margin-top: 40px;
+}
+
+.footer-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    text-decoration: none;
+}
+
+.footer-logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--t-surface-2);
+    padding: 8px;
+    border: 1px solid var(--t-border);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.footer-logo:hover .footer-logo-img {
+    transform: translateY(-2px);
+    border-color: var(--t-accent);
+}
+
+.footer-text {
+    font-size: 0.85rem;
+    color: var(--t-text-muted);
+    margin: 0;
+}
