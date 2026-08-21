@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Torneos Commander | Sergio's Life</title>
+    <meta name="description" content="Herramienta para gestionar torneos de Magic: The Gathering Commander. Registro de jugadores, emparejamiento automático y seguimiento de resultados.">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/svg+xml" href="favicon-dark.svg" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="torneo.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Saltar al contenido</a>
+    <div id="nav-placeholder"></div>
+
+    <main id="main-content" class="torneo-app">
+        <header class="torneo-header">
+            <h1 data-i18n="app.title">Gestor de Torneos Commander</h1>
+            <p data-i18n="app.subtitle">Registra jugadores, genera rondas y lleva el control de resultados</p>
+        </header>
+
+        <!-- VISTA: LISTA DE TORNEOS -->
+        <section id="view-tournaments" class="view active">
+            <div class="torneo-container">
+                <div class="torneo-toolbar">
+                    <button class="btn-primary" onclick="app.showCreateModal()">
+                        <i class="fas fa-plus"></i> <span data-i18n="app.new_tournament">Nuevo Torneo</span>
+                    </button>
+                </div>
+                <div id="tournaments-list" class="cards-grid"></div>
+            </div>
+        </section>
+
+        <!-- VISTA: DETALLE DEL TORNEOS -->
+        <section id="view-tournament" class="view">
+            <div class="torneo-container">
+                <div class="torneo-toolbar">
+                    <button class="btn-secondary" onclick="app.showTournaments()">
+                        <i class="fas fa-arrow-left"></i> <span data-i18n="app.back">Volver</span>
+                    </button>
+                    <div class="torneo-actions">
+                        <button id="btn-start" class="btn-primary" onclick="app.startTournament()" style="display:none">
+                            <i class="fas fa-play"></i> <span data-i18n="app.start">Iniciar Torneo</span>
+                        </button>
+                        <button id="btn-next-round" class="btn-primary" onclick="app.nextRound()" style="display:none">
+                            <i class="fas fa-forward"></i> <span data-i18n="app.next_round">Siguiente Ronda</span>
+                        </button>
+                        <button id="btn-add-extra-round" class="btn-secondary" onclick="app.addExtraRound()" style="display:none">
+                            <i class="fas fa-plus"></i> <span data-i18n="app.add_round">Agregar Ronda</span>
+                        </button>
+                        <button id="btn-finish" class="btn-secondary" onclick="app.finishTournament()" style="display:none">
+                            <i class="fas fa-flag-checkered"></i> <span data-i18n="app.finish">Finalizar</span>
+                        </button>
+                        <button class="btn-secondary" onclick="app.showScoringModal()" style="display:none" id="btn-scoring">
+                            <i class="fas fa-star"></i> <span data-i18n="app.scoring">Puntuación</span>
+                        </button>
+                        <button id="btn-delete" class="btn-danger" onclick="app.deleteTournament()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="tournament-info" class="tournament-info"></div>
+
+                <!-- Setup: Agregar jugadores -->
+                <div id="tournament-setup" class="tournament-setup">
+                    <div class="setup-card">
+                        <h3 data-i18n="app.add_players">Agregar Jugadores</h3>
+
+                        <form id="form-add-player" class="form-row" onsubmit="app.addPlayer(event)">
+                            <input type="text" id="input-player-name" placeholder="Nombre del jugador" required>
+                            <button type="submit" class="btn-primary"><i class="fas fa-plus"></i></button>
+                        </form>
+
+                        <div class="import-section">
+                            <button type="button" class="btn-secondary" onclick="app.toggleImport()">
+                                <i class="fas fa-file-import"></i> <span data-i18n="app.import_players">Importar lista</span>
+                            </button>
+                            <div id="import-area" class="import-area" style="display:none">
+                                <textarea id="import-players-text" rows="6" placeholder="Pega la lista de jugadores aquí, uno por línea..."></textarea>
+                                <button type="button" class="btn-primary" onclick="app.importPlayers()">
+                                    <i class="fas fa-check"></i> <span data-i18n="app.import">Importar</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="duplicate-warning" class="duplicate-warning" style="display:none">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span data-i18n="app.duplicate_warning">Nombres duplicados detectados</span>
+                        </div>
+
+                        <div class="setup-stats">
+                            <span id="setup-players-count" class="stat-badge">0 jugadores</span>
+                            <span id="setup-tables-count" class="stat-badge">0 mesas</span>
+                            <span id="setup-rounds-recommendation" class="stat-badge">0 rondas recomendadas</span>
+                        </div>
+
+                        <ul id="players-list" class="players-list"></ul>
+                    </div>
+                </div>
+
+                <!-- Dashboard Principal -->
+                <div id="tournament-dashboard" class="tournament-dashboard" style="display:none">
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">
+                            <h2 id="dashboard-tournament-name"></h2>
+                            <span id="dashboard-format" class="dashboard-badge"></span>
+                        </div>
+                        <div class="dashboard-timer">
+                            <span id="timer-display" class="timer-display">00:00</span>
+                            <button id="btn-start-timer" class="btn-primary btn-timer" onclick="app.startRoundTimer()">
+                                <i class="fas fa-play"></i> <span data-i18n="app.start_round">Iniciar Ronda</span>
+                            </button>
+                            <button id="btn-pause-timer" class="btn-secondary btn-timer" onclick="app.pauseRoundTimer()" style="display:none">
+                                <i class="fas fa-pause"></i> <span data-i18n="app.pause">Pausar</span>
+                            </button>
+                            <button id="btn-resume-timer" class="btn-primary btn-timer" onclick="app.resumeRoundTimer()" style="display:none">
+                                <i class="fas fa-play"></i> <span data-i18n="app.resume">Reanudar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-stats">
+                        <div class="dashboard-stat">
+                            <span id="dashboard-round-info" class="dashboard-stat-value">0 / 0</span>
+                            <span class="dashboard-stat-label" data-i18n="app.rounds">Rondas</span>
+                        </div>
+                        <div class="dashboard-stat">
+                            <span id="dashboard-tables-count" class="dashboard-stat-value">0</span>
+                            <span class="dashboard-stat-label" data-i18n="app.tables">Mesas</span>
+                        </div>
+                        <div class="dashboard-stat">
+                            <span id="dashboard-players-count" class="dashboard-stat-value">0</span>
+                            <span class="dashboard-stat-label" data-i18n="app.players">Jugadores</span>
+                        </div>
+                        <div class="dashboard-stat">
+                            <span id="dashboard-completed-count" class="dashboard-stat-value">0 / 0</span>
+                            <span class="dashboard-stat-label" data-i18n="app.completed">Finalizadas</span>
+                        </div>
+                    </div>
+
+                    <div id="tables-status" class="tables-status"></div>
+
+                    <div id="timer-alert" class="timer-alert" style="display:none">
+                        <i class="fas fa-clock"></i>
+                        <span id="timer-alert-text"></span>
+                    </div>
+
+                    <div class="round-toolbar" id="round-toolbar" style="display:none">
+                        <button class="btn-secondary btn-sm" onclick="app.editCurrentRound()">
+                            <i class="fas fa-edit"></i> <span data-i18n="app.edit_round">Editar Ronda</span>
+                        </button>
+                        <button class="btn-primary btn-sm" onclick="app.confirmRound()" id="btn-confirm-round" style="display:none">
+                            <i class="fas fa-check"></i> <span data-i18n="app.confirm_round">Confirmar Mesas</span>
+                        </button>
+                        <button class="btn-secondary btn-sm" onclick="app.cancelRoundEdit()" id="btn-cancel-round-edit" style="display:none">
+                            <i class="fas fa-times"></i> <span data-i18n="app.cancel">Cancelar</span>
+                        </button>
+                    </div>
+
+                    <div class="add-round-section" id="add-round-section" style="display:none">
+                        <button class="btn-add-round" onclick="app.addExtraRound()">
+                            <i class="fas fa-plus"></i> <span data-i18n="app.add_round">Agregar Ronda</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ronda actual (detalle) -->
+                <div id="tournament-round" class="tournament-round" style="display:none">
+                    <div class="round-header">
+                        <h2 id="round-title" data-i18n="app.round">Ronda</h2>
+                        <span id="round-badge" class="round-badge"></span>
+                        <span id="round-state-badge" class="round-state-badge"></span>
+                        <span id="round-timer" class="round-timer"></span>
+                    </div>
+
+                    <div id="round-tables" class="round-tables"></div>
+                    <div id="round-actions" class="round-actions" style="display:none">
+                        <button class="btn-primary" onclick="app.saveRoundResults()">
+                            <i class="fas fa-save"></i> <span data-i18n="app.save_results">Guardar Resultados</span>
+                        </button>
+                        <button class="btn-secondary" onclick="app.regenerateCurrentRound()">
+                            <i class="fas fa-redo"></i> <span data-i18n="app.regenerate_round">Regenerar Ronda</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Standings -->
+                <div id="tournament-standings" class="tournament-standings" style="display:none">
+                    <div class="standings-header">
+                        <h3 data-i18n="app.standings">Posiciones</h3>
+                        <button class="btn-secondary btn-sm" onclick="app.editScoring()">
+                            <i class="fas fa-star"></i> <span data-i18n="app.scoring">Puntuación</span>
+                        </button>
+                    </div>
+                    <div id="standings-table" class="standings-table"></div>
+                </div>
+
+                <!-- Historial -->
+                <div id="tournament-history" class="tournament-history" style="display:none">
+                    <h3 data-i18n="app.history">Historial de Rondas</h3>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+
+                <!-- Players Management -->
+                <div id="tournament-players-management" class="tournament-players-management" style="display:none">
+                    <div class="management-card">
+                        <h3 data-i18n="app.player_management">Administración de Jugadores</h3>
+                        <div class="management-actions">
+                            <button class="btn-secondary btn-sm" onclick="app.showAddLatePlayerModal()">
+                                <i class="fas fa-user-plus"></i> <span data-i18n="app.add_late_player">Jugador tardío</span>
+                            </button>
+                            <button class="btn-secondary btn-sm" onclick="app.showRetirePlayerModal()">
+                                <i class="fas fa-user-minus"></i> <span data-i18n="app.retire_player">Jugador retirado</span>
+                            </button>
+                        </div>
+                        <div id="retired-players-list" class="retired-players-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Crear Torneo -->
+    <div id="modal-create" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideCreateModal()"></div>
+        <div class="modal-content modal-wide">
+            <h2 data-i18n="app.create_tournament">Crear Torneo</h2>
+            <form id="form-create-tournament" onsubmit="app.createTournament(event)">
+                <div class="form-group">
+                    <label for="input-t-name" data-i18n="app.tournament_name">Nombre del torneo</label>
+                    <input type="text" id="input-t-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="input-t-format" data-i18n="app.tournament_format">Juego / Formato</label>
+                    <select id="input-t-format" required onchange="app.updateFormatOptions()">
+    <option value="commander" selected>Commander</option>
+    <option value="1v1">1 vs 1</option>
+    <option value="two-headed-giant">Two-Headed Giant</option>
+</select>
+                </div>
+                <div class="form-group">
+                    <label for="input-t-date" data-i18n="app.tournament_date">Fecha</label>
+                    <input type="date" id="input-t-date" required>
+                </div>
+
+                <div id="section-commander" class="format-section">
+                    <div class="form-group">
+                        <label for="input-t-tablesize" data-i18n="app.tournament_tablesize">Jugadores por mesa</label>
+                        <select id="input-t-tablesize" onchange="app.updateTableSizeOptions()">
+                            <option value="auto" selected>Automático (3–5)</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="custom-table-sizes" style="display:none">
+                        <label data-i18n="app.custom_table_sizes">Tamaños de mesa permitidos</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="custom-size-check" value="3" checked> 3 jugadores
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="custom-size-check" value="4" checked> 4 jugadores
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="custom-size-check" value="5"> 5 jugadores
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-t-distribution" data-i18n="app.distribution_model">Modelo de distribución</label>
+                        <select id="input-t-distribution">
+                            <option value="auto" selected>Automático</option>
+                            <option value="prefer3">Priorizar 3</option>
+                            <option value="prefer4">Priorizar 4</option>
+                            <option value="prefer5">Priorizar 5</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="input-t-rounds" data-i18n="app.tournament_rounds">Número de rondas</label>
+                            <input type="number" id="input-t-rounds" min="1" max="15" value="4">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-t-duration" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
+                            <input type="number" id="input-t-duration" min="10" max="180" step="5" value="50">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-1v1" class="format-section" style="display:none">
+                    <div class="form-group">
+                        <label for="input-t-competition" data-i18n="app.competition_system">Sistema de competición</label>
+                        <select id="input-t-competition">
+                            <option value="swiss" selected>Suizo</option>
+                            <option value="elimination">Eliminación directa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-t-match-format" data-i18n="app.match_format">Modalidad de partida</label>
+                        <select id="input-t-match-format">
+                            <option value="bo1" selected>Mejor de 1</option>
+                            <option value="bo3">Mejor de 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-t-rounds-1v1" data-i18n="app.tournament_rounds">Número de rondas</label>
+                        <input type="number" id="input-t-rounds-1v1" min="1" max="15" value="4">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-t-duration-1v1" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
+                        <input type="number" id="input-t-duration-1v1" min="10" max="180" step="5" value="50">
+                    </div>
+                </div>
+
+                <div id="section-2hg" class="format-section" style="display:none">
+                    <div class="form-group">
+                        <label for="input-t-team-creation" data-i18n="app.team_creation">Creación de equipos</label>
+                        <select id="input-t-team-creation">
+                            <option value="random" selected>Aleatorios</option>
+                            <option value="manual">Manuales</option>
+                            <option value="chosen">Elegidos por jugadores</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-t-competition-2hg" data-i18n="app.competition_system">Sistema de competición</label>
+                        <select id="input-t-competition-2hg">
+                            <option value="swiss" selected>Suizo</option>
+                            <option value="elimination">Eliminación directa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-t-match-format-2hg" data-i18n="app.match_format">Modalidad de partida</label>
+                        <select id="input-t-match-format-2hg">
+                            <option value="bo1" selected>Mejor de 1</option>
+                            <option value="bo3">Mejor de 3</option>
+                        </select>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="input-t-rounds-2hg" data-i18n="app.tournament_rounds">Número de rondas</label>
+                            <input type="number" id="input-t-rounds-2hg" min="1" max="15" value="4">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-t-duration-2hg" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
+                            <input type="number" id="input-t-duration-2hg" min="10" max="180" step="5" value="50">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="app.hideCreateModal()" data-i18n="app.cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary" data-i18n="app.create">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Configuración de Puntuación -->
+    <div id="modal-scoring" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideScoringModal()"></div>
+        <div class="modal-content modal-wide">
+            <h2 data-i18n="app.scoring_config">Configuración de Puntuación</h2>
+            <form id="form-scoring" onsubmit="app.saveScoring(event)">
+                <div class="scoring-table-wrapper">
+                    <table class="scoring-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="app.position">Posición</th>
+                                <th data-i18n="app.points_4">Puntos (mesa 4)</th>
+                                <th data-i18n="app.points_3">Puntos (mesa 3)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scoring-body">
+                            <tr>
+                                <td>1.º</td>
+                                <td><input type="number" class="scoring-input" data-table="4" data-pos="1" value="4" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="3" data-pos="1" value="4" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td>2.º</td>
+                                <td><input type="number" class="scoring-input" data-table="4" data-pos="2" value="3" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="3" data-pos="2" value="3" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td>3.º</td>
+                                <td><input type="number" class="scoring-input" data-table="4" data-pos="3" value="2" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="3" data-pos="3" value="2" min="0" max="10"></td>
+                            </tr>
+                            <tr>
+                                <td>4.º</td>
+                                <td><input type="number" class="scoring-input" data-table="4" data-pos="4" value="1" min="0" max="10"></td>
+                                <td><span style="color: var(--t-text-muted);">—</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="app.hideScoringModal()" data-i18n="app.cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary" data-i18n="app.save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Mesa -->
+    <div id="modal-edit-table" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideEditTableModal()"></div>
+        <div class="modal-content">
+            <h2 data-i18n="app.edit_table">Editar Mesa</h2>
+            <div id="edit-table-players" class="edit-table-players"></div>
+            <div id="edit-table-warning" class="edit-table-warning" style="display:none">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="edit-table-warning-text"></span>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="app.hideEditTableModal()" data-i18n="app.close">Cerrar</button>
+                <button type="button" class="btn-primary" onclick="app.saveTableEdit()" data-i18n="app.save_changes">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Jugador Tardío -->
+    <div id="modal-late-player" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideLatePlayerModal()"></div>
+        <div class="modal-content">
+            <h2 data-i18n="app.add_late_player">Jugador Tardío</h2>
+            <form id="form-late-player" onsubmit="app.addLatePlayer(event)">
+                <div class="form-group">
+                    <label for="input-late-name" data-i18n="app.player_name">Nombre del jugador</label>
+                    <input type="text" id="input-late-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="input-late-option" data-i18n="app.late_option">Opción de ingreso</label>
+                    <select id="input-late-option" required onchange="app.toggleLateOptionFields()">
+                        <option value="next_round">Ingresar desde la próxima ronda</option>
+                        <option value="current_round">Ingresar a la ronda actual (con sanción)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="late-sanction-group" style="display:none">
+                    <label for="input-late-sanction" data-i18n="app.late_sanction">Sanción de tiempo (minutos perdidos)</label>
+                    <input type="number" id="input-late-sanction" min="0" value="0">
+                </div>
+                <div class="form-group" id="late-missed-group">
+                    <label data-i18n="app.missed_rounds">Rondas perdidas</label>
+                    <div id="missed-rounds-list"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="app.hideLatePlayerModal()" data-i18n="app.cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary" data-i18n="app.add">Agregar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Jugador Retirado -->
+    <div id="modal-retire-player" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideRetirePlayerModal()"></div>
+        <div class="modal-content">
+            <h2 data-i18n="app.retire_player">Jugador Retirado</h2>
+            <form id="form-retire-player" onsubmit="app.retirePlayer(event)">
+                <div class="form-group">
+                    <label for="input-retire-player" data-i18n="app.select_player">Seleccionar jugador</label>
+                    <select id="input-retire-player" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="input-retire-round" data-i18n="app.retire_after_round">Después de la ronda</label>
+                    <select id="input-retire-round" required></select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="app.hideRetirePlayerModal()" data-i18n="app.cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary" data-i18n="app.retire">Retirar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Ronda -->
+    <div id="modal-edit-round" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideEditRoundModal()"></div>
+        <div class="modal-content modal-wide">
+            <h2 data-i18n="app.edit_round">Editar Ronda</h2>
+            <form id="form-edit-round" onsubmit="app.saveRoundEdit(event)">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="edit-round-duration" data-i18n="app.round_duration">Duración (min)</label>
+                        <input type="number" id="edit-round-duration" min="5" max="180" step="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-round-start" data-i18n="app.round_start">Hora de inicio</label>
+                        <input type="datetime-local" id="edit-round-start" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="app.round_tables">Mesas</label>
+                    <div id="edit-round-tables" class="edit-round-tables"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="app.hideEditRoundModal()" data-i18n="app.cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary" data-i18n="app.save_changes">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Historial Jugador -->
+    <div id="modal-player-history" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hidePlayerHistoryModal()"></div>
+        <div class="modal-content modal-wide">
+            <h2 id="player-history-name" data-i18n="app.player_history">Historial del Jugador</h2>
+            <div id="player-history-content"></div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="app.hidePlayerHistoryModal()" data-i18n="app.close">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script src="torneo.js"></script>
+    <script src="js/includes.js"></script>
+</body>
+</html>
