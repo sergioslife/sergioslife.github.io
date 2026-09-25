@@ -134,7 +134,7 @@ const app = {
         if (!name || !date) return;
 
         const isCommander = ['commander'].includes(format);
-        const is1v1 = ['pioneer', 'modern', 'standard', 'legacy', 'pauper', 'draft', 'sealed', 'other'].includes(format);
+        const is1v1 = ['pioneer', 'modern', 'standard', 'legacy', 'pauper', 'draft', 'sealed', 'other', '1v1'].includes(format);
         const is2hg = format === 'two-headed-giant';
 
         const tournament = {
@@ -152,34 +152,32 @@ const app = {
             customAllowedSizes: [3, 4, 5],
             scoring: null,
             competitionSystem: is1v1 || is2hg ? 'swiss' : null,
-            matchFormat: is1v1 || is2hg ? 'bo1' : null,
+            matchFormat: is1v1 ? 'bo3' : (is2hg ? 'bo1' : null),
             teamCreation: is2hg ? 'random' : null,
             createdAt: Date.now()
         };
 
         if (isCommander) {
-            const roundsCount = parseInt(document.getElementById('input-t-rounds').value, 10) || 4;
             const roundDuration = parseInt(document.getElementById('input-t-duration').value, 10) || 50;
             const tableSize = document.getElementById('input-t-tablesize').value;
             const distributionModel = document.getElementById('input-t-distribution').value || 'auto';
             const customAllowedSizes = this.getCustomAllowedSizes();
 
-            tournament.roundsCount = roundsCount;
             tournament.roundDuration = roundDuration;
             tournament.tableSize = tableSize;
             tournament.distributionModel = distributionModel;
             tournament.customAllowedSizes = customAllowedSizes;
             tournament.scoring = {
-                4: {1: 3, 2: 2, 3: 1, 4: 0},
-                3: {1: 3, 2: 2, 3: 1}
+                2: {1: 2, 2: 1},
+                3: {1: 3, 2: 2, 3: 1},
+                4: {1: 4, 2: 3, 3: 2, 4: 1},
+                5: {1: 5, 2: 4, 3: 3, 4: 2, 5: 1}
             };
         } else if (is1v1 || is2hg) {
-            const roundsCount = parseInt(document.getElementById(is2hg ? 'input-t-rounds-2hg' : 'input-t-rounds-1v1').value, 10) || 4;
             const roundDuration = parseInt(document.getElementById(is2hg ? 'input-t-duration-2hg' : 'input-t-duration-1v1').value, 10) || 50;
             const competitionSystem = document.getElementById(is2hg ? 'input-t-competition-2hg' : 'input-t-competition').value;
-            const matchFormat = document.getElementById(is2hg ? 'input-t-match-format-2hg' : 'input-t-match-format').value;
+            const matchFormat = is2hg ? document.getElementById('input-t-match-format-2hg').value : 'bo3';
 
-            tournament.roundsCount = roundsCount;
             tournament.roundDuration = roundDuration;
             tournament.competitionSystem = competitionSystem;
             tournament.matchFormat = matchFormat;
@@ -211,7 +209,7 @@ const app = {
     updateFormatOptions() {
         const format = document.getElementById('input-t-format').value;
         const isCommander = ['commander'].includes(format);
-        const is1v1 = ['pioneer', 'modern', 'standard', 'legacy', 'pauper', 'draft', 'sealed', 'other'].includes(format);
+        const is1v1 = ['pioneer', 'modern', 'standard', 'legacy', 'pauper', 'draft', 'sealed', 'other', '1v1'].includes(format);
         const is2hg = format === 'two-headed-giant';
 
         const sectionCommander = document.getElementById('section-commander');
@@ -311,6 +309,8 @@ const app = {
 
         const input = document.getElementById('input-player-name');
         const name = input.value.trim();
+        const groupInput = document.getElementById('input-player-group');
+        const groupId = groupInput ? groupInput.value.trim().toLowerCase().replace(/\s+/g, '_') : '';
         if (!name) return;
 
         // Check duplicate
@@ -321,11 +321,13 @@ const app = {
 
         t.players.push({
             id: this.generateId(),
-            name
+            name,
+            group_id: groupId || null
         });
 
         this.saveTournaments();
         input.value = '';
+        if (groupInput) groupInput.value = '';
         this.renderPlayersList();
         this.renderTournamentDetail();
     },
@@ -359,12 +361,15 @@ const app = {
         const added = [];
 
         lines.forEach(name => {
-            if (existingNames.has(name.toLowerCase())) {
-                duplicates.push(name);
-            } else if (name.length > 0) {
-                t.players.push({id: this.generateId(), name});
-                existingNames.add(name.toLowerCase());
-                added.push(name);
+            const parts = name.split('|');
+            const playerName = parts[0].trim();
+            const groupId = parts.length > 1 ? parts[1].trim().toLowerCase().replace(/\s+/g, '_') : '';
+            if (existingNames.has(playerName.toLowerCase())) {
+                duplicates.push(playerName);
+            } else if (playerName.length > 0) {
+                t.players.push({id: this.generateId(), name: playerName, group_id: groupId || null});
+                existingNames.add(playerName.toLowerCase());
+                added.push(playerName);
             }
         });
 
@@ -385,10 +390,26 @@ const app = {
 
     getRecommendedRounds(playerCount) {
         if (playerCount < 3) return 0;
-        if (playerCount <= 6) return 3;
-        if (playerCount <= 12) return 4;
-        if (playerCount <= 20) return 5;
-        return Math.min(7, Math.ceil(playerCount / 6));
+
+        const t = this.getCurrentTournament();
+
+        if (t && t.format === 'commander') {
+            if (playerCount <= 12) return 3;
+            if (playerCount <= 20) return 4;
+            return Math.min(5, Math.ceil(playerCount / 6));
+        }
+
+        if (t && t.format === 'two-headed-giant') {
+            const teams = Math.floor(playerCount / 2);
+            if (teams <= 4) return 2;
+            if (teams <= 8) return 3;
+            return 4;
+        }
+
+        if (playerCount <= 8) return 3;
+        if (playerCount <= 16) return 4;
+        if (playerCount <= 32) return 5;
+        return 6;
     },
 
     calculateEstimatedDuration(roundsCount, roundDuration, transitionMinutes) {
@@ -525,16 +546,83 @@ const app = {
         currentRound.pausedAt = null;
         this.timerAlertsShown = [];
 
+        currentRound.tables.forEach(table => {
+            if (table.bye) return;
+            if (!table.turnState) {
+                table.turnState = {
+                    activePlayerIndex: 0,
+                    playerTimes: new Array(table.players.length).fill(0)
+                };
+            }
+            table.turnState.turnStartTime = Date.now();
+        });
+
         document.getElementById('btn-start-timer').style.display = 'none';
         document.getElementById('btn-pause-timer').style.display = 'inline-flex';
         document.getElementById('btn-resume-timer').style.display = 'none';
 
         this.timerInterval = setInterval(() => {
             this.updateTimerDisplay();
+            this.updateTurnTimers();
             this.checkTimerAlerts();
         }, 1000);
 
         this.updateTimerDisplay();
+        this.updateTurnTimers();
+    },
+
+    updateTurnTimers() {
+        const t = this.getCurrentTournament();
+        if (!t) return;
+
+        const currentRound = t.rounds[t.rounds.length - 1];
+        if (!currentRound) return;
+
+        const now = Date.now();
+
+        currentRound.tables.forEach(table => {
+            if (table.bye || !table.turnState) return;
+
+            const display = document.getElementById(`turn-timer-${table.id}`);
+            if (display) {
+                const elapsed = Math.floor((now - (table.turnState.turnStartTime || now)) / 1000);
+                const m = Math.floor(elapsed / 60);
+                const s = elapsed % 60;
+                display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+        });
+    },
+
+    passTurn(tableId) {
+        const t = this.getCurrentTournament();
+        if (!t || t.status !== 'active') return;
+
+        const currentRound = t.rounds[t.rounds.length - 1];
+        if (!currentRound) return;
+
+        const now = Date.now();
+
+        if (!table.turnState) {
+            table.turnState = {
+                activePlayerIndex: 0,
+                playerTimes: new Array(table.players.length).fill(0),
+                turnStartTime: now
+            };
+            this.saveTournaments();
+            this.renderCurrentRound();
+            this.updateTurnTimers();
+            return;
+        }
+
+        const elapsedTurn = Math.floor((now - (table.turnState.turnStartTime || now)) / 1000);
+
+        table.turnState.playerTimes[table.turnState.activePlayerIndex] += elapsedTurn;
+        table.turnState.activePlayerIndex = (table.turnState.activePlayerIndex + 1) % table.players.length;
+        table.turnState.turnStartTime = now;
+
+        this.saveTournaments();
+        this.renderCurrentRound();
+        this.updateTurnTimers();
     },
 
     pauseRoundTimer() {
@@ -559,8 +647,15 @@ const app = {
 
         const currentRound = t.rounds[t.rounds.length - 1];
         if (currentRound && currentRound.pausedAt) {
-            currentRound.pausedDuration += Date.now() - currentRound.pausedAt;
+            const pauseDelta = Date.now() - currentRound.pausedAt;
+            currentRound.pausedDuration += pauseDelta;
             currentRound.pausedAt = null;
+
+            currentRound.tables.forEach(table => {
+                if (table.turnState && table.turnState.turnStartTime) {
+                    table.turnState.turnStartTime += pauseDelta;
+                }
+            });
         }
 
         document.getElementById('btn-resume-timer').style.display = 'none';
@@ -568,8 +663,11 @@ const app = {
 
         this.timerInterval = setInterval(() => {
             this.updateTimerDisplay();
+            this.updateTurnTimers();
             this.checkTimerAlerts();
         }, 1000);
+
+        this.updateTurnTimers();
     },
 
     stopTimer() {
@@ -651,6 +749,55 @@ const app = {
         });
     },
 
+    playAlertSound(type) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (type === '10min') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.6);
+            } else if (type === '5min') {
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.frequency.setValueAtTime(587, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc1.start(audioCtx.currentTime);
+                osc1.stop(audioCtx.currentTime + 0.3);
+
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.frequency.setValueAtTime(587, audioCtx.currentTime + 0.4);
+                gain2.gain.setValueAtTime(0.15, audioCtx.currentTime + 0.4);
+                osc2.start(audioCtx.currentTime + 0.4);
+                osc2.stop(audioCtx.currentTime + 0.7);
+            } else if (type === 'timeup') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.5);
+            }
+        } catch (e) {
+            console.warn('Web Audio API no disponible:', e);
+        }
+    },
+
     showTimerAlert(key, remaining) {
         const alertEl = document.getElementById('timer-alert');
         const alertText = document.getElementById('timer-alert-text');
@@ -666,6 +813,10 @@ const app = {
 
         alertText.textContent = messages[key] || '';
         alertEl.style.display = 'flex';
+
+        if (key === '10min' || key === '5min' || key === 'timeup') {
+            this.playAlertSound(key);
+        }
 
         if (key === 'timeup') {
             setTimeout(() => {
@@ -838,8 +989,10 @@ const app = {
         if (!t) return;
 
         const scoring = {
+            5: {},
             4: {},
-            3: {}
+            3: {},
+            2: {}
         };
 
         document.querySelectorAll('.scoring-input').forEach(input => {
@@ -857,14 +1010,7 @@ const app = {
     getPointsForPosition(placement, tableSize) {
         const t = this.getCurrentTournament();
         if (!t || !t.scoring) {
-            // Default scoring
-            if (tableSize === 4) {
-                const defaults = {1: 3, 2: 2, 3: 1, 4: 0};
-                return defaults[placement] || 0;
-            } else {
-                const defaults = {1: 3, 2: 2, 3: 1};
-                return defaults[placement] || 0;
-            }
+            return Math.max(0, (tableSize - placement) + 1);
         }
 
         return t.scoring[tableSize]?.[placement] || 0;
@@ -886,7 +1032,10 @@ const app = {
         } else {
             list.innerHTML = t.players.map(p => `
                 <li>
-                    <span class="player-name">${this.escapeHtml(p.name)}</span>
+                    <span class="player-name">
+                        ${this.escapeHtml(p.name)}
+                        ${p.group_id ? `<span class="group-tag" title="Grupo">${this.escapeHtml(p.group_id)}</span>` : ''}
+                    </span>
                     <button class="btn-remove" onclick="app.removePlayer('${p.id}')" aria-label="Eliminar ${this.escapeHtml(p.name)}">
                         <i class="fas fa-times"></i>
                     </button>
@@ -906,10 +1055,13 @@ const app = {
 
         t.status = 'active';
         t.rounds = [];
+        t.roundsCount = this.getRecommendedRounds(t.players.length);
         if (!t.scoring) {
             t.scoring = {
-                4: {1: 3, 2: 2, 3: 1, 4: 0},
-                3: {1: 3, 2: 2, 3: 1}
+                2: {1: 2, 2: 1},
+                3: {1: 3, 2: 2, 3: 1},
+                4: {1: 4, 2: 3, 3: 2, 4: 1},
+                5: {1: 5, 2: 4, 3: 3, 4: 2, 5: 1}
             };
         }
         this.saveTournaments();
@@ -945,8 +1097,13 @@ const app = {
         if (!t || t.status !== 'active') return;
 
         const roundNumber = t.rounds.length + 1;
-        const activePlayers = [...t.players];
+        let activePlayers = [...t.players];
         const tableSizes = this.calculateTableSizes(activePlayers.length);
+
+        if (roundNumber === 1) {
+            activePlayers = this.shuffleArray(activePlayers);
+        }
+
         const opponentsHistory = this.buildOpponentsHistory(t);
         const stats = this.getPlayerStats(t);
 
@@ -1035,7 +1192,16 @@ const app = {
             if (remainder === 0) {
                 return Array(teams).fill(4);
             }
-            return [...Array(teams).fill(4), remainder];
+             return [...Array(teams).fill(4), remainder];
+        }
+
+        if (t && t.format !== 'commander' && t.format !== 'two-headed-giant') {
+            if (playerCount < 2) return [];
+            const pairs = Math.floor(playerCount / 2);
+            if (playerCount % 2 === 0) {
+                return Array(pairs).fill(2);
+            }
+            return [...Array(pairs).fill(2), 0];
         }
 
         const mode = (t && t.distributionModel) || 'auto';
@@ -1064,7 +1230,8 @@ const app = {
             return t.customAllowedSizes.slice().sort((a, b) => a - b);
         }
         if (t.format === 'commander') return [3, 4, 5];
-        return [3, 4];
+        if (t.format === 'two-headed-giant') return [4];
+        return [2];
     },
 
     autoDistribution(playerCount, allowedSizes) {
@@ -1255,7 +1422,10 @@ const app = {
         for (let i = 1; i < size && selected.length < size; i++) {
             const candidates = sorted.filter(p => !assigned.has(p.id));
             const best = candidates.find(c => {
-                return selected.every(s => !opponentsHistory[c.id]?.has(s.id));
+                return selected.every(s =>
+                    !opponentsHistory[c.id]?.has(s.id) &&
+                    !(c.group_id && s.group_id && c.group_id === s.group_id)
+                );
             });
 
             if (best) {
@@ -1270,6 +1440,15 @@ const app = {
         }
 
         return selected;
+    },
+
+    shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
     },
 
     nextRound() {
@@ -1409,27 +1588,59 @@ const app = {
                 `;
             }
 
-            const playersHtml = players.map(p => {
+            const playersHtml = players.map((p, idx) => {
                 const existingResult = table.results.find(r => r.playerId === p.id);
                 const placement = existingResult ? existingResult.placement : 0;
                 const duration = existingResult ? existingResult.duration : '';
+                const bounties = existingResult ? (existingResult.bounties || 0) : 0;
                 const isRepeat = !table.bye && hasRepeats && this.isRepeatInTable(p.id, table, opponentsHistory);
+                const tableSize = players.length;
+                const maxBounties = tableSize - 1;
+                const positionPts = placement > 0 ? (tableSize - placement) + 1 : 0;
+                const turnState = table.turnState;
+                const isActiveTurn = turnState && turnState.activePlayerIndex === idx;
+                const playerTurnTime = turnState ? (turnState.playerTimes[idx] || 0) : 0;
+
+                let playerBadge = null;
+                if (placement > 0 && currentRound.startedAt) {
+                    const roundMinutes = t.roundDuration || 60;
+                    const elapsedMin = Math.floor((Date.now() - currentRound.startedAt - (currentRound.pausedDuration || 0)) / 60000);
+                    if (placement === 1) {
+                        const speedThreshold = tableSize <= 4 ? 20 : 35;
+                        if (elapsedMin <= speedThreshold) {
+                            playerBadge = {type: 'speed', icon: '⚡', title: 'Victoria Rápida'};
+                        } else {
+                            playerBadge = {type: 'methodical', icon: '🏆', title: 'Victoria Metódica'};
+                        }
+                    } else if (placement === tableSize && elapsedMin <= 15) {
+                        playerBadge = {type: 'early', icon: '⚠️', title: 'Eliminación Temprana'};
+                    }
+                }
+
+                const placementButtons = Array.from({length: tableSize}, (_, i) => {
+                    const val = i + 1;
+                    const colorClass = val === 1 ? 'win' : (val === tableSize ? 'last' : 'mid');
+                    return `<button type="button" class="placement-btn placement-btn-${colorClass} ${placement === val ? 'selected' : ''}" onclick="app.updateResult('${table.id}', '${p.id}', 'placement', '${val}')" aria-label="Posición ${val} de ${this.escapeHtml(p.name)}">${val}º</button>`;
+                }).join('');
 
                 return `
-                    <div class="table-player ${isRepeat ? 'repeat' : ''} ${placement === 1 ? 'winner' : ''}">
-                        <span class="p-name">${this.escapeHtml(p.name)}</span>
+                    <div class="table-player ${isRepeat ? 'repeat' : ''} ${placement === 1 ? 'winner' : ''} ${isActiveTurn ? 'turn-active' : ''}">
+                        <span class="p-name" title="${p.group_id ? 'Grupo: ' + this.escapeHtml(p.group_id) : ''}">${this.escapeHtml(p.name)}${p.group_id && canEdit ? `<span class="group-tag-small">${this.escapeHtml(p.group_id)}</span>` : ''}</span>
                         <span class="p-placement">
                             ${canEdit ? `
-                                <select class="placement-select" onchange="app.updateResult('${table.id}', '${p.id}', 'placement', this.value)" aria-label="Posición de ${this.escapeHtml(p.name)}">
-                                    <option value="0" ${placement === 0 ? 'selected' : ''}>-</option>
-                                    <option value="1" ${placement === 1 ? 'selected' : ''}>1°</option>
-                                    <option value="2" ${placement === 2 ? 'selected' : ''}>2°</option>
-                                    <option value="3" ${placement === 3 ? 'selected' : ''}>3°</option>
-                                    <option value="4" ${placement === 4 ? 'selected' : ''}>4°</option>
-                                </select>
+                                <div class="placement-btn-group">
+                                    <button type="button" class="placement-btn placement-btn-clear ${placement === 0 ? 'selected' : ''}" onclick="app.updateResult('${table.id}', '${p.id}', 'placement', '0')" aria-label="Sin posición">${placement === 0 ? '✕' : '-'}</button>
+                                    ${placementButtons}
+                                </div>
+                                ${t.format === 'commander' ? `<input type="number" class="bounty-input" placeholder="💀" value="${bounties}" min="0" max="${maxBounties}" onchange="app.updateResult('${table.id}', '${p.id}', 'bounties', this.value)" aria-label="Bounties (máx ${maxBounties}) de ${this.escapeHtml(p.name)}">` : ''}
                                 <input type="number" class="duration-input" placeholder="min" value="${duration}" min="0" onchange="app.updateResult('${table.id}', '${p.id}', 'duration', this.value)" aria-label="Duración en minutos">
                             ` : `
-                                <span>${placement > 0 ? placement + '°' : '-'}</span>
+                                <span title="Posición / Puntos base">${placement > 0 ? placement + '°' : '-'}</span>
+                                <span title="+${positionPts || 0} pts de posición" class="position-pts">${positionPts > 0 ? '+' + positionPts + ' pts' : ''}</span>
+                                ${placement === 1 ? '<span title="Ganador 🥇" style="color: var(--t-amarillo); font-weight: 700;">🥇</span>' : ''}
+                                ${t.format === 'commander' ? `<span title="Bounties (máx ${maxBounties})">${bounties > 0 ? '💀 ' + bounties : '-'}</span>` : ''}
+                                ${playerTurnTime > 0 ? `<span title="Tiempo en turnos anteriores" style="color: var(--t-text-muted); font-size: 0.75rem;">⏱ ${Math.floor(playerTurnTime/60)}:${String(playerTurnTime%60).padStart(2,'0')}</span>` : ''}
+                                ${playerBadge ? `<span title="${playerBadge.title}" class="badge-${playerBadge.type}">${playerBadge.icon}</span>` : ''}
                                 <span style="color: var(--t-text-muted); font-size: 0.85rem;">${duration ? duration + ' min' : ''}</span>
                             `}
                         </span>
@@ -1437,10 +1648,30 @@ const app = {
                 `;
             }).join('');
 
+            const pointsLegend = Array.from({length: players.length}, (_, i) => {
+                const pos = i + 1;
+                const pts = players.length - i;
+                return `${pos}°=${pts}pts`;
+            }).join(' · ');
+
+            const turnControls = t.format === 'commander' && canEdit
+                ? `<div class="turn-controls">
+                    <div class="turn-timer" aria-label="Tiempo de turno actual">
+                        <span class="turn-timer-label">Turno:</span>
+                        <span id="turn-timer-${table.id}" class="turn-timer-display">00:00</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-turn" onclick="app.passTurn('${table.id}')" aria-label="Pasar turno al siguiente jugador">
+                        PASAR TURNO
+                    </button>
+                </div>`
+                : '';
+
             return `
                 <div class="table-card">
                     <h4>Mesa ${idx + 1} ${hasRepeats ? '<span style="color: var(--t-rosa); font-size: 0.75rem; margin-left: 8px;">CON REPETICIÓN</span>' : ''}</h4>
+                    <div class="table-legend" style="font-size: 0.7rem; color: var(--t-text-muted); margin-top: 2px;">Puntos base: ${pointsLegend}</div>
                     <div class="table-players">${playersHtml}</div>
+                    ${turnControls}
                 </div>
             `;
         }).join('');
@@ -1476,9 +1707,9 @@ const app = {
             return;
         }
 
-        let result = table.results.find(r => r.playerId === playerId);
+         let result = table.results.find(r => r.playerId === playerId);
         if (!result) {
-            result = {playerId, placement: 0, duration: 0};
+            result = {playerId, placement: 0, duration: 0, bounties: 0};
             table.results.push(result);
         }
 
@@ -1486,6 +1717,35 @@ const app = {
             result.placement = parseInt(value) || 0;
         } else if (field === 'duration') {
             result.duration = parseInt(value) || 0;
+        } else if (field === 'bounties') {
+            const numVal = parseInt(value) || 0;
+            const tableSize = table.players.length;
+            const maxBounties = tableSize - 1;
+
+            if (numVal > maxBounties) {
+                alert(`Máximo de bounties para este jugador en mesa de ${tableSize}: ${maxBounties}`);
+                return;
+            }
+
+            const otherBounties = table.results
+                .filter(r => r.playerId !== playerId)
+                .reduce((sum, r) => sum + (r.bounties || 0), 0);
+
+            if (otherBounties + numVal > maxBounties) {
+                const remaining = maxBounties - otherBounties;
+                if (remaining < 0) remaining = 0;
+
+                if (!confirm(`Solo quedan ${remaining} bounties disponibles en esta mesa. ¿Asignar ${remaining}?`)) {
+                    return;
+                }
+                result.bounties = remaining;
+                this.saveTournaments();
+                this.renderCurrentRound();
+                this.renderDashboard();
+                return;
+            }
+
+            result.bounties = numVal;
         }
 
         // Auto-calculate duration from internal timestamps when placement is set
@@ -1584,6 +1844,7 @@ const app = {
             stats[p.id] = {
                 name: p.name,
                 points: 0,
+                bounties: 0,
                 wins: 0,
                 losses: 0,
                 draws: 0,
@@ -1660,11 +1921,21 @@ const app = {
                         s.wins += 1;
                     } else if (result.placement === 2) {
                         s.points += points;
+                        if (tableSize === 2) {
+                            s.losses += 1;
+                        }
                     } else if (result.placement === 3) {
                         s.points += points;
                         s.losses += 1;
                     } else if (result.placement === 4) {
                         s.losses += 1;
+                    } else if (result.placement >= 5) {
+                        s.losses += 1;
+                    }
+
+                    if (result.bounties > 0) {
+                        s.bounties += result.bounties;
+                        s.points += result.bounties;
                     }
 
                     if (result.duration > 0) {
@@ -1689,22 +1960,24 @@ const app = {
         const stats = this.getPlayerStats(t);
         const sorted = Object.entries(stats)
             .map(([id, s]) => ({id, ...s}))
-            .sort((a, b) => b.points - a.points || b.wins - a.wins || (b.avgDuration || 0) - (a.avgDuration || 0));
+            .sort((a, b) => b.points - a.points || b.wins - a.wins || b.bounties - a.bounties || (b.avgDuration || 0) - (a.avgDuration || 0));
 
         container.innerHTML = `
             <div class="standing-row header">
                 <div>#</div>
                 <div>Jugador</div>
-                <div style="text-align: center;">Pts</div>
-                <div style="text-align: center;">V</div>
+                <div title="Puntos totales (base + bounties)" style="text-align: center;">Pts</div>
+                <div title="Victorias" style="text-align: center;">V</div>
+                <div title="Bounties (puntos por eliminación)" style="text-align: center;">Bs</div>
                 <div style="text-align: center;">Duración</div>
             </div>
             ${sorted.map((s, i) => `
                 <div class="standing-row">
                     <div class="standing-rank">${i + 1}</div>
                     <div class="standing-name">${this.escapeHtml(s.name)}</div>
-                    <div class="standing-stat">${s.points}</div>
+                    <div class="standing-stat" title="Base: ${s.points - (s.bounties || 0)} + Bounties: ${s.bounties || 0} = Total: ${s.points}">${s.points}</div>
                     <div class="standing-stat">${s.wins}</div>
+                    <div class="standing-stat" style="color: var(--t-rosa);">${s.bounties > 0 ? '💀 ' + s.bounties : '-'}</div>
                     <div class="standing-stat">${s.avgDuration > 0 ? s.avgDuration + ' min' : '-'}</div>
                 </div>
             `).join('')}

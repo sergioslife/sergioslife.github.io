@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li><a href="${basePath}ilustracion.html" class="ilustracion">Ilustración</a></li>
                         <li><a href="${basePath}sobre-mi.html" class="sobre-mi">Sobre Mi</a></li>
                         <li><a href="${basePath}Page/galeria.html" class="trabajos">Trabajos</a></li>
+                        <li><a href="${basePath}torneo.html" class="torneo">Torneos</a></li>
                         <li><a href="${basePath}contacto.html" class="contacto">Contacto</a></li>
                     </ul>
                 </div>
@@ -73,8 +74,11 @@ document.addEventListener("DOMContentLoaded", () => {
             </nav>
         `);
 
-        document.getElementById("nav-placeholder").innerHTML = navHTML;
-        setupMobileMenu();
+        const navPlaceholder = document.getElementById("nav-placeholder");
+        if (navPlaceholder) {
+            navPlaceholder.innerHTML = navHTML;
+            setupMobileMenu();
+        }
         loadLang();
         updateYear();
         return Promise.resolve();
@@ -109,7 +113,10 @@ document.addEventListener("DOMContentLoaded", () => {
             </footer>
         `);
 
-        document.getElementById("footer-placeholder").innerHTML = footerHTML;
+        const footerPlaceholder = document.getElementById("footer-placeholder");
+        if (footerPlaceholder) {
+            footerPlaceholder.innerHTML = footerHTML;
+        }
         loadLang();
         updateYear();
         return Promise.resolve();

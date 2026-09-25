@@ -75,6 +75,7 @@
 
                         <form id="form-add-player" class="form-row" onsubmit="app.addPlayer(event)">
                             <input type="text" id="input-player-name" placeholder="Nombre del jugador" required>
+                            <input type="text" id="input-player-group" placeholder="Grupo (opcional)" style="max-width: 120px;">
                             <button type="submit" class="btn-primary"><i class="fas fa-plus"></i></button>
                         </form>
 
@@ -83,7 +84,7 @@
                                 <i class="fas fa-file-import"></i> <span data-i18n="app.import_players">Importar lista</span>
                             </button>
                             <div id="import-area" class="import-area" style="display:none">
-                                <textarea id="import-players-text" rows="6" placeholder="Pega la lista de jugadores aquí, uno por línea..."></textarea>
+                                <textarea id="import-players-text" rows="6" placeholder="Pega la lista de jugadores aquí, uno por línea...&#10;Nombre (grupo opcional: Nombre|grupo)"></textarea>
                                 <button type="button" class="btn-primary" onclick="app.importPlayers()">
                                     <i class="fas fa-check"></i> <span data-i18n="app.import">Importar</span>
                                 </button>
@@ -247,7 +248,7 @@
                 </div>
                 <div class="form-group">
                     <label for="input-t-date" data-i18n="app.tournament_date">Fecha</label>
-                    <input type="date" id="input-t-date" required>
+                    <input type="date" id="input-t-date" required min="1900-01-01">
                 </div>
 
                 <div id="section-commander" class="format-section">
@@ -282,15 +283,9 @@
                             <option value="custom">Personalizado</option>
                         </select>
                     </div>
-                    <div class="form-row-2">
-                        <div class="form-group">
-                            <label for="input-t-rounds" data-i18n="app.tournament_rounds">Número de rondas</label>
-                            <input type="number" id="input-t-rounds" min="1" max="15" value="4">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-t-duration" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
-                            <input type="number" id="input-t-duration" min="10" max="180" step="5" value="50">
-                        </div>
+                    <div class="form-group">
+                        <label for="input-t-duration" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
+                        <input type="number" id="input-t-duration" min="10" max="180" step="5" value="50">
                     </div>
                 </div>
 
@@ -301,17 +296,6 @@
                             <option value="swiss" selected>Suizo</option>
                             <option value="elimination">Eliminación directa</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="input-t-match-format" data-i18n="app.match_format">Modalidad de partida</label>
-                        <select id="input-t-match-format">
-                            <option value="bo1" selected>Mejor de 1</option>
-                            <option value="bo3">Mejor de 3</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="input-t-rounds-1v1" data-i18n="app.tournament_rounds">Número de rondas</label>
-                        <input type="number" id="input-t-rounds-1v1" min="1" max="15" value="4">
                     </div>
                     <div class="form-group">
                         <label for="input-t-duration-1v1" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
@@ -342,15 +326,9 @@
                             <option value="bo3">Mejor de 3</option>
                         </select>
                     </div>
-                    <div class="form-row-2">
-                        <div class="form-group">
-                            <label for="input-t-rounds-2hg" data-i18n="app.tournament_rounds">Número de rondas</label>
-                            <input type="number" id="input-t-rounds-2hg" min="1" max="15" value="4">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-t-duration-2hg" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
-                            <input type="number" id="input-t-duration-2hg" min="10" max="180" step="5" value="50">
-                        </div>
+                    <div class="form-group">
+                        <label for="input-t-duration-2hg" data-i18n="app.tournament_duration">Duración por ronda (min)</label>
+                        <input type="number" id="input-t-duration-2hg" min="10" max="180" step="5" value="50">
                     </div>
                 </div>
 
@@ -373,29 +351,46 @@
                         <thead>
                             <tr>
                                 <th data-i18n="app.position">Posición</th>
+                                <th data-i18n="app.points_5">Puntos (mesa 5)</th>
                                 <th data-i18n="app.points_4">Puntos (mesa 4)</th>
                                 <th data-i18n="app.points_3">Puntos (mesa 3)</th>
+                                <th data-i18n="app.points_2">Puntos (mesa 2)</th>
                             </tr>
                         </thead>
                         <tbody id="scoring-body">
                             <tr>
                                 <td>1.º</td>
+                                <td><input type="number" class="scoring-input" data-table="5" data-pos="1" value="5" min="0" max="10"></td>
                                 <td><input type="number" class="scoring-input" data-table="4" data-pos="1" value="4" min="0" max="10"></td>
-                                <td><input type="number" class="scoring-input" data-table="3" data-pos="1" value="4" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="3" data-pos="1" value="3" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="2" data-pos="1" value="2" min="0" max="10"></td>
                             </tr>
                             <tr>
                                 <td>2.º</td>
+                                <td><input type="number" class="scoring-input" data-table="5" data-pos="2" value="4" min="0" max="10"></td>
                                 <td><input type="number" class="scoring-input" data-table="4" data-pos="2" value="3" min="0" max="10"></td>
-                                <td><input type="number" class="scoring-input" data-table="3" data-pos="2" value="3" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="3" data-pos="2" value="2" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="2" data-pos="2" value="1" min="0" max="10"></td>
                             </tr>
                             <tr>
                                 <td>3.º</td>
+                                <td><input type="number" class="scoring-input" data-table="5" data-pos="3" value="3" min="0" max="10"></td>
                                 <td><input type="number" class="scoring-input" data-table="4" data-pos="3" value="2" min="0" max="10"></td>
-                                <td><input type="number" class="scoring-input" data-table="3" data-pos="3" value="2" min="0" max="10"></td>
+                                <td><input type="number" class="scoring-input" data-table="3" data-pos="3" value="1" min="0" max="10"></td>
+                                <td><span style="color: var(--t-text-muted);">—</span></td>
                             </tr>
                             <tr>
                                 <td>4.º</td>
+                                <td><input type="number" class="scoring-input" data-table="5" data-pos="4" value="2" min="0" max="10"></td>
                                 <td><input type="number" class="scoring-input" data-table="4" data-pos="4" value="1" min="0" max="10"></td>
+                                <td><span style="color: var(--t-text-muted);">—</span></td>
+                                <td><span style="color: var(--t-text-muted);">—</span></td>
+                            </tr>
+                            <tr>
+                                <td>5.º</td>
+                                <td><input type="number" class="scoring-input" data-table="5" data-pos="5" value="1" min="0" max="10"></td>
+                                <td><span style="color: var(--t-text-muted);">—</span></td>
+                                <td><span style="color: var(--t-text-muted);">—</span></td>
                                 <td><span style="color: var(--t-text-muted);">—</span></td>
                             </tr>
                         </tbody>
