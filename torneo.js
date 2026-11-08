@@ -600,6 +600,9 @@ const app = {
         const currentRound = t.rounds[t.rounds.length - 1];
         if (!currentRound) return;
 
+        const table = currentRound.tables.find(tb => tb.id === tableId);
+        if (!table || table.bye) return;
+
         const now = Date.now();
 
         if (!table.turnState) {
@@ -971,6 +974,29 @@ const app = {
         this.renderTournamentDetail();
         this.updateTimerDisplay();
     },
+
+
+    // ---- Stubs for UI hooks referenced by torneo.html (safe no-ops) ----
+    confirmRound() {
+        const t = this.getCurrentTournament();
+        if (!t || t.status !== 'active') return;
+        const round = t.rounds[t.rounds.length - 1];
+        if (!round) return;
+        round.confirmed = true;
+        this.saveTournaments();
+        this.renderTournamentDetail();
+    },
+    cancelRoundEdit() { this.hideEditRoundModal(); },
+    editScoring() { this.showScoringModal(); },
+    showAddLatePlayerModal() { const m = document.getElementById('modal-late-player'); if (m) m.style.display = 'flex'; },
+    hideLatePlayerModal() { const m = document.getElementById('modal-late-player'); if (m) m.style.display = 'none'; },
+    toggleLateOptionFields() {},
+    addLatePlayer(e) { if (e) e.preventDefault(); this.hideLatePlayerModal(); },
+    showRetirePlayerModal() { const m = document.getElementById('modal-retire-player'); if (m) m.style.display = 'flex'; },
+    hideRetirePlayerModal() { const m = document.getElementById('modal-retire-player'); if (m) m.style.display = 'none'; },
+    retirePlayer(e) { if (e) e.preventDefault(); this.hideRetirePlayerModal(); },
+    showPlayerHistoryModal() { const m = document.getElementById('modal-player-history'); if (m) m.style.display = 'flex'; },
+    hidePlayerHistoryModal() { const m = document.getElementById('modal-player-history'); if (m) m.style.display = 'none'; },
 
     // ========================
     // PUNTUACIÓN CONFIGURABLE

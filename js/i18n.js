@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "app.edit_round": "Edit Round",
             "app.round_duration": "Duration (min)",
             "app.round_start": "Start time",
-            "app.round_tables": "Tables"
+            "app.round_tables": "Tables",
             "hero.greeting_1": "HELLO!!",
             "hero.greeting_2": "I AM",
             "hero.download_cv": "DOWNLOAD CV",
