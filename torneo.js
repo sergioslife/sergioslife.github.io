@@ -505,12 +505,13 @@ const app = {
                     <div class="table-status-info">
                         <div class="table-status-indicator ${statusClass}"></div>
                         <div>
-                            <div class="table-status-name">Mesa ${idx + 1}</div>
+                            <div class="table-status-name">Mesa ${idx + 1} ${table.officialReportAppliedAt ? '<span class="sync-mode sync-mode-firestore" style="margin-left:6px">oficial</span>' : ''}</div>
                             <div class="table-status-players">${playerNames || 'Bye'}</div>
                         </div>
                     </div>
                     <div class="table-status-actions">
                         <span class="table-status-badge ${statusClass}">${statusLabel}</span>
+                        ${!table.bye ? `<a class="btn-icon" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener" aria-label="Abrir mesa táctil ${idx + 1}" title="Abrir mesa táctil"><i class="fas fa-mobile-screen-button"></i></a>` : ''}
                         <button class="btn-icon" onclick="app.showEditTableModal('${table.id}')" aria-label="Editar mesa ${idx + 1}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -1033,13 +1034,45 @@ const app = {
         this.renderStandings();
     },
 
-    getPointsForPosition(placement, tableSize) {
-        const t = this.getCurrentTournament();
-        if (!t || !t.scoring) {
-            return Math.max(0, (tableSize - placement) + 1);
-        }
-
+    getPointsForPosition(placement, tableSize, t) {
+        t = t || this.getCurrentTournament();
+        if (!t || !t.scoring) return Math.max(0, (tableSize - placement) + 1);
         return t.scoring[tableSize]?.[placement] || 0;
+    },
+
+    getMesaUrl(tableId) {
+        const t = this.getCurrentTournament();
+        const sid = (t && t.syncSessionId) ? t.syncSessionId : (t ? String(t.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() : '');
+        return location.origin + location.pathname.replace(/torneo\.html.*$/i, 'mesa.html') + '?session=' + encodeURIComponent(sid) + '&table=' + encodeURIComponent(tableId || '');
+    },
+
+    applyOfficialTableReport(sessionId, tableId, report) {
+        const t = this.tournaments.find(x => x.syncSessionId === sessionId || String(x.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() === sessionId);
+        if (!t || !report || report.status !== 'submitted') return false;
+        const round = (t.rounds || []).slice().reverse().find(r => (r.tables || []).some(tb => tb.id === tableId));
+        const table = round && round.tables.find(tb => tb.id === tableId);
+        if (!table || table.bye) return false;
+        if (table.officialReportAppliedAt === report.submittedAt) return false;
+        const placements = Array.isArray(report.placements) ? report.placements : [];
+        const tableSize = (table.players || []).length;
+        table.results = placements.map(p => ({
+            playerId: p.playerId,
+            placement: Number(p.placement) || 0,
+            duration: Math.max(0, Math.round((report.timeConsumedSec && report.timeConsumedSec[p.playerId] ? report.timeConsumedSec[p.playerId] : 0) / 60)),
+            bounties: 0,
+            elimination: p.elimination || null,
+            points: this.getPointsForPosition(Number(p.placement) || 0, tableSize, t)
+        }));
+        table.completed = true;
+        table.finishedAt = report.submittedAt || Date.now();
+        table.officialReportAppliedAt = report.submittedAt || Date.now();
+        table.officialReportReason = report.reason || null;
+        table.officialTotalDurationSec = report.totalDurationSec || 0;
+        table.officialTimeConsumedSec = report.timeConsumedSec || {};
+        if (round && round.tables.every(tb => tb.completed || tb.bye)) { round.completed = true; round.finishedAt = round.finishedAt || Date.now(); }
+        this.saveTournaments();
+        if (this.currentTournamentId === t.id) this.renderTournamentDetail();
+        return true;
     },
 
     renderPlayersList() {
@@ -1587,7 +1620,11 @@ const app = {
 
                 return `
                     <div class="table-card">
-                        <h4>Mesa ${idx + 1}</h4>
+                        <h4>Mesa ${idx + 1} ${table.officialReportAppliedAt ? '<span class="sync-mode sync-mode-firestore" style="margin-left:6px">resultado oficial</span>' : ''}</h4>
+                        <div class="table-legend" style="font-size: 0.72rem; color: var(--t-text-muted); margin-top: 2px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa táctil</a>
+                          <code style="font-size:.72rem; opacity:.8;">ID mesa: ${this.escapeHtml(table.id)}</code>
+                        </div>
                         <div class="table-players">
                             <div class="table-player ${teamAPlacement === 1 ? 'winner' : ''}">
                                 <span class="p-name">Equipo A: ${teamA.map(p => this.escapeHtml(p.name)).join(' + ')}</span>
@@ -1693,9 +1730,13 @@ const app = {
                 : '';
 
             return `
-                <div class="table-card">
-                    <h4>Mesa ${idx + 1} ${hasRepeats ? '<span style="color: var(--t-rosa); font-size: 0.75rem; margin-left: 8px;">CON REPETICIÃ“N</span>' : ''}</h4>
-                    <div class="table-legend" style="font-size: 0.7rem; color: var(--t-text-muted); margin-top: 2px;">Puntos base: ${pointsLegend}</div>
+                                    <div class="table-card">
+                        <h4>Mesa ${idx + 1} ${hasRepeats ? '<span style="color: var(--t-rosa); font-size: 0.75rem; margin-left: 8px;">CON REPETICION</span>' : ''} ${table.officialReportAppliedAt ? '<span class="sync-mode sync-mode-firestore" style="margin-left:6px">resultado oficial</span>' : ''}</h4>
+                        <div class="table-legend" style="font-size: 0.72rem; color: var(--t-text-muted); margin-top: 2px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                          <span>Puntos base: ${pointsLegend}</span>
+                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa tactil</a>
+                          <code style="font-size:.72rem; opacity:.8;">ID mesa: ${this.escapeHtml(table.id)}</code>
+                        </div>
                     <div class="table-players">${playersHtml}</div>
                     ${turnControls}
                 </div>

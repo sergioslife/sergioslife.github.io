@@ -1,39 +1,32 @@
-﻿# Torneo Commander — arquitectura en tiempo real (GitHub Pages)
+﻿# Torneo Commander — arquitectura tiempo real (GitHub Pages)
 
-## Resumen
-- **Anfitrión (`torneo.html`)**: gestión local existente (localStorage) + publicación opcional del estado vivo de la ronda/mesas a un backend en tiempo real.
-- **Invitado / Companion (`companion.html`)**: vista móvil liviana. Se une por `?session=<codigo>&table=<mesa>&player=<id>` o selector. Lee estado del torneo/mesa y escribe contadores de vida/comandante/secundarios de su jugador.
-- **Sincronización**: adaptador con Firestore (recomendado para GitHub Pages) y fallback `BroadcastChannel`/`localStorage` para pruebas en el mismo navegador.
+## Capas
+- **Host/admin (`torneo.html` + `torneo.js`)**: fuente de verdad del torneo (jugadores, rondas, emparejamientos, puntuación). Persiste localmente en `localStorage` (`commander-tournaments`). Publica sesión/mesas a Firestore y **solo consume** `officialReport` enviado por la mesa.
+- **Mesa invitada táctil (`mesa.html`, compat `companion.html`)**: vista 2x2 sincronizada estilo companion (Lifetap/MTG Companion). Estado cosmético en tiempo real: vida, veneno, experiencia, impuesto de comandante, daño de comandante por oponente/fuente nombrada, turno activo, tiempos usados. Al finalizar envía **resultado oficial** al host.
+- **Sync (`js/torneo/sync.js`)**: Firestore (producción) o `BroadcastChannel`+`localStorage` (demo mismo navegador). `patchTable` fusiona estado compartido para no borrar `live/turn` al republicar metadatos.
 
-## Firebase (producción)
-1. Crea un proyecto en Firebase Console y habilita **Cloud Firestore**.
-2. Copia la configuración web en `js/torneo/firebase-config.js` (ver plantilla).
-3. Reglas iniciales (ajustar para producción):
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /torneoSessions/{sessionId} {
-      allow read: if true;
-      allow write: if request.resource.data.keys().hasAny(['hostSecretHash']) == false
-                   || resource == null; // simplificado: endurecer con auth/claims
-      match /tables/{tableId} {
-        allow read, write: if true; // endurecer: validar session/token/jugador
-      }
-    }
-  }
-}
-```
-4. Para privacidad real del anfitrión, usa **Firebase Auth** + reglas por `hostUid` (GitHub Pages no puede ocultar credenciales cliente; Firestore Rules son el control de acceso).
+## Estado dividido
+**A. Tiempo real / persistencia ligera (`torneoSessions/{session}/tables/{tableId}`)**
+- `live.{playerId}`: `life`, `poison`, `energy`, `experience`, `commanderTax`, `commanderDamage.{opponentId}.{commanderName,damage}`, `eliminated`, `elimination`, `timeUsedSec`.
+- `turn`: `index`, `activePlayerId`, `startedAt` (turno activo; indicador visual + “Pasar turno” horario).
+- Sesión: `roundDurationSec`, `roundStartedAt`, `roundPausedDurationMs`, `roundPausedAt`.
 
-## Estructura modular
-- `torneo.html` / `torneo.js` / `torneo.css`: host (existente, extendido con puente).
-- `companion.html` / `css/companion.css` / `js/torneo/companion.js`: companion móvil.
-- `js/torneo/firebase-config.js`: config (no commitear secretos reales en repos públicos si aplica; Firebase web config es identificador público, las reglas protegen datos).
-- `js/torneo/sync.js`: capa de datos (Firestore/BroadcastChannel).
-- `js/torneo/host-bridge.js`: publica estado host → sesión/mesa.
-- `js/torneo/companion-model.js`: lógica pura de contadores/daño comandante.
+**B. Impacto oficial al torneo (host)**
+Solo `officialReport` con `status:"submitted"`:
+- `placements[]`: `playerId`, `placement` (1º–4º), `elimination`.
+- `timeConsumedSec{playerId}` y `totalDurationSec`.
+- `reason`: `eliminations | global-timeout | manual`.
 
-## Modelo de datos (sesión)
-`torneoSessions/{sessionId}`: `{ tournamentName, status, roundNumber, roundDurationSec, roundStartedAt, roundPausedDurationMs, roundPausedAt, hostUpdatedAt }`
-`torneoSessions/{sessionId}/tables/{tableId}`: `{ tableIndex, players:[{id,name,life,poison,energy,experience,storm,commanderDamage:{[opponentPlayerId]:{commanderName,damage}}}], turnSecondsPerPlayer, activePlayerId }`
+`host-bridge` suscribe mesas activas; `app.applyOfficialTableReport` en `torneo.js` calcula puntos con `getPointsForPosition/scoring`, escribe `table.results`/duraciones, marca `table.completed` y actualiza standings. No se guardan en el host cambios cosméticos continuos de vida/comandante.
+
+## Derrotas automáticas (mesa)
+- Vida `<= 0`, veneno `>= 10`, daño de comandante `>= 21` de una misma fuente: se marca eliminado visualmente y se registra condición.
+- Tiempo global agotado / 3 eliminaciones: habilita envío de resultado oficial (confirmación manual para evitar falsos positivos; puede automatizarse con regla estricta si se desea).
+- Tiempo por turno/jugador se acumula mientras el jugador tiene turno activo.
+
+## Firebase
+Config: `js/torneo/firebase-config.js`. Firestore Rules (prueba): permitir `read,write` en `torneoSessions/{sessionId}` y `tables/{tableId}`. Producción: Firebase Auth + reglas por host/sesión; validar que invitados solo modifiquen `live/turn` y que `officialReport` sea controlado (idealmente Cloud Function) si se requiere integridad fuerte.
+
+## Rutas
+- Host: `torneo.html`
+- Mesa: `mesa.html?session=<CODIGO>&table=<tableId>` (`companion.html` redirige conservando query)

@@ -2,111 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Companion de Mesa | Torneo Commander</title>
-  <meta name="description" content="Companion móvil para jugadores: vida, contadores, daño de comandante y temporizadores.">
-  <link rel="icon" href="favicon.ico" sizes="any">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="torneo.css">
-  <link rel="stylesheet" href="css/companion.css">
+  <meta http-equiv="refresh" content="0; url=mesa.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Companion | Mesa</title>
 </head>
-<body class="companion-body">
-  <main class="companion-app" id="companion-app">
-    <header class="companion-header">
-      <a class="companion-back" href="torneo.html" aria-label="Volver al gestor"><i class="fas fa-arrow-left"></i></a>
-      <div class="companion-title-wrap">
-        <h1 id="c-tournament-name">Companion</h1>
-        <p id="c-subtitle">Únete con el código de sesión y tu mesa</p>
-      </div>
-      <span id="c-sync-badge" class="sync-mode sync-mode-local">conectando</span>
-    </header>
-
-    <section id="c-join" class="c-card">
-      <h2><i class="fas fa-link"></i> Unirse a una mesa</h2>
-      <label class="c-label">Código de sesión
-        <input id="c-session" class="c-input" placeholder="Ej. A1B2C3D4" autocomplete="off">
-      </label>
-      <label class="c-label">ID de mesa
-        <input id="c-table" class="c-input" placeholder="ID de mesa del anfitrión" autocomplete="off">
-      </label>
-      <label class="c-label">Tu jugador (opcional; puedes elegir después)
-        <select id="c-player" class="c-input"><option value="">Seleccionar jugador…</option></select>
-      </label>
-      <div class="c-actions">
-        <button id="c-join-btn" class="btn-primary" type="button"><i class="fas fa-right-to-bracket"></i> Entrar</button>
-      </div>
-      <p class="c-help">El anfitrión comparte el enlace desde el panel del torneo. En GitHub Pages, el tiempo real entre dispositivos requiere configurar Firebase (<code>js/torneo/firebase-config.js</code>).</p>
-    </section>
-
-    <section id="c-board" class="c-board" style="display:none">
-      <div class="c-timers c-card">
-        <div class="c-timer-block">
-          <div class="c-timer-label">Ronda global</div>
-          <div id="c-round-timer" class="c-timer-value">--:--</div>
-          <div id="c-round-meta" class="c-timer-meta"></div>
-        </div>
-        <div class="c-timer-block">
-          <div class="c-timer-label">Tu tiempo (ronda / 4)</div>
-          <div id="c-player-timer" class="c-timer-value">--:--</div>
-          <div class="c-timer-meta c-timer-controls">
-            <button id="c-player-timer-toggle" class="btn-secondary btn-sm" type="button"><i class="fas fa-play"></i> Iniciar</button>
-            <button id="c-player-timer-reset" class="btn-secondary btn-sm" type="button"><i class="fas fa-rotate-left"></i></button>
-          </div>
-        </div>
-      </div>
-
-      <div id="c-status" class="c-status" aria-live="polite"></div>
-
-      <div class="c-card c-life-card">
-        <div class="c-life-head">
-          <h2 id="c-player-name">Jugador</h2>
-          <button id="c-change-player" class="btn-secondary btn-sm" type="button">Cambiar</button>
-        </div>
-        <div class="c-life-display">
-          <button class="c-life-btn minus" data-delta="-1" data-field="life" type="button">−1</button>
-          <button class="c-life-btn minus big" data-delta="-5" data-field="life" type="button">−5</button>
-          <div class="c-life-value" id="c-life">40</div>
-          <button class="c-life-btn plus big" data-delta="5" data-field="life" type="button">+5</button>
-          <button class="c-life-btn plus" data-delta="1" data-field="life" type="button">+1</button>
-        </div>
-      </div>
-
-      <div class="c-grid">
-        <div class="c-card c-counter-card" data-counter="poison">
-          <h3><i class="fas fa-skull-crossbones"></i> Veneno</h3>
-          <div class="c-counter-row"><button class="c-mini" data-field="poison" data-delta="-1">−</button><span id="c-poison" class="c-counter-val">0</span><button class="c-mini" data-field="poison" data-delta="1">+</button></div>
-          <div class="c-counter-hint">10 = derrota</div>
-        </div>
-        <div class="c-card c-counter-card" data-counter="energy">
-          <h3><i class="fas fa-bolt"></i> Energía</h3>
-          <div class="c-counter-row"><button class="c-mini" data-field="energy" data-delta="-1">−</button><span id="c-energy" class="c-counter-val">0</span><button class="c-mini" data-field="energy" data-delta="1">+</button></div>
-        </div>
-        <div class="c-card c-counter-card" data-counter="experience">
-          <h3><i class="fas fa-star"></i> Experiencia</h3>
-          <div class="c-counter-row"><button class="c-mini" data-field="experience" data-delta="-1">−</button><span id="c-experience" class="c-counter-val">0</span><button class="c-mini" data-field="experience" data-delta="1">+</button></div>
-        </div>
-        <div class="c-card c-counter-card" data-counter="storm">
-          <h3><i class="fas fa-cloud-bolt"></i> Tormenta</h3>
-          <div class="c-counter-row"><button class="c-mini" data-field="storm" data-delta="-1">−</button><span id="c-storm" class="c-counter-val">0</span><button class="c-mini" data-field="storm" data-delta="1">+</button></div>
-        </div>
-      </div>
-
-      <div class="c-card">
-        <div class="c-section-head">
-          <h2><i class="fas fa-chess-king"></i> Daño de comandante</h2>
-          <span class="c-counter-hint">21 por comandante = derrota</span>
-        </div>
-        <div id="c-commander-list" class="c-commander-list"></div>
-      </div>
-    </section>
-  </main>
-
-  <script src="js/torneo/firebase-config.js"></script>
-  <script src="js/torneo/sync.js"></script>
-  <script src="js/torneo/companion-model.js"></script>
-  <script src="js/torneo/companion.js"></script>
+<body>
+  <script>location.replace('mesa.html' + location.search + location.hash);</script>
+  <p>Redirigiendo a <a href="mesa.html">mesa.html</a>…</p>
 </body>
 </html>

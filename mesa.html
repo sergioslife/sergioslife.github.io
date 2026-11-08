@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Mesa Companion | Torneo Commander</title>
+  <meta name="description" content="Vista táctil 2x2 de mesa compartida para Commander: vida, comandante, contadores, turno y resultados oficiales.">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="torneo.css">
+  <link rel="stylesheet" href="css/companion.css">
+</head>
+<body class="mesa-body">
+  <main id="mesa-app" class="mesa-app">
+    <header class="mesa-topbar">
+      <a class="companion-back" href="torneo.html" aria-label="Volver"><i class="fas fa-arrow-left"></i></a>
+      <div class="mesa-top-meta">
+        <div id="m-title" class="mesa-title">Mesa Companion</div>
+        <div id="m-sub" class="mesa-sub">Únete con sesión y mesa</div>
+      </div>
+      <div class="mesa-top-actions">
+        <span id="m-sync" class="sync-mode sync-mode-local">...</span>
+        <button id="m-open-join" class="btn-secondary btn-sm" type="button" title="Cambiar mesa"><i class="fas fa-link"></i></button>
+      </div>
+    </header>
+
+    <section id="m-join" class="c-card m-join">
+      <h2><i class="fas fa-users"></i> Mesa compartida (2x2)</h2>
+      <label class="c-label">Código de sesión<input id="m-session" class="c-input" autocomplete="off" placeholder="Código del anfitrión"></label>
+      <label class="c-label">ID de mesa<input id="m-table" class="c-input" autocomplete="off" placeholder="ID de mesa"></label>
+      <div class="c-actions"><button id="m-join-btn" class="btn-primary" type="button"><i class="fas fa-right-to-bracket"></i> Entrar a la mesa</button></div>
+      <p class="c-help">Abre esta vista en el centro de la mesa o compártela con los 4 jugadores. El estado cosmético (vida, comandante, turno, tiempos) se sincroniza en tiempo real; al finalizar se envía al anfitrión solo el resultado oficial (puestos, puntos, duración y tiempos consumidos).</p>
+    </section>
+
+    <section id="m-board" class="m-board" style="display:none">
+      <div class="m-global-bar">
+        <div class="m-global-item"><span class="k">Ronda</span><strong id="m-round-timer">--:--</strong><small id="m-round-meta"></small></div>
+        <div class="m-global-item turn"><span class="k">Turno activo</span><strong id="m-active-name">-</strong><small id="m-active-time">00:00</small></div>
+        <button id="m-pass-turn" class="btn-primary m-pass-btn" type="button"><i class="fas fa-forward"></i> Pasar turno</button>
+      </div>
+
+      <div id="m-grid" class="m-grid seats-4" aria-label="Mesa táctil 2x2"></div>
+
+      <div class="m-official c-card">
+        <div class="m-official-head">
+          <div>
+            <strong><i class="fas fa-trophy"></i> Resultado oficial al anfitrión</strong>
+            <div id="m-official-status" class="c-counter-hint">Se envía solo al finalizar la mesa (eliminaciones/tiempo global o envío manual).</div>
+          </div>
+          <button id="m-submit-official" class="btn-secondary btn-sm" type="button"><i class="fas fa-paper-plane"></i> Enviar resultado</button>
+        </div>
+        <div id="m-official-preview" class="m-official-preview"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/torneo/firebase-config.js"></script>
+  <script src="js/torneo/sync.js"></script>
+  <script src="js/torneo/companion-model.js"></script>
+  <script src="js/torneo/mesa.js"></script>
+</body>
+</html>
