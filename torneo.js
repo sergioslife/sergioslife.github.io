@@ -2082,3 +2082,4 @@ const app = {
 document.addEventListener('DOMContentLoaded', () => {
     app.init();
 });
+window.app = app;

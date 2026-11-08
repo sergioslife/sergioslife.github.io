@@ -118,12 +118,13 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
-      if (!global.app) return;
-      global.TorneoHostBridge.init(global.app).then(function () {
-        var origShow = global.app.showTournament.bind(global.app);
-        global.app.showTournament = function (id) { origShow(id); setTimeout(function(){ global.TorneoHostBridge.injectUI(); publishCurrent(global.app); }, 0); };
-        var origRender = global.app.renderTournamentDetail.bind(global.app);
-        global.app.renderTournamentDetail = function () { origRender(); setTimeout(function(){ global.TorneoHostBridge.injectUI(); }, 0); };
+      var app = global.app || (typeof window !== 'undefined' && window.app);
+      if (!app) return;
+      global.TorneoHostBridge.init(app).then(function () {
+        var origShow = app.showTournament.bind(app);
+        app.showTournament = function (id) { origShow(id); setTimeout(function(){ global.TorneoHostBridge.injectUI(); publishCurrent(app); }, 0); };
+        var origRender = app.renderTournamentDetail.bind(app);
+        app.renderTournamentDetail = function () { origRender(); setTimeout(function(){ global.TorneoHostBridge.injectUI(); }, 0); };
       });
     }, 0);
   });
