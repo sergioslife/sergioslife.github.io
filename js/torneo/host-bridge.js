@@ -10,6 +10,11 @@
     });
   }
   function getBaseMesaUrl() { return location.origin + location.pathname.replace(/torneo\.html.*$/i, 'mesa.html'); }
+  function normMesaId(table, idx) {
+    if (table && table.tableNumber) return 'mesa-' + table.tableNumber;
+    if (table && typeof table.id === 'string' && /^mesa-\d+$/i.test(table.id)) return table.id;
+    return 'mesa-' + (idx + 1);
+  }
   function publishCurrent(app) {
     if (!global.TorneoSync || !global.TorneoSync.ready()) return Promise.resolve();
     var t = app && app.getCurrentTournament ? app.getCurrentTournament() : null;
@@ -31,9 +36,11 @@
     if (round && round.tables) {
       round.tables.forEach(function (table, idx) {
         if (table.bye) return;
-        var tid = table.id || ('t' + (idx + 1));
-    var patch = {
-          sessionId: sessionId, tableId: tid, tableIndex: idx + 1, roundNumber: round.roundNumber,
+        var tid = normMesaId(table, idx);
+        table.tableNumber = idx + 1;
+        table.publicMesaId = tid;
+        var patch = {
+          sessionId: sessionId, tableId: tid, internalTableId: table.id, tableIndex: idx + 1, roundNumber: round.roundNumber,
           players: normPlayers(t, table), completed: !!table.completed,
           hostPublishedAt: Date.now()
         };
@@ -71,22 +78,36 @@
       var round = (t.rounds || [])[ (t.rounds || []).length - 1 ];
       if (!round) return;
       var self = this;
-      (round.tables || []).forEach(function (table) {
+      (round.tables || []).forEach(function (table, idx) {
         if (table.bye) return;
-        var key = sessionId + '::' + table.id;
-        if (self._tableSubs[key]) return;
-        self._tableSubs[key] = global.TorneoSync.subscribeTable(sessionId, table.id, function (data) {
-          if (!data) return;
-          if (data.officialReport && data.officialReport.status === 'submitted' && app.applyOfficialTableReport) {
-            app.applyOfficialTableReport(sessionId, table.id, data.officialReport);
-          } else if (app.applyLiveTableState) {
-            app.applyLiveTableState(sessionId, table.id, data);
-          }
+        var pubId = normMesaId(table, idx);
+        var ids = [];
+        if (pubId) ids.push(pubId);
+        if (table.id && ids.indexOf(table.id) < 0) ids.push(table.id);
+        if (table.publicMesaId && ids.indexOf(table.publicMesaId) < 0) ids.push(table.publicMesaId);
+        ids.forEach(function(subId){
+          var key = sessionId + '::' + subId;
+          if (self._tableSubs[key]) return;
+          self._tableSubs[key] = global.TorneoSync.subscribeTable(sessionId, subId, function (data) {
+            if (!data) return;
+            var internalId = (data && (data.internalTableId || data.tableId)) || table.id;
+            // prefer mapping back to current host table
+            var hostTableId = table.id;
+            if (internalId && internalId !== hostTableId && table.publicMesaId === internalId) hostTableId = table.id;
+            if (data.officialReport && data.officialReport.status === 'submitted' && app.applyOfficialTableReport) {
+              app.applyOfficialTableReport(sessionId, hostTableId, data.officialReport);
+            } else if (app.applyLiveTableState) {
+              app.applyLiveTableState(sessionId, hostTableId, data);
+            }
+          });
         });
       });
     },
-    joinUrl: function (sessionId, tableId) {
-      return getBaseMesaUrl() + '?session=' + encodeURIComponent(sessionId || '') + (tableId ? '&table=' + encodeURIComponent(tableId) : '');
+    joinUrl: function (sessionId, tableId, tableIndex) {
+      var mesa = tableId || '';
+      if (typeof tableIndex === 'number' && tableIndex > 0) mesa = 'mesa-' + tableIndex;
+      else if (/^\d+$/.test(String(mesa))) mesa = 'mesa-' + mesa;
+      return getBaseMesaUrl() + '?sesion=' + encodeURIComponent(sessionId || '') + (mesa ? '&mesa=' + encodeURIComponent(mesa) : '');
     },
     injectUI: function () {
       var box = document.getElementById('companion-share-box');
@@ -104,7 +125,7 @@
       var mode = (global.TorneoSync && global.TorneoSync.mode) || 'local';
       var round = (t.rounds || [])[ (t.rounds || []).length - 1 ];
       var mesaLinks = (round && round.tables ? round.tables.filter(function(tb){return !tb.bye;}) : []).map(function(tb, i){
-        var url = getBaseMesaUrl() + '?session=' + encodeURIComponent(sessionId) + '&table=' + encodeURIComponent(tb.id);
+        var url = getBaseMesaUrl() + '?sesion=' + encodeURIComponent(sessionId) + '&mesa=' + encodeURIComponent(normMesaId(tb, i));
         return '<a class="btn-secondary btn-sm" href="' + esc(url) + '" target="_blank" rel="noopener">Mesa ' + (i+1) + ' (táctil)</a>';
       }).join(' ');
       box.style.display = 'block';

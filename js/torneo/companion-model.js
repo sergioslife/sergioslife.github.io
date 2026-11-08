@@ -5,6 +5,7 @@
     return {
       life: typeof startingLife === 'number' ? startingLife : 40,
       poison: 0, energy: 0, experience: 0, commanderTax: 0,
+      storm: 0, manaPool: 0, monarch: false, initiative: false, extra: {},
       commanderDamage: {}, eliminated: false, elimination: null, eliminationOrder: null,
       timeUsedSec: 0, lossExceptions: {}
     };
@@ -16,6 +17,7 @@
     Object.keys(d).forEach(function (k) { if (cur[k] === undefined) cur[k] = d[k]; });
     cur.commanderDamage = cur.commanderDamage || {};
     cur.lossExceptions = cur.lossExceptions || {};
+    cur.extra = cur.extra || {};
     table.live[playerId] = cur;
     return cur;
   }
@@ -55,18 +57,40 @@
     for (var op in cd) if ((Number(cd[op] && cd[op].damage) || 0) >= 21) return { type: 'commander', source: op, commanderName: (cd[op] && cd[op].commanderName) || 'Comandante', label: '21 de daño de comandante' };
     return null;
   }
+  function fmtRoundClock(session, at) {
+    if (!session || !session.roundStartedAt) return null;
+    var paused = session.roundPausedDurationMs || 0;
+    var ts = at || Date.now();
+    if (session.roundPausedAt && ts > session.roundPausedAt) paused += (ts - session.roundPausedAt);
+    var sec = Math.max(0, Math.floor((ts - session.roundStartedAt - paused) / 1000));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return { sec: sec, label: String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0') };
+  }
   function nextEliminationOrder(table) {
     var max = 0;
     ((table && table.players) || []).forEach(function(p){ var l = table.live && table.live[p.id]; if (l && Number(l.eliminationOrder) > max) max = Number(l.eliminationOrder); });
     return max + 1;
   }
-  function confirmElimination(table, playerId, condition, at) {
+  function confirmElimination(table, playerId, condition, at, session) {
     var live = ensureLive(table, playerId);
     if (live.eliminated) return live;
     accrueIfActive(table, playerId);
+    var ts = at || Date.now();
+    var clock = fmtRoundClock(session, ts);
     live.eliminated = true;
     live.eliminationOrder = nextEliminationOrder(table);
-    live.elimination = { type: condition && condition.type || 'manual', label: (condition && condition.label) || 'Derrota confirmada', source: condition && condition.source || null, commanderName: condition && condition.commanderName || null, detail: condition && condition.detail || null, at: at || Date.now() };
+    live.timeUsedSec = effectiveTimeUsed(table, playerId); // snapshot at elimination
+    live.elimination = {
+      type: condition && condition.type || 'manual',
+      label: (condition && condition.label) || 'Derrota confirmada',
+      source: condition && condition.source || null, commanderName: condition && condition.commanderName || null,
+      detail: condition && condition.detail || null,
+      at: ts,
+      timeOfElimination: clock ? clock.label : null,
+      timeOfEliminationSec: clock ? clock.sec : null,
+      playerTurnTimeSec: Math.max(0, Math.floor(Number(live.timeUsedSec) || 0)),
+      playerTurnTime: (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(Math.max(0, Math.floor(Number(live.timeUsedSec) || 0)))
+    };
     // if active player eliminated, pass turn state to next alive without accruing again
     if (activePlayerId(table) === playerId) moveTurnToNextAlive(table, playerId);
     return live;
@@ -142,7 +166,12 @@
         // 1st out => 4th place for 4 players: place = n - eliminationOrder + 1
         place = n - Number(l.eliminationOrder) + 1;
       }
-      return { playerId: p.id, placement: place, elimination: l.elimination || null, eliminationOrder: l.eliminationOrder || null };
+      var elim = l.elimination || null;
+      return { playerId: p.id, placement: place, elimination: elim, eliminationOrder: l.eliminationOrder || null,
+        timeOfElimination: elim && (elim.timeOfElimination || null), timeOfEliminationSec: elim && (elim.timeOfEliminationSec != null ? elim.timeOfEliminationSec : null),
+        playerTurnTimeSec: Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0)),
+        playerTurnTime: elim && elim.playerTurnTime ? elim.playerTurnTime : (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0)))
+      };
     });
     var alive = placements.filter(function(p){ return p.placement == null; });
     alive.sort(function(a,b){
@@ -176,7 +205,7 @@
     return Math.floor(((session && session.roundDurationSec) || 3000) / n);
   }
   global.CompanionModel = {
-    clamp: clamp, defaultLive: defaultLive, ensureLive: ensureLive, conditionKey: conditionKey,
+    clamp: clamp, defaultLive: defaultLive, ensureLive: ensureLive, conditionKey: conditionKey, fmtRoundClock: fmtRoundClock,
     detectLossConditions: detectLossConditions, eliminationFor: eliminationFor,
     confirmElimination: confirmElimination, ignoreCondition: ignoreCondition, nextEliminationOrder: nextEliminationOrder,
     activePlayerId: activePlayerId, activeIndex: activeIndex, turnElapsedSec: turnElapsedSec, effectiveTimeUsed: effectiveTimeUsed,

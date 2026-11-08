@@ -511,7 +511,7 @@ const app = {
                     </div>
                     <div class="table-status-actions">
                         <span class="table-status-badge ${statusClass}">${statusLabel}</span>
-                        ${!table.bye ? `<a class="btn-icon" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener" aria-label="Abrir mesa t�ctil ${idx + 1}" title="Abrir mesa t�ctil"><i class="fas fa-mobile-screen-button"></i></a>` : ''}
+                        ${!table.bye ? `<a class="btn-icon" href="${app.getMesaUrl(table.id, idx + 1)}" target="_blank" rel="noopener" aria-label="Abrir mesa t�ctil ${idx + 1}" title="Abrir mesa t�ctil"><i class="fas fa-mobile-screen-button"></i></a>` : ''}
                         <button class="btn-icon" onclick="app.showEditTableModal('${table.id}')" aria-label="Editar mesa ${idx + 1}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -1043,10 +1043,13 @@ const app = {
         return t.scoring[tableSize]?.[placement] || 0;
     },
 
-    getMesaUrl(tableId) {
+    getMesaUrl(tableId, tableIndex) {
         const t = this.getCurrentTournament();
         const sid = (t && t.syncSessionId) ? t.syncSessionId : (t ? String(t.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() : '');
-        return location.origin + location.pathname.replace(/torneo\.html.*$/i, 'mesa.html') + '?session=' + encodeURIComponent(sid) + '&table=' + encodeURIComponent(tableId || '');
+        var mesa = tableId || '';
+        if (typeof tableIndex === 'number' && tableIndex > 0) mesa = 'mesa-' + tableIndex; // ID amigable para invitado
+        else if (/^\d+$/.test(String(mesa))) mesa = 'mesa-' + mesa;
+        return location.origin + location.pathname.replace(/torneo\.html.*$/i, 'mesa.html') + '?sesion=' + encodeURIComponent(sid) + '&mesa=' + encodeURIComponent(mesa);
     },
 
     applyLiveTableState(sessionId, tableId, tableData) {
@@ -1056,8 +1059,9 @@ const app = {
             if (!tableData) return false;
             const t = this.tournaments.find(x => x.syncSessionId === sessionId || String(x.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() === sessionId);
             if (!t) return false;
-            const round = (t.rounds || []).slice().reverse().find(r => (r.tables || []).some(tb => tb.id === tableId));
-            const table = round && round.tables.find(tb => tb.id === tableId);
+            const normId = String(tableId||'').replace(/^mesa-0*/i,'mesa-');
+            const round = (t.rounds || []).slice().reverse().find(r => (r.tables || []).some(tb => tb.id === tableId || tb.publicMesaId === tableId || ('mesa-'+tb.tableNumber)===normId));
+            const table = round && (round.tables.find(tb => tb.id === tableId) || round.tables.find(tb => tb.publicMesaId === tableId) || round.tables.find(tb => ('mesa-'+tb.tableNumber)===normId));
             if (!table || table.bye) return false;
             // Si ya hay resultado oficial aplicado, mantenerlo; solo refrescar metadatos vivos.
             table.live = tableData.live || table.live || {};
@@ -1075,10 +1079,17 @@ const app = {
                 var n = players.length;
                 var results = [];
                 var used = {};
-                eliminated.forEach(function(e, idx){ var placement = n - (e.order || (idx+1)) + 1; if (placement < 1) placement = n; results.push({ playerId:e.playerId, placement: placement, duration:0, bounties:0, elimination:e.elimination, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][placement]) || Math.max(0,(n-placement)+1) }); used[e.playerId]=true; });
+                eliminated.forEach(function(e, idx){
+                  var placement = n - (e.order || (idx+1)) + 1; if (placement < 1) placement = n;
+                  var l = live[e.playerId] || {};
+                  var elim = e.elimination || l.elimination || null;
+                  var turnSec = Math.max(0, Math.floor(Number(l.timeUsedSec) || 0));
+                  results.push({ playerId:e.playerId, placement: placement, duration: Math.round(turnSec/60), turnTimeSec: turnSec, playerTurnTimeSec: turnSec, playerTurnTime: (elim&&elim.playerTurnTime)||null, timeOfElimination: (elim&&elim.timeOfElimination)||null, timeOfEliminationSec: (elim&&elim.timeOfEliminationSec!=null?elim.timeOfEliminationSec:null), bounties:0, elimination:elim, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][placement]) || Math.max(0,(n-placement)+1) });
+                  used[e.playerId]=true;
+                });
                 var alive = players.filter(function(pid){ return !used[pid]; });
                 if (alive.length === 1) results.push({ playerId: alive[0], placement: 1, duration:0, bounties:0, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][1]) || n });
-                else alive.forEach(function(pid){ results.push({ playerId: pid, placement: 0, duration:0, bounties:0, provisional:true, points:0 }); });
+                else alive.forEach(function(pid){ var l2=live[pid]||{}; var ts2=Math.max(0,Math.floor(Number(l2.timeUsedSec)||0)); results.push({ playerId: pid, placement: 0, duration:Math.round(ts2/60), turnTimeSec:ts2, playerTurnTimeSec:ts2, bounties:0, provisional:true, points:0 }); });
                 table.results = results;
                 table.liveStatus = alive.length <= 1 ? 'decided' : 'in-progress';
                 table.completed = false; // oficial sigue pendiente hasta reporte enviado
@@ -1096,8 +1107,9 @@ const app = {
     applyOfficialTableReport(sessionId, tableId, report) {
         const t = this.tournaments.find(x => x.syncSessionId === sessionId || String(x.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() === sessionId);
         if (!t || !report || report.status !== 'submitted') return false;
-        const round = (t.rounds || []).slice().reverse().find(r => (r.tables || []).some(tb => tb.id === tableId));
-        const table = round && round.tables.find(tb => tb.id === tableId);
+        const normId = String(tableId||'').replace(/^mesa-0*/i,'mesa-');
+        const round = (t.rounds || []).slice().reverse().find(r => (r.tables || []).some(tb => tb.id === tableId || tb.publicMesaId === tableId || ('mesa-'+tb.tableNumber)===normId));
+        const table = round && (round.tables.find(tb => tb.id === tableId) || round.tables.find(tb => tb.publicMesaId === tableId) || round.tables.find(tb => ('mesa-'+tb.tableNumber)===normId));
         if (!table || table.bye) return false;
         if (table.officialReportAppliedAt === report.submittedAt) return false;
         const placements = Array.isArray(report.placements) ? report.placements : [];
@@ -1106,6 +1118,11 @@ const app = {
             playerId: p.playerId,
             placement: Number(p.placement) || 0,
             duration: Math.max(0, Math.round((report.timeConsumedSec && report.timeConsumedSec[p.playerId] ? report.timeConsumedSec[p.playerId] : 0) / 60)),
+            turnTimeSec: Math.max(0, Math.round(report.timeConsumedSec && report.timeConsumedSec[p.playerId] ? report.timeConsumedSec[p.playerId] : (p.playerTurnTimeSec || 0))),
+            playerTurnTimeSec: Math.max(0, Math.round(p.playerTurnTimeSec || (report.timeConsumedSec && report.timeConsumedSec[p.playerId]) || 0)),
+            playerTurnTime: p.playerTurnTime || null,
+            timeOfElimination: p.timeOfElimination || (p.elimination && p.elimination.timeOfElimination) || null,
+            timeOfEliminationSec: p.timeOfEliminationSec != null ? p.timeOfEliminationSec : (p.elimination && p.elimination.timeOfEliminationSec != null ? p.elimination.timeOfEliminationSec : null),
             bounties: 0,
             elimination: p.elimination || null,
             points: this.getPointsForPosition(Number(p.placement) || 0, tableSize, t)
@@ -1133,7 +1150,7 @@ const app = {
         const players = (t.players || []).slice();
         const rounds = (t.rounds || []).filter(r => r && r.completed);
         const byId = {};
-        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, commanderDamageDealt: 0, commanderDamageReceived: 0 }; });
+        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, commanderDamageDealt: 0, commanderDamageReceived: 0, eliminations: 0, firstOutAtSec: null }; });
         rounds.forEach(round => {
             (round.tables || []).forEach(table => {
                 if (!table || table.bye) {
@@ -1151,10 +1168,12 @@ const app = {
                     s.points += pts + (Number(res.bounties) || 0);
                     s.gamesPlayed += 1;
                     if (placement === 1) { s.wins += 1; s.gamesWon += 1; }
-                    else if (placement > 0) { s.losses += 1; }
-                    const sec = table.officialTimeConsumedSec && table.officialTimeConsumedSec[res.playerId];
+                    else if (placement > 0) { s.losses += 1; if (placement >= tableSize && tableSize > 1) s.eliminations += 1; }
+                    const sec = (res.playerTurnTimeSec != null ? Number(res.playerTurnTimeSec) : (res.turnTimeSec != null ? Number(res.turnTimeSec) : (table.officialTimeConsumedSec && table.officialTimeConsumedSec[res.playerId])));
                     if (sec != null) { s.timeUsedSec += Number(sec) || 0; s.timeSamples += 1; }
                     else if (res.duration) { s.timeUsedSec += (Number(res.duration)||0) * 60; s.timeSamples += 1; }
+                    const elimSec = res.timeOfEliminationSec != null ? Number(res.timeOfEliminationSec) : (res.elimination && res.elimination.timeOfEliminationSec != null ? Number(res.elimination.timeOfEliminationSec) : null);
+                    if (elimSec != null) s.firstOutAtSec = s.firstOutAtSec == null ? elimSec : Math.min(s.firstOutAtSec, elimSec);
                 });
                 if (table.live) {
                     Object.keys(table.live).forEach(pid => {
@@ -1201,8 +1220,8 @@ const app = {
         var data = this.buildReportData(); if (!data) return;
         var hasCmdr = false;
         for (var i = 0; i < data.rows.length; i++) { var rr = data.rows[i]; if (rr.avgTurnTimeSec != null || rr.commanderDamageDealt || rr.commanderDamageReceived) { hasCmdr = true; break; } }
-        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas'];
-        if (hasCmdr) head = head.concat(['Tiempo medio (s)','Dano comandante infligido','Dano comandante recibido']);
+        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas','Tiempo medio turno (s)','Tiempo medio turno','Eliminado (primer reloj ronda)','Salidas registradas'];
+        if (hasCmdr) head = head.concat(['Daño comandante infligido','Daño comandante recibido']);
         var escCsv = function(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; };
         var lines = [
           ['Evento', data.meta.tournamentName], ['Formato', data.meta.format], ['Fecha', data.meta.date], ['Hora', data.meta.time],
@@ -1210,8 +1229,10 @@ const app = {
         ];
         for (var j = 0; j < data.rows.length; j++) {
           var r = data.rows[j];
-          var row = [r.rank,r.name,r.points,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses];
-          if (hasCmdr) row = row.concat([r.avgTurnTimeSec==null?'':r.avgTurnTimeSec, r.commanderDamageDealt||0, r.commanderDamageReceived||0]);
+          var avgLabel = r.avgTurnTimeSec==null?'':(Math.floor(r.avgTurnTimeSec/60)+':'+String(r.avgTurnTimeSec%60).padStart(2,'0'));
+          var elimLabel = r.firstOutAtSec==null?'':(Math.floor(r.firstOutAtSec/60)+':'+String(r.firstOutAtSec%60).padStart(2,'0'));
+          var row = [r.rank,r.name,r.points,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses,r.avgTurnTimeSec==null?'':r.avgTurnTimeSec,avgLabel,elimLabel,r.eliminations||0];
+          if (hasCmdr) row = row.concat([r.commanderDamageDealt||0, r.commanderDamageReceived||0]);
           lines.push(row);
         }
         var csv = '\uFEFF' + lines.map(function(row){ return Array.isArray(row) ? row.map(escCsv).join(',') : escCsv(row); }).join('\r\n');
@@ -1834,8 +1855,8 @@ const app = {
                     <div class="table-card">
                         <h4>Mesa ${idx + 1} ${table.officialReportAppliedAt ? '<span class="sync-mode sync-mode-firestore" style="margin-left:6px">resultado oficial</span>' : ''}</h4>
                         <div class="table-legend" style="font-size: 0.72rem; color: var(--t-text-muted); margin-top: 2px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa t�ctil</a>
-                          <code style="font-size:.72rem; opacity:.8;">ID mesa: ${this.escapeHtml(table.id)}</code>
+                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id, idx + 1)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa t�ctil</a>
+                          <code style="font-size:.72rem; opacity:.8;">Mesa: ${idx + 1}</code>
                         </div>
                         <div class="table-players">
                             <div class="table-player ${teamAPlacement === 1 ? 'winner' : ''}">
@@ -1912,9 +1933,10 @@ const app = {
                             ` : `
                                 <span title="Posición / Puntos base">${placement > 0 ? placement + '°' : '-'}</span>
                                 <span title="+${positionPts || 0} pts de posición" class="position-pts">${positionPts > 0 ? '+' + positionPts + ' pts' : ''}</span>
-                                ${placement === 1 ? '<span title="Ganador 🥇" style="color: var(--t-amarillo); font-weight: 700;">🥇</span>' : ''}
-                                ${t.format === 'commander' ? `<span title="Bounties (máx ${maxBounties})">${bounties > 0 ? '💀 ' + bounties : '-'}</span>` : ''}
-                                ${playerTurnTime > 0 ? `<span title="Tiempo en turnos anteriores" style="color: var(--t-text-muted); font-size: 0.75rem;">❱ ${Math.floor(playerTurnTime/60)}:${String(playerTurnTime%60).padStart(2,'0')}</span>` : ''}
+                                ${placement === 1 ? '<span title="Ganador" style="color: var(--t-amarillo); font-weight: 700;">🥇</span>' : ''}
+                                ${t.format === 'commander' ? `<span title="Bounties (máx ${maxBounties})">${bounties > 0 ? '☠ ' + bounties : '-'}</span>` : ''}
+                                ${existingResult && existingResult.timeOfElimination ? `<span title="Eliminado (reloj de ronda)" style="color: var(--t-text-muted); font-size: 0.75rem;">⏱ ${this.escapeHtml(existingResult.timeOfElimination)}</span>` : ''}
+                                ${existingResult && (existingResult.playerTurnTime || existingResult.playerTurnTimeSec != null) ? `<span title="Tiempo total consumido en turnos" style="color: var(--t-text-muted); font-size: 0.75rem;">⌛ ${this.escapeHtml(existingResult.playerTurnTime || (Math.floor((Number(existingResult.playerTurnTimeSec)||0)/60)+':'+String((Number(existingResult.playerTurnTimeSec)||0)%60).padStart(2,'0')))}</span>` : (playerTurnTime > 0 ? `<span title="Tiempo en turnos" style="color: var(--t-text-muted); font-size: 0.75rem;">⌛ ${Math.floor(playerTurnTime/60)}:${String(playerTurnTime%60).padStart(2,'0')}</span>` : '')}
                                 ${playerBadge ? `<span title="${playerBadge.title}" class="badge-${playerBadge.type}">${playerBadge.icon}</span>` : ''}
                                 <span style="color: var(--t-text-muted); font-size: 0.85rem;">${duration ? duration + ' min' : ''}</span>
                             `}
@@ -1946,8 +1968,8 @@ const app = {
                         <h4>Mesa ${idx + 1} ${hasRepeats ? '<span style="color: var(--t-rosa); font-size: 0.75rem; margin-left: 8px;">CON REPETICION</span>' : ''} ${table.officialReportAppliedAt ? '<span class="sync-mode sync-mode-firestore" style="margin-left:6px">resultado oficial</span>' : ''}</h4>
                         <div class="table-legend" style="font-size: 0.72rem; color: var(--t-text-muted); margin-top: 2px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                           <span>Puntos base: ${pointsLegend}</span>
-                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa tactil</a>
-                          <code style="font-size:.72rem; opacity:.8;">ID mesa: ${this.escapeHtml(table.id)}</code>
+                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id, idx + 1)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa tactil</a>
+                          <code style="font-size:.72rem; opacity:.8;">Mesa: ${idx + 1}</code>
                         </div>
                     <div class="table-players">${playersHtml}</div>
                     ${turnControls}
