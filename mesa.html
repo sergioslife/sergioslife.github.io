@@ -1,25 +1,27 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Mesa Companion | Torneo Commander</title>
-  <meta name="description" content="Vista tÃ¡ctil 2x2 de mesa compartida para Commander: vida, comandante, contadores, turno y resultados oficiales.">
+  <meta name="description" content="Vista táctil dinámica de mesa compartida para Commander: vida, comandante, contadores, turno y resultados oficiales.">
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="torneo.css">
-  <link rel="stylesheet" href="css/companion.css">
+  <link rel="stylesheet" href="Css/companion.css">
+  <style>.mesa-body{background:#111;color:#eee;font-family:system-ui,sans-serif;margin:0}.m-top{padding:10px;border-bottom:1px solid #333}.m-board{padding:8px}.sync-mode{padding:2px 8px;border-radius:999px;font-size:12px;background:#333}#m-join{max-width:520px;margin:12px auto;padding:12px}.mesa-join-card input,.mesa-join-card button{width:100%;padding:10px;margin:6px 0;box-sizing:border-box}.m-grid{display:grid;gap:8px}.m-quad{border:1px solid #333;border-radius:10px;padding:8px;min-height:120px}</style>
 </head>
 <body class="mesa-body">
+  <noscript><div style="padding:16px;color:#fff;background:#8b1d1d;font:16px sans-serif">Esta mesa necesita JavaScript habilitado.</div></noscript>
   <main id="mesa-app" class="mesa-app">
     <header class="mesa-topbar">
       <a class="companion-back" href="torneo.html" aria-label="Volver"><i class="fas fa-arrow-left"></i></a>
       <div class="mesa-top-meta">
         <div id="m-title" class="mesa-title">Mesa Companion</div>
-        <div id="m-sub" class="mesa-sub">Ãšnete con sesiÃ³n y mesa</div>
+        <div id="m-sub" class="mesa-sub">Únete con sesión y mesa</div>
       </div>
       <div class="mesa-top-actions">
         <span id="m-sync" class="sync-mode sync-mode-local">...</span>
@@ -28,11 +30,11 @@
     </header>
 
     <section id="m-join" class="c-card m-join">
-      <h2><i class="fas fa-users"></i> Mesa compartida (2x2)</h2>
-      <label class="c-label">CÃ³digo de sesiÃ³n<input id="m-session" class="c-input" autocomplete="off" placeholder="CÃ³digo del anfitriÃ³n"></label>
+      <h2><i class="fas fa-users"></i> Mesa compartida (dinámica)</h2>
+      <label class="c-label">Código de sesión<input id="m-session" class="c-input" autocomplete="off" placeholder="Código del anfitrión"></label>
       <label class="c-label">ID de mesa<input id="m-table" class="c-input" autocomplete="off" placeholder="ID de mesa"></label>
       <div class="c-actions"><button id="m-join-btn" class="btn-primary" type="button"><i class="fas fa-right-to-bracket"></i> Entrar a la mesa</button></div>
-      <p class="c-help">Abre esta vista en el centro de la mesa o compÃ¡rtela con los 4 jugadores. El estado cosmÃ©tico (vida, comandante, turno, tiempos) se sincroniza en tiempo real; al finalizar se envÃ­a al anfitriÃ³n solo el resultado oficial (puestos, puntos, duraciÃ³n y tiempos consumidos).</p>
+      <p class="c-help">Abre esta vista en el centro de la mesa o compártela. La interfaz se adapta a 3, 4 o 5 jugadores. El estado cosmético (vida, comandante, turno, tiempos) se sincroniza en tiempo real; al finalizar se envía al anfitrión solo el resultado oficial.</p>
     </section>
 
     <section id="m-board" class="m-board" style="display:none">
@@ -42,24 +44,54 @@
         <button id="m-pass-turn" class="btn-primary m-pass-btn" type="button"><i class="fas fa-forward"></i> Pasar turno</button>
       </div>
 
-      <div id="m-grid" class="m-grid seats-4" aria-label="Mesa tÃ¡ctil 2x2"></div>
+      <div id="m-start-wrap" class="m-start-wrap c-card" style="margin:0 0 8px">
+        <strong><i class="fas fa-dice-d20"></i> Selección de jugador inicial</strong>
+        <p class="c-counter-hint" style="margin:6px 0 10px">Elige manualmente quién empieza o usa la ruleta visual. Luego presiona <strong>Iniciar Tiempo</strong>.</p>
+        <div class="m-start-controls">
+          <label class="c-label" style="margin:0;flex:1;min-width:180px">Quién inicia
+            <select id="m-start-player" class="c-input" style="margin-top:4px"></select>
+          </label>
+          <button id="m-pick-random" class="btn-secondary" type="button"><i class="fas fa-shuffle"></i> Elegir al azar</button>
+          <button id="m-start-time" class="btn-primary" type="button" disabled><i class="fas fa-play"></i> Iniciar Tiempo</button>
+        </div>
+        <div id="m-pick-status" class="c-counter-hint" style="margin-top:8px"></div>
+      </div>
+
+      <div id="m-grid" class="m-grid seats-4" aria-label="Mesa táctil dinámica"></div>
 
       <div class="m-official c-card">
         <div class="m-official-head">
           <div>
-            <strong><i class="fas fa-trophy"></i> Resultado oficial al anfitriÃ³n</strong>
-            <div id="m-official-status" class="c-counter-hint">Se envÃ­a solo al finalizar la mesa (eliminaciones/tiempo global o envÃ­o manual).</div>
+            <strong><i class="fas fa-trophy"></i> Resultado oficial al anfitrión</strong>
+            <div id="m-official-status" class="c-counter-hint">Se envía solo al finalizar la mesa (eliminaciones/tiempo global o envío manual).</div>
           </div>
           <button id="m-submit-official" class="btn-secondary btn-sm" type="button"><i class="fas fa-paper-plane"></i> Enviar resultado</button>
         </div>
         <div id="m-official-preview" class="m-official-preview"></div>
       </div>
     </section>
+
+    <div id="m-loss-modal" class="m-modal" style="display:none" aria-hidden="true">
+      <div class="m-modal-backdrop" data-loss-close="1"></div>
+      <div class="m-modal-card" role="dialog" aria-modal="true" aria-labelledby="m-loss-title">
+        <h3 id="m-loss-title"><i class="fas fa-triangle-exclamation"></i> ¿Has perdido el juego?</h3>
+        <p id="m-loss-msg" class="m-loss-msg"></p>
+        <p class="m-loss-hint">Se cumple una condición de derrota. Si tienes un efecto como <em>Ángel de Platino</em>, elige <strong>No, continuar</strong>: la partida seguirá y se registrarán valores en negativo/acumulados (vida, veneno, daño de comandante, tiempo).</p>
+        <div class="m-modal-actions">
+          <button id="m-loss-no" class="btn-secondary" type="button">No, continuar (tengo protección)</button>
+          <button id="m-loss-yes" class="btn-primary" type="button">Sí, confirmar derrota</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script src="js/torneo/firebase-config.js"></script>
   <script src="js/torneo/sync.js"></script>
   <script src="js/torneo/companion-model.js"></script>
   <script src="js/torneo/mesa.js"></script>
+  <script>
+    window.addEventListener('error', function(ev){ try { var s=document.getElementById('m-official-status'); if(s && !s.textContent) s.textContent='Error en mesa: ' + (ev && ev.message || 'script'); console.error('Mesa error', ev.error||ev.message, ev.filename, ev.lineno); } catch(e){} });
+    window.addEventListener('unhandledrejection', function(ev){ try { console.error('Mesa rejection', ev.reason); } catch(e){} });
+  </script>
 </body>
 </html>

@@ -1490,11 +1490,23 @@ select:focus-visible {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .standings-header h3 {
     margin: 0;
 }
+.standings-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.report-modal-content { max-width: min(1100px, 96vw); }
+.report-preview-meta { margin: 8px 0 12px; color: var(--t-text-muted); font-size: .92rem; }
+.report-meta-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 14px; background: var(--t-surface-2); border:1px solid var(--t-border); border-radius: 12px; padding: 12px; }
+.report-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 12px; }
+.report-preview-table { max-height: min(52vh, 520px); overflow:auto; margin-bottom: 8px; }
+.report-row { grid-template-columns: 50px minmax(140px,1fr) 80px 90px 90px 90px; }
+.report-row.report-row-cmdr { grid-template-columns: 50px minmax(140px,1fr) 70px 80px 80px 80px 110px 110px; }
+.report-footnote { margin: 8px 0 0; color: var(--t-text-muted); font-size: .8rem; line-height: 1.35; }
+@media (max-width: 900px) { .report-row, .report-row.report-row-cmdr { min-width: 760px; } .report-preview-table { overflow:auto; } }
 
 /* Players Management */
 .tournament-players-management {

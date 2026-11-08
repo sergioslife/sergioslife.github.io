@@ -71,7 +71,7 @@
   var FirestoreProvider = {
     name: 'firestore', db: null, fs: null,
     init: function () {
-      var cfg = global.TORNEO_FIREBASE_CONFIG;
+      var cfg = globalObj.TORNEO_FIREBASE_CONFIG;
       if (!cfg) return Promise.reject(new Error('No Firebase config'));
       var self = this;
       return Promise.all([
@@ -90,14 +90,20 @@
     subscribeTable: function (sid, tid, fn) { var fs = this.fs; return fs.onSnapshot(this._ref(sid, tid), function (snap) { if (snap.exists()) fn(snap.data()); }, function(e){ console.warn('table sub', e); }); }
   };
 
-  global.TorneoSync = {
+  var globalObj = (typeof window !== 'undefined') ? window : global;
+  globalObj.TorneoSync = {
     provider: null, mode: 'none',
     init: function (preferred) {
       var self = this;
-      var tryFs = function () { if (!global.TORNEO_FIREBASE_CONFIG) return Promise.reject(new Error('no config')); return FirestoreProvider.init().then(function () { self.provider = FirestoreProvider; self.mode = 'firestore'; }); };
-      var useLocal = function () { return LocalProvider.init().then(function () { self.provider = LocalProvider; self.mode = 'local'; }); };
+      var useLocal = function () { return LocalProvider.init().then(function () { self.provider = LocalProvider; self.mode = 'local'; }).catch(function(){ self.provider = LocalProvider; self.mode = 'local'; }); };
+      var tryFs = function () {
+        try {
+          if (!globalObj.TORNEO_FIREBASE_CONFIG) return Promise.reject(new Error('no config'));
+          return FirestoreProvider.init().then(function () { self.provider = FirestoreProvider; self.mode = 'firestore'; });
+        } catch (e) { return Promise.reject(e); }
+      };
       if (preferred === 'local') return useLocal();
-      return tryFs().catch(useLocal);
+      return tryFs().catch(function(e){ console.warn('Firebase unavailable, using local sync', e); return useLocal(); });
     },
     ready: function () { return !!this.provider; },
     publishSession: function () { return this.provider ? this.provider.publishSession.apply(this.provider, arguments) : Promise.resolve(); },

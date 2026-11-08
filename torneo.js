@@ -511,7 +511,7 @@ const app = {
                     </div>
                     <div class="table-status-actions">
                         <span class="table-status-badge ${statusClass}">${statusLabel}</span>
-                        ${!table.bye ? `<a class="btn-icon" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener" aria-label="Abrir mesa t�ctil ${idx + 1}" title="Abrir mesa t�ctil"><i class="fas fa-mobile-screen-button"></i></a>` : ''}
+                        ${!table.bye ? `<a class="btn-icon" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener" aria-label="Abrir mesa t�ctil ${idx + 1}" title="Abrir mesa t�ctil"><i class="fas fa-mobile-screen-button"></i></a>` : ''}
                         <button class="btn-icon" onclick="app.showEditTableModal('${table.id}')" aria-label="Editar mesa ${idx + 1}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -570,6 +570,7 @@ const app = {
 
         this.updateTimerDisplay();
         this.updateTurnTimers();
+        this.saveTournaments(); // publica tiempo global a mesas/companion
     },
 
     updateTurnTimers() {
@@ -641,8 +642,9 @@ const app = {
             currentRound.pausedAt = Date.now();
         }
 
-        document.getElementById('btn-pause-timer').style.display = 'none';
-        document.getElementById('btn-resume-timer').style.display = 'inline-flex';
+        var bp = document.getElementById('btn-pause-timer'); if (bp) bp.style.display = 'none';
+        var br = document.getElementById('btn-resume-timer'); if (br) br.style.display = 'inline-flex';
+        this.saveTournaments(); // sincroniza pausa con mesas
     },
 
     resumeRoundTimer() {
@@ -652,7 +654,7 @@ const app = {
         const currentRound = t.rounds[t.rounds.length - 1];
         if (currentRound && currentRound.pausedAt) {
             const pauseDelta = Date.now() - currentRound.pausedAt;
-            currentRound.pausedDuration += pauseDelta;
+            currentRound.pausedDuration = (currentRound.pausedDuration || 0) + pauseDelta;
             currentRound.pausedAt = null;
 
             currentRound.tables.forEach(table => {
@@ -662,8 +664,8 @@ const app = {
             });
         }
 
-        document.getElementById('btn-resume-timer').style.display = 'none';
-        document.getElementById('btn-pause-timer').style.display = 'inline-flex';
+        var br2 = document.getElementById('btn-resume-timer'); if (br2) br2.style.display = 'none';
+        var bp2 = document.getElementById('btn-pause-timer'); if (bp2) bp2.style.display = 'inline-flex';
 
         this.timerInterval = setInterval(() => {
             this.updateTimerDisplay();
@@ -672,6 +674,7 @@ const app = {
         }, 1000);
 
         this.updateTurnTimers();
+        this.saveTournaments(); // sincroniza reanudación con mesas
     },
 
     stopTimer() {
@@ -1046,6 +1049,50 @@ const app = {
         return location.origin + location.pathname.replace(/torneo\.html.*$/i, 'mesa.html') + '?session=' + encodeURIComponent(sid) + '&table=' + encodeURIComponent(tableId || '');
     },
 
+    applyLiveTableState(sessionId, tableId, tableData) {
+        // Sincronización cosmética/en vivo desde mesa (localStorage/Firebase): refleja eliminaciones y estado sin recargar.
+        // No reemplaza resultado oficial enviado (officialReport/submitted) salvo para marcar eliminados en UI.
+        try {
+            if (!tableData) return false;
+            const t = this.tournaments.find(x => x.syncSessionId === sessionId || String(x.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() === sessionId);
+            if (!t) return false;
+            const round = (t.rounds || []).slice().reverse().find(r => (r.tables || []).some(tb => tb.id === tableId));
+            const table = round && round.tables.find(tb => tb.id === tableId);
+            if (!table || table.bye) return false;
+            // Si ya hay resultado oficial aplicado, mantenerlo; solo refrescar metadatos vivos.
+            table.live = tableData.live || table.live || {};
+            table.turn = tableData.turn || table.turn || table.turn;
+            if (table.officialReportAppliedAt || (table.officialReport && table.officialReport.status === 'submitted')) {
+                if (this.currentTournamentId === t.id) this._liveRenderThrottle(t);
+                return true;
+            }
+            // Derivar estado provisional desde live: marcar tabla/puestos parciales cuando hay eliminaciones confirmadas.
+            var live = table.live || {};
+            var players = table.players || [];
+            var eliminated = players.map(function(pid){ var l=live[pid]||{}; return { playerId: pid, eliminated: !!l.eliminated, order: l.eliminationOrder, elimination: l.elimination }; }).filter(function(x){ return x.eliminated; });
+            if (eliminated.length) {
+                eliminated.sort(function(a,b){ return (a.order||999)-(b.order||999); });
+                var n = players.length;
+                var results = [];
+                var used = {};
+                eliminated.forEach(function(e, idx){ var placement = n - (e.order || (idx+1)) + 1; if (placement < 1) placement = n; results.push({ playerId:e.playerId, placement: placement, duration:0, bounties:0, elimination:e.elimination, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][placement]) || Math.max(0,(n-placement)+1) }); used[e.playerId]=true; });
+                var alive = players.filter(function(pid){ return !used[pid]; });
+                if (alive.length === 1) results.push({ playerId: alive[0], placement: 1, duration:0, bounties:0, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][1]) || n });
+                else alive.forEach(function(pid){ results.push({ playerId: pid, placement: 0, duration:0, bounties:0, provisional:true, points:0 }); });
+                table.results = results;
+                table.liveStatus = alive.length <= 1 ? 'decided' : 'in-progress';
+                table.completed = false; // oficial sigue pendiente hasta reporte enviado
+            }
+            if (this.currentTournamentId === t.id) this._liveRenderThrottle(t);
+            return true;
+        } catch (e) { return false; }
+    },
+    _liveRenderThrottle: function(t) {
+        var self = this;
+        if (this._liveRenderTimer) clearTimeout(this._liveRenderTimer);
+        this._liveRenderTimer = setTimeout(function(){ try { if (self.currentTournamentId === t.id) self.renderTournamentDetail(); } catch(e){} }, 120);
+    },
+
     applyOfficialTableReport(sessionId, tableId, report) {
         const t = this.tournaments.find(x => x.syncSessionId === sessionId || String(x.id || '').replace(/[^a-z0-9]/gi, '').slice(-8).toUpperCase() === sessionId);
         if (!t || !report || report.status !== 'submitted') return false;
@@ -1073,6 +1120,130 @@ const app = {
         this.saveTournaments();
         if (this.currentTournamentId === t.id) this.renderTournamentDetail();
         return true;
+    },
+
+    // ========================
+    // REPORTES / EXPORTACI�N (EventLink-style)
+    // ========================
+    _minPct(v) { return v <= 0 ? 0 : Math.max(1/3, v); },
+    _fmtPct(v) { return (Math.round((v || 0) * 10000) / 100).toFixed(2) + '%'; },
+    buildReportData() {
+        const t = this.getCurrentTournament();
+        if (!t) return null;
+        const players = (t.players || []).slice();
+        const rounds = (t.rounds || []).filter(r => r && r.completed);
+        const byId = {};
+        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, commanderDamageDealt: 0, commanderDamageReceived: 0 }; });
+        rounds.forEach(round => {
+            (round.tables || []).forEach(table => {
+                if (!table || table.bye) {
+                    const r = table && table.results && table.results[0];
+                    if (r && byId[r.playerId]) { byId[r.playerId].points += 3; byId[r.playerId].wins += 1; byId[r.playerId].gamesPlayed += 1; byId[r.playerId].gamesWon += 1; }
+                    return;
+                }
+                const ids = (table.players || []).filter(id => byId[id]);
+                ids.forEach(a => ids.forEach(b => { if (a !== b) byId[a].opponents.push(b); }));
+                const tableSize = ids.length || 1;
+                (table.results || []).forEach(res => {
+                    const s = byId[res.playerId]; if (!s) return;
+                    const placement = Number(res.placement) || 0;
+                    const pts = placement > 0 ? this.getPointsForPosition(placement, tableSize, t) : 0;
+                    s.points += pts + (Number(res.bounties) || 0);
+                    s.gamesPlayed += 1;
+                    if (placement === 1) { s.wins += 1; s.gamesWon += 1; }
+                    else if (placement > 0) { s.losses += 1; }
+                    const sec = table.officialTimeConsumedSec && table.officialTimeConsumedSec[res.playerId];
+                    if (sec != null) { s.timeUsedSec += Number(sec) || 0; s.timeSamples += 1; }
+                    else if (res.duration) { s.timeUsedSec += (Number(res.duration)||0) * 60; s.timeSamples += 1; }
+                });
+                if (table.live) {
+                    Object.keys(table.live).forEach(pid => {
+                        const s = byId[pid]; if (!s) return;
+                        const cd = table.live[pid].commanderDamage || {};
+                        Object.values(cd).forEach(v => { s.commanderDamageReceived += Number(v && v.damage) || 0; });
+                    });
+                    Object.keys(table.live).forEach(src => {
+                        const cd = (table.live[src] && table.live[src].commanderDamage) || {};
+                        Object.keys(cd).forEach(tgt => { if (byId[tgt]) byId[tgt].commanderDamageReceived += 0; if (byId[src]) byId[src].commanderDamageDealt += Number(cd[tgt] && cd[tgt].damage) || 0; });
+                    });
+                }
+            });
+        });
+        const mw = {};
+        Object.keys(byId).forEach(id => { const s = byId[id]; const raw = s.gamesPlayed > 0 ? (s.gamesWon / s.gamesPlayed) : 0; s.mwRaw = raw; s.mw = s.gamesPlayed > 0 ? this._minPct(raw) : 0; mw[id] = s.mw; });
+        Object.keys(byId).forEach(id => {
+            const s = byId[id]; const ops = s.opponents.length ? s.opponents : [];
+            const avg = (arr) => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+            const omwVals = ops.map(oid => mw[oid] != null ? mw[oid] : 0);
+            s.omw = ops.length ? this._minPct(avg(omwVals)) : 0;
+            s.ogw = ops.length ? this._minPct(avg(ops.map(oid => (byId[oid] && byId[oid].mw) || 0))) : 0; // same base metric in commander table context
+            s.avgTurnTimeSec = s.timeSamples > 0 ? Math.round(s.timeUsedSec / s.timeSamples) : null;
+        });
+        const rows = Object.values(byId).sort((a,b)=> b.points-a.points || b.mw-a.mw || b.omw-a.omw || b.ogw-b.ogw || (a.name||'').localeCompare(b.name||''));
+        rows.forEach((r,i)=> r.rank = i+1);
+        const totalTables = rounds.reduce((n,r)=> n + (r.tables||[]).filter(tb=>!tb.bye).length, 0);
+        const status = t.status === 'finished' ? 'Posiciones Definitivas' : (rounds.length ? `Ronda ${rounds[rounds.length-1].roundNumber}` : 'Sin rondas completadas');
+        const finishedAt = new Date();
+        const meta = { tournamentName: t.name || 'Torneo', date: finishedAt.toLocaleDateString('es-CO'), time: finishedAt.toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'}), status, players: players.length, tables: totalTables, roundsCompleted: rounds.length, format: this.getFormatLabel ? this.getFormatLabel(t.format) : (t.format||'') };
+        return { meta, rows, tournament: t };
+    },
+    showReportModal() { this.refreshReportPreview(); const m=document.getElementById('modal-report'); if(m) m.style.display='flex'; },
+    hideReportModal() { const m=document.getElementById('modal-report'); if(m) m.style.display='none'; },
+    refreshReportPreview() {
+        const data = this.buildReportData(); if (!data) return;
+        const meta = document.getElementById('report-preview-meta');
+        if (meta) meta.innerHTML = `<div class="report-meta-grid"><div><strong>Evento:</strong> ${this.escapeHtml(data.meta.tournamentName)}</div><div><strong>Formato:</strong> ${this.escapeHtml(data.meta.format)}</div><div><strong>Fecha/Hora:</strong> ${this.escapeHtml(data.meta.date)} ${this.escapeHtml(data.meta.time)}</div><div><strong>Estado:</strong> ${this.escapeHtml(data.meta.status)}</div><div><strong>Jugadores:</strong> ${data.meta.players}</div><div><strong>Mesas completadas:</strong> ${data.meta.tables}</div></div>`;
+        const box = document.getElementById('report-preview-table'); if (!box) return;
+        const hasCmdr = data.rows.some(r => r.avgTurnTimeSec != null || r.commanderDamageDealt || r.commanderDamageReceived);
+        box.innerHTML = `<div class="standing-row header report-row ${hasCmdr?'report-row-cmdr':''}"><div>#</div><div>Jugador</div><div>Pts</div><div>%JG</div><div>%VPO</div><div>%JGO</div>${hasCmdr?'<div>Tiempo medio</div><div>Da�o Cmdr D/R</div>':''}</div>` + data.rows.map(r => `<div class="standing-row report-row ${hasCmdr?'report-row-cmdr':''}"><div class="standing-rank">${r.rank}</div><div class="standing-name">${this.escapeHtml(r.name)}</div><div class="standing-stat">${r.points}</div><div class="standing-stat">${this._fmtPct(r.mw)}</div><div class="standing-stat">${this._fmtPct(r.omw)}</div><div class="standing-stat">${this._fmtPct(r.ogw)}</div>${hasCmdr?`<div class="standing-stat">${r.avgTurnTimeSec!=null?Math.floor(r.avgTurnTimeSec/60)+'m '+(r.avgTurnTimeSec%60)+'s':'-'}</div><div class="standing-stat">${r.commanderDamageDealt||0}/${r.commanderDamageReceived||0}</div>`:''}</div>`).join('');
+    },
+    downloadReportCSV() {
+        var data = this.buildReportData(); if (!data) return;
+        var hasCmdr = false;
+        for (var i = 0; i < data.rows.length; i++) { var rr = data.rows[i]; if (rr.avgTurnTimeSec != null || rr.commanderDamageDealt || rr.commanderDamageReceived) { hasCmdr = true; break; } }
+        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas'];
+        if (hasCmdr) head = head.concat(['Tiempo medio (s)','Dano comandante infligido','Dano comandante recibido']);
+        var escCsv = function(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; };
+        var lines = [
+          ['Evento', data.meta.tournamentName], ['Formato', data.meta.format], ['Fecha', data.meta.date], ['Hora', data.meta.time],
+          ['Estado', data.meta.status], ['Total jugadores', data.meta.players], ['Mesas completadas', data.meta.tables], [], head
+        ];
+        for (var j = 0; j < data.rows.length; j++) {
+          var r = data.rows[j];
+          var row = [r.rank,r.name,r.points,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses];
+          if (hasCmdr) row = row.concat([r.avgTurnTimeSec==null?'':r.avgTurnTimeSec, r.commanderDamageDealt||0, r.commanderDamageReceived||0]);
+          lines.push(row);
+        }
+        var csv = '\uFEFF' + lines.map(function(row){ return Array.isArray(row) ? row.map(escCsv).join(',') : escCsv(row); }).join('\r\n');
+        var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = (data.meta.tournamentName || 'reporte').replace(/[^\w\-]+/g,'_') + '_posiciones.csv'; a.click();
+        setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 500);
+    },
+    async downloadReportPDF() {
+        const data = this.buildReportData(); if (!data) return;
+        const load = (src) => new Promise((res, rej)=>{ if (document.querySelector('script[src="'+src+'"]') && ((src.indexOf('jspdf')>-1 && window.jspdf) || (src.indexOf('autotable')>-1 && window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable))) return res(); const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+        try {
+            if (!window.jspdf) await load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+            if (!(window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable)) await load('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+        } catch(e) { alert('No se pudo cargar el generador PDF. Verifica conexi�n e intenta de nuevo, o usa CSV.'); return; }
+        if (!window.jspdf || !window.jspdf.jsPDF) { this.downloadReportCSV(); return; }
+        const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+        const m = data.meta; const margin = 36; let y = 40;
+        doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text(String(m.tournamentName || 'Reporte de Torneo'), margin, y); y += 18;
+        doc.setFont('helvetica','normal'); doc.setFontSize(10);
+        [ `Formato: ${m.format}`, `Fecha y hora: ${m.date} ${m.time}`, `Estado: ${m.status}`, `Total jugadores: ${m.players} | Mesas completadas: ${m.tables} | Rondas completadas: ${m.roundsCompleted}` ].forEach(line=>{ doc.text(line, margin, y); y += 14; });
+        const hasCmdr = data.rows.some(r => r.avgTurnTimeSec != null || r.commanderDamageDealt || r.commanderDamageReceived);
+        const head = [['Puesto','Jugador','Puntos','%JG','%VPO','%JGO','Mesas','G/P'].concat(hasCmdr?[ 'Tiempo medio','Cmdr D/R' ]:[])];
+        const body = data.rows.map(r => [r.rank, r.name, r.points, this._fmtPct(r.mw), this._fmtPct(r.omw), this._fmtPct(r.ogw), r.gamesPlayed, `${r.wins}/${r.losses}`].concat(hasCmdr?[ r.avgTurnTimeSec!=null?Math.floor(r.avgTurnTimeSec/60)+'m '+(r.avgTurnTimeSec%60)+'s':'-', `${r.commanderDamageDealt||0}/${r.commanderDamageReceived||0}` ]:[]));
+        if (doc.autoTable) {
+            doc.autoTable({ startY: y + 6, head, body, styles: { fontSize: 8, cellPadding: 4, overflow: 'linebreak' }, headStyles: { fillColor: [22,22,22], textColor: 255 }, alternateRowStyles: { fillColor: [246,246,246] }, margin: { left: margin, right: margin } });
+        } else {
+            let yy = y + 18; doc.setFontSize(8); body.slice(0,40).forEach(row=>{ doc.text(row.join(' | ').slice(0,180), margin, yy); yy += 12; });
+        }
+        const footerY = doc.internal.pageSize.getHeight() - 24;
+        doc.setFontSize(8); doc.setTextColor(100); doc.text('M�tricas: Match Points, %JG, %VPO, %JGO (estilo EventLink). Commander opcional: tiempo medio/da�o comandante.', margin, footerY);
+        doc.save((m.tournamentName || 'reporte').replace(/[^\w\-]+/g,'_') + '_posiciones.pdf');
     },
 
     renderPlayersList() {
@@ -1131,11 +1302,13 @@ const app = {
     finishTournament() {
         const t = this.getCurrentTournament();
         if (!t) return;
-        if (!confirm('¿Estás seguro de finalizar este torneo? No podrás agregar más rondas.')) return;
+        if (!confirm('�Est�s seguro de finalizar este torneo? No podr�s agregar m�s rondas.')) return;
 
         t.status = 'finished';
+        t.finishedAt = Date.now();
         this.saveTournaments();
         this.renderTournamentDetail();
+        setTimeout(() => { try { if (typeof this.showReportModal === "function") this.showReportModal(); } catch (e) {} }, 80);
     },
 
     deleteTournament() {
@@ -1158,10 +1331,10 @@ const app = {
         const roundNumber = t.rounds.length + 1;
         let activePlayers = [...t.players];
         const tableSizes = this.calculateTableSizes(activePlayers.length);
+        if (!tableSizes.length) return;
 
-        if (roundNumber === 1) {
-            activePlayers = this.shuffleArray(activePlayers);
-        }
+        // Siempre barajar inscritos antes de distribuir (ronda 1 y siguientes), preservando equidad competitiva por puntos en pick.
+        activePlayers = this.shuffleArray(activePlayers);
 
         const opponentsHistory = this.buildOpponentsHistory(t);
         const stats = this.getPlayerStats(t);
@@ -1181,7 +1354,8 @@ const app = {
                         id: this.generateId(),
                         players: [byed.id],
                         bye: true,
-                        results: [{playerId: byed.id, placement: 1, duration: 0}]
+                        results: [{playerId: byed.id, placement: 1, duration: 0}],
+                        completed: true
                     });
                 }
                 continue;
@@ -1192,30 +1366,32 @@ const app = {
             if (t.format === 'two-headed-giant' && size === 4) {
                 const teams = this.buildTwoHeadedTeams(available, opponentsHistory, assigned);
                 if (teams.length === 2) {
-                    teams.forEach(team => {
-                        team.forEach(p => assigned.add(p.id));
-                    });
-                    tables.push({
-                        id: this.generateId(),
-                        players: teams.flat(),
-                        teams,
-                        bye: false,
-                        results: []
-                    });
+                    teams.forEach(team => { team.forEach(pid => assigned.add(pid)); });
+                    var all = teams.flat();
+                    all = this.shuffleArray(all.map(function(id){ return {id:id}; })).map(function(x){ return x.id; });
+                    tables.push({ id: this.generateId(), players: all, teams, bye: false, results: [], completed: false });
                 }
             } else {
                 const tablePlayers = this.pickTablePlayers(available, size, opponentsHistory, assigned, stats);
-
                 if (tablePlayers.length === size) {
                     tablePlayers.forEach(p => assigned.add(p.id));
-                    tables.push({
-                        id: this.generateId(),
-                        players: tablePlayers.map(p => p.id),
-                        bye: false,
-                        results: []
-                    });
+                    var seatOrder = this.shuffleArray(tablePlayers).map(function(p){ return p.id; });
+                    tables.push({ id: this.generateId(), players: seatOrder, bye: false, results: [], completed: false });
+                } else if (tablePlayers.length > 0) {
+                    // No dejar jugadores fuera si el solver esperaba cubrirlos: crea mesa parcial con los disponibles.
+                    tablePlayers.forEach(p => assigned.add(p.id));
+                    var seatOrder2 = this.shuffleArray(tablePlayers).map(function(p){ return p.id; });
+                    tables.push({ id: this.generateId(), players: seatOrder2, bye: false, results: [], completed: false, partial: true });
                 }
             }
+        }
+
+        // Salvaguarda final: asignar cualquier jugador restante (no debería ocurrir con solveTableDistribution).
+        var remaining = activePlayers.filter(function(p){ return !assigned.has(p.id); });
+        while (remaining.length > 0) {
+            var chunk = remaining.splice(0, Math.min(4, remaining.length || 4));
+            if (chunk.length === 1) { tables.push({ id: this.generateId(), players:[chunk[0].id], bye:true, results:[{playerId:chunk[0].id, placement:1, duration:0}], completed:true }); }
+            else { tables.push({ id: this.generateId(), players: this.shuffleArray(chunk).map(function(p){return p.id;}), bye:false, results:[], completed:false, partial: chunk.length < 3 }); }
         }
 
         t.rounds.push({
@@ -1240,47 +1416,83 @@ const app = {
         return [teamA.map(p => p.id), teamB.map(p => p.id)];
     },
 
-    calculateTableSizes(playerCount) {
-        if (playerCount < 3) return [];
+    // Distribución que garantiza 100% de jugadores asignados (sin byes/sobrantes no asignados).
+    // Prioriza tamaños permitidos y minimiza desbalance (diferencia <= 1 cuando es posible con 3/4/5).
+    solveTableDistribution(playerCount, allowedSizes, preferredSize) {
+        var sizes = (allowedSizes || [3,4]).filter(function(s){ return s > 0; }).slice().sort(function(a,b){ return b-a; });
+        if (!sizes.length) sizes = [3,4];
+        var min = Math.min.apply(null, sizes);
+        var max = Math.max.apply(null, sizes);
+        if (playerCount <= 0) return [];
+        if (playerCount < min) return this.smallTableFallback(playerCount, sizes);
+        var pref = sizes.indexOf(preferredSize) >= 0 ? preferredSize : (sizes.indexOf(4)>=0?4:sizes[0]);
+        // Búsqueda acotada: pocos tamaños (2,3,4,5), coste trivial.
+        var best = null;
+        var maxTables = Math.floor(playerCount / min);
+        function score(counts) {
+            var total = 0, tables = 0, spread = 0, used = {};
+            sizes.forEach(function(s,i){ var c=counts[i]||0; total += c*s; tables += c; if(c) used[s]=c; });
+            if (total !== playerCount) return 1e15;
+            var usedSizes = Object.keys(used).map(Number);
+            if (usedSizes.length > 1) spread = Math.max.apply(null, usedSizes) - Math.min.apply(null, usedSizes);
+            var nonPref = tables - (counts[sizes.indexOf(pref)]||0);
+            return spread * 1000 + nonPref * 10 + Math.abs(tables - Math.round(playerCount/pref));
+        }
+        function rec(i, remaining, counts) {
+            if (i === sizes.length - 1) {
+                var s = sizes[i]; if (remaining % s !== 0) return;
+                counts[i] = remaining / s; var sc = score(counts); if (!best || sc < best.sc) best = { counts: counts.slice(), sc: sc };
+                return;
+            }
+            var s = sizes[i];
+            var maxC = Math.floor(remaining / s);
+            for (var c = maxC; c >= 0; c--) { counts[i] = c; rec(i+1, remaining - c*s, counts); }
+            counts[i] = 0;
+        }
+        rec(0, playerCount, sizes.map(function(){ return 0; }));
+        if (best) {
+            var out = [];
+            sizes.forEach(function(s,i){ for(var k=0;k<(best.counts[i]||0);k++) out.push(s); });
+            return out.sort(function(a,b){ return b-a; });
+        }
+        return this.smallTableFallback(playerCount, sizes);
+    },
+    smallTableFallback(playerCount, sizes) {
+        // Último recurso: usa el menor tamaño permitido repetido y agrupa sobrante si cabe.
+        var min = Math.min.apply(null, sizes), max = Math.max.apply(null, sizes);
+        if (playerCount <= max) return [playerCount];
+        var tables = Math.max(1, Math.ceil(playerCount / Math.min(4, max)));
+        var base = Math.floor(playerCount / tables), rem = playerCount % tables;
+        var out = []; for (var i=0;i<tables;i++) out.push(base + (i < rem ? 1 : 0));
+        // Ajuste simple: evita mesas de 1/2 si hay alternativa fusionando hacia vecinos cuando posible.
+        return out.sort(function(a,b){ return b-a; });
+    },
 
+    calculateTableSizes(playerCount) {
+        if (playerCount < 2) return [];
         const t = this.getCurrentTournament();
         if (t && t.format === 'two-headed-giant') {
+            // 2HG real son 4 jugadores; para cubrir 100% en emparejamiento suizo simplificado, solo generamos mesas de 4 completas.
+            // Excedente < 4 se asigna como bye rotativo (o se omite la ronda completa si no hay mesa). Aquí evitamos dejar jugadores "sin mesa":
+            // si hay 13, se crean 3 mesas de 4? (12) y 1 bye — se informa; distribución exacta 4/4/5 no es 2HG estándar.
             if (playerCount < 4) return [];
-            const teams = Math.floor(playerCount / 4);
-            const remainder = playerCount % 4;
-            if (remainder === 0) {
-                return Array(teams).fill(4);
-            }
-             return [...Array(teams).fill(4), remainder];
+            const teamsOf4 = Math.floor(playerCount / 4);
+            const rem = playerCount % 4;
+            var out = Array(teamsOf4).fill(4);
+            if (rem > 0) out.push(0); // bye para sobrantes (no inventar mesa 2HG inválida)
+            return out;
         }
-
         if (t && t.format !== 'commander' && t.format !== 'two-headed-giant') {
             if (playerCount < 2) return [];
             const pairs = Math.floor(playerCount / 2);
-            if (playerCount % 2 === 0) {
-                return Array(pairs).fill(2);
-            }
-            return [...Array(pairs).fill(2), 0];
+            if (playerCount % 2 === 0) return Array(pairs).fill(2);
+            return [...Array(pairs).fill(2), 0]; // 1v1: impar => bye
         }
-
         const mode = (t && t.distributionModel) || 'auto';
         const allowedSizes = this.getAllowedSizes(t);
-
-        if (mode === 'custom') {
-            return this.customDistribution(playerCount, allowedSizes);
-        }
-
-        if (mode === 'prefer3') {
-            return this.preferSmallTables(playerCount, allowedSizes);
-        }
-        if (mode === 'prefer5') {
-            return this.preferFiveTables(playerCount, allowedSizes);
-        }
-        if (mode === 'prefer4') {
-            return this.preferFourTables(playerCount, allowedSizes);
-        }
-
-        return this.autoDistribution(playerCount, allowedSizes);
+        var pref = 4;
+        if (mode === 'prefer3') pref = 3; else if (mode === 'prefer5') pref = 5; else if (mode === 'prefer4') pref = 4;
+        return this.solveTableDistribution(playerCount, allowedSizes.length ? allowedSizes : [3,4,5], pref);
     },
 
     getAllowedSizes(t) {
@@ -1622,7 +1834,7 @@ const app = {
                     <div class="table-card">
                         <h4>Mesa ${idx + 1} ${table.officialReportAppliedAt ? '<span class="sync-mode sync-mode-firestore" style="margin-left:6px">resultado oficial</span>' : ''}</h4>
                         <div class="table-legend" style="font-size: 0.72rem; color: var(--t-text-muted); margin-top: 2px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa t�ctil</a>
+                          <a class="btn-secondary btn-sm" href="${app.getMesaUrl(table.id)}" target="_blank" rel="noopener"><i class="fas fa-mobile-screen-button"></i> Abrir mesa t�ctil</a>
                           <code style="font-size:.72rem; opacity:.8;">ID mesa: ${this.escapeHtml(table.id)}</code>
                         </div>
                         <div class="table-players">
@@ -1673,10 +1885,10 @@ const app = {
                         if (elapsedMin <= speedThreshold) {
                             playerBadge = {type: 'speed', icon: '⚡', title: 'Victoria Rápida'};
                         } else {
-                            playerBadge = {type: 'methodical', icon: '🏆', title: 'Victoria Metódica'};
+                            playerBadge = {type: 'methodical', icon: '🝆', title: 'Victoria Metódica'};
                         }
                     } else if (placement === tableSize && elapsedMin <= 15) {
-                        playerBadge = {type: 'early', icon: '⚠️', title: 'Eliminación Temprana'};
+                        playerBadge = {type: 'early', icon: '⚠︝', title: 'Eliminación Temprana'};
                     }
                 }
 
@@ -1702,7 +1914,7 @@ const app = {
                                 <span title="+${positionPts || 0} pts de posición" class="position-pts">${positionPts > 0 ? '+' + positionPts + ' pts' : ''}</span>
                                 ${placement === 1 ? '<span title="Ganador 🥇" style="color: var(--t-amarillo); font-weight: 700;">🥇</span>' : ''}
                                 ${t.format === 'commander' ? `<span title="Bounties (máx ${maxBounties})">${bounties > 0 ? '💀 ' + bounties : '-'}</span>` : ''}
-                                ${playerTurnTime > 0 ? `<span title="Tiempo en turnos anteriores" style="color: var(--t-text-muted); font-size: 0.75rem;">⏱ ${Math.floor(playerTurnTime/60)}:${String(playerTurnTime%60).padStart(2,'0')}</span>` : ''}
+                                ${playerTurnTime > 0 ? `<span title="Tiempo en turnos anteriores" style="color: var(--t-text-muted); font-size: 0.75rem;">❱ ${Math.floor(playerTurnTime/60)}:${String(playerTurnTime%60).padStart(2,'0')}</span>` : ''}
                                 ${playerBadge ? `<span title="${playerBadge.title}" class="badge-${playerBadge.type}">${playerBadge.icon}</span>` : ''}
                                 <span style="color: var(--t-text-muted); font-size: 0.85rem;">${duration ? duration + ' min' : ''}</span>
                             `}
@@ -1897,13 +2109,14 @@ const app = {
 
         if (allCompleted) {
             alert(`Ronda ${round.roundNumber} finalizada. ${round.tables.filter(tb => !tb.bye).length} mesas completadas.`);
+            setTimeout(() => { if (confirm('�Deseas previsualizar/descargar el reporte de posiciones de esta ronda?')) this.showReportModal(); }, 60);
         }
 
         this.renderTournamentDetail();
     },
 
     // ========================
-    // ESTADÍSTICAS Y POSICIONES
+    // ESTADÝSTICAS Y POSICIONES
     // ========================
     getPlayerStats(tournament) {
         const stats = {};

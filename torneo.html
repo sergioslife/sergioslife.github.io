@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="torneo.css">
-    <link rel="stylesheet" href="css/companion.css">
+    <link rel="stylesheet" href="Css/companion.css">
 </head>
 <body>
     <a href="#main-content" class="skip-link">Saltar al contenido</a>
@@ -197,9 +197,12 @@
                 <div id="tournament-standings" class="tournament-standings" style="display:none">
                     <div class="standings-header">
                         <h3 data-i18n="app.standings">Posiciones</h3>
-                        <button class="btn-secondary btn-sm" onclick="app.editScoring()">
-                            <i class="fas fa-star"></i> <span data-i18n="app.scoring">Puntuación</span>
-                        </button>
+                        <div class="standings-actions">
+                            <button class="btn-primary btn-sm" onclick="app.showReportModal()"><i class="fas fa-file-export"></i> Exportar / Reporte</button>
+                            <button class="btn-secondary btn-sm" onclick="app.editScoring()">
+                                <i class="fas fa-star"></i> <span data-i18n="app.scoring">Puntuación</span>
+                            </button>
+                        </div>
                     </div>
                     <div id="standings-table" class="standings-table"></div>
                 </div>
@@ -405,6 +408,24 @@
         </div>
     </div>
 
+    <!-- Modal Reporte / Exportaci�n -->
+    <div id="modal-report" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="app.hideReportModal()"></div>
+        <div class="modal-content modal-wide report-modal-content">
+            <h2><i class="fas fa-file-export"></i> Reporte de Rendimiento y Posiciones</h2>
+            <div id="report-preview-meta" class="report-preview-meta"></div>
+            <div class="report-actions">
+                <button type="button" class="btn-primary btn-sm" onclick="app.downloadReportPDF()"><i class="fas fa-file-pdf"></i> Descargar Reporte PDF</button>
+                <button type="button" class="btn-secondary btn-sm" onclick="app.downloadReportCSV()"><i class="fas fa-file-csv"></i> Descargar CSV / Excel</button>
+                <button type="button" class="btn-secondary btn-sm" onclick="app.refreshReportPreview()"><i class="fas fa-rotate"></i> Actualizar vista previa</button>
+            </div>
+            <div id="report-preview-table" class="report-preview-table standings-table"></div>
+            <p class="report-footnote">M�tricas estilo EventLink: Match Points, %JG (partidas/mesas ganadas sobre participaciones registradas), %VPO (media del %JG de oponentes), %JGO (media del %JG de oponentes). En multijugador se usan resultados de mesa completados; m�nimo EventLink 33.33% aplicado a MW/GW base cuando hay participaci�n. Campos opcionales de Commander (tiempo medio usado/recibido) se incluyen si la mesa t�ctil report� tiempos.</p>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="app.hideReportModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
     <!-- Modal Editar Mesa -->
     <div id="modal-edit-table" class="modal" style="display:none">
         <div class="modal-backdrop" onclick="app.hideEditTableModal()"></div>
@@ -517,6 +538,8 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="js/i18n.js"></script>
     <script src="js/torneo/firebase-config.js"></script>
     <script src="js/torneo/sync.js"></script>

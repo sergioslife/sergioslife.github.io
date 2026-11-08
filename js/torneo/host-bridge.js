@@ -32,13 +32,13 @@
       round.tables.forEach(function (table, idx) {
         if (table.bye) return;
         var tid = table.id || ('t' + (idx + 1));
-        var patch = {
+    var patch = {
           sessionId: sessionId, tableId: tid, tableIndex: idx + 1, roundNumber: round.roundNumber,
           players: normPlayers(t, table), completed: !!table.completed,
-          hostPublishedAt: Date.now(),
-          // initialize live/turn only when absent so mesa interaction state is not overwritten
+          hostPublishedAt: Date.now()
         };
-        tasks.push(global.TorneoSync.patchTable(sessionId, tid, patch, 0));
+        if (global.TorneoSync.patchTable) tasks.push(global.TorneoSync.patchTable(sessionId, tid, patch, 0));
+        else tasks.push(global.TorneoSync.publishTable(sessionId, tid, patch));
       });
     }
     try { localStorage.setItem('commander-tournaments', JSON.stringify(app.tournaments)); } catch (e) {}
@@ -76,8 +76,11 @@
         var key = sessionId + '::' + table.id;
         if (self._tableSubs[key]) return;
         self._tableSubs[key] = global.TorneoSync.subscribeTable(sessionId, table.id, function (data) {
-          if (data && data.officialReport && data.officialReport.status === 'submitted' && app.applyOfficialTableReport) {
+          if (!data) return;
+          if (data.officialReport && data.officialReport.status === 'submitted' && app.applyOfficialTableReport) {
             app.applyOfficialTableReport(sessionId, table.id, data.officialReport);
+          } else if (app.applyLiveTableState) {
+            app.applyLiveTableState(sessionId, table.id, data);
           }
         });
       });
