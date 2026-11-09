@@ -175,3 +175,20 @@
 .m-tab .m-svg{width:16px;height:16px;margin-right:6px;vertical-align:-3px}
 .m-modal-row-label{display:flex;align-items:center;gap:8px}
 .m-toggle-row>span{display:inline-flex;align-items:center;gap:8px}
+
+
+/* pass turn centered (non-intrusive) */
+.mesa-top-actions .m-pass-btn{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:22;min-width:64px;min-height:64px;border-radius:999px;padding:10px;box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 0 1px rgba(105,192,175,.18);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.mesa-top-actions .m-pass-btn .m-btn-txt{display:inline}
+.mesa-top-actions .m-pass-btn:disabled{opacity:.35;filter:saturate(.4)}
+.m-pass-fab{display:none !important}
+@media (max-width:700px){
+  .mesa-top-actions .m-pass-btn{min-width:56px;min-height:56px;padding:8px}
+  .mesa-top-actions .m-pass-btn .m-btn-txt{font-size:.72rem}
+}
+/* optional virtual landscape on portrait narrow devices (keeps 2x2 distribution readable) */
+@media (orientation:portrait) and (max-width:700px) and (max-aspect-ratio: 3/4){
+  .mesa-body.virtual-landscape, .mesa-body:has(.m-grid){ }
+}
+/* explicit class hook if enabled later; default: no forced rotation to avoid UX/accessibility issues */
+.mesa-body.force-landscape .mesa-app{position:fixed;top:50%;left:50%;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center;overflow:hidden}

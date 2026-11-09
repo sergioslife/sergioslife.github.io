@@ -1739,3 +1739,14 @@ select:focus-visible {
     color: var(--t-text-muted);
     margin: 0;
 }
+
+/* Add players (mobile-safe) */
+#form-add-player.form-row, #form-add-late.form-row { display:flex; flex-wrap:wrap; gap:8px; align-items:stretch; }
+#form-add-player input, #form-add-late input { flex:1 1 160px; min-width:0; max-width:none !important; width:auto; }
+#form-add-player #input-player-group { flex:1 1 120px; }
+#form-add-player button[type="submit"], #form-add-late button[type="submit"] { flex:0 0 44px; width:44px; min-width:44px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
+.import-section { display:flex; flex-direction:column; gap:8px; }
+.import-area textarea { width:100%; min-width:0; box-sizing:border-box; }
+@media (max-width: 520px){
+  #form-add-player button[type="submit"], #form-add-late button[type="submit"]{ flex:1 1 100%; width:100%; min-height:42px; }
+}
