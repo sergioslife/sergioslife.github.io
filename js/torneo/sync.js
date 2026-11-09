@@ -110,6 +110,7 @@
     publishTable: function () { return this.provider ? this.provider.publishTable.apply(this.provider, arguments) : Promise.resolve(); },
     subscribeSession: function () { return this.provider ? this.provider.subscribeSession.apply(this.provider, arguments) : function () {}; },
     subscribeTable: function () { return this.provider ? this.provider.subscribeTable.apply(this.provider, arguments) : function () {}; },
+    patchSession: function (id, patch) { var base = mem.sessions[id] || read(keySession(id)) || {}; var data = deepMerge(base, patch); return this.publishSession(id, data); },
     patchTable: function (sid, tid, patch, delayMs) { return queueTablePatch(sid, tid, patch, delayMs); },
     flushTable: function (sid, tid) { return flushTable(sid, tid); }
   };

@@ -1084,12 +1084,12 @@ const app = {
                   var l = live[e.playerId] || {};
                   var elim = e.elimination || l.elimination || null;
                   var turnSec = Math.max(0, Math.floor(Number(l.timeUsedSec) || 0));
-                  results.push({ playerId:e.playerId, placement: placement, duration: Math.round(turnSec/60), turnTimeSec: turnSec, playerTurnTimeSec: turnSec, playerTurnTime: (elim&&elim.playerTurnTime)||null, timeOfElimination: (elim&&elim.timeOfElimination)||null, timeOfEliminationSec: (elim&&elim.timeOfEliminationSec!=null?elim.timeOfEliminationSec:null), bounties:0, elimination:elim, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][placement]) || Math.max(0,(n-placement)+1) });
+                  results.push({ playerId:e.playerId, placement: placement, duration: Math.round(turnSec/60), turnTimeSec: turnSec, playerTurnTimeSec: turnSec, playerTurnTime: (elim&&elim.playerTurnTime)||null, timeOfElimination: (elim&&elim.timeOfElimination)||null, timeOfEliminationSec: (elim&&elim.timeOfEliminationSec!=null?elim.timeOfEliminationSec:null), bounties: Math.max(0,Number(l.bounties)||0), elimination:elim, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][placement]) || Math.max(0,(n-placement)+1) });
                   used[e.playerId]=true;
                 });
                 var alive = players.filter(function(pid){ return !used[pid]; });
-                if (alive.length === 1) results.push({ playerId: alive[0], placement: 1, duration:0, bounties:0, provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][1]) || n });
-                else alive.forEach(function(pid){ var l2=live[pid]||{}; var ts2=Math.max(0,Math.floor(Number(l2.timeUsedSec)||0)); results.push({ playerId: pid, placement: 0, duration:Math.round(ts2/60), turnTimeSec:ts2, playerTurnTimeSec:ts2, bounties:0, provisional:true, points:0 }); });
+                if (alive.length === 1) { var lw=live[alive[0]]||{}; results.push({ playerId: alive[0], placement: 1, duration:0, bounties: Math.max(0,Number(lw.bounties)||0), provisional:true, points: (t.scoring && t.scoring[n] && t.scoring[n][1]) || n }); }
+                else alive.forEach(function(pid){ var l2=live[pid]||{}; var ts2=Math.max(0,Math.floor(Number(l2.timeUsedSec)||0)); results.push({ playerId: pid, placement: 0, duration:Math.round(ts2/60), turnTimeSec:ts2, playerTurnTimeSec:ts2, bounties: Math.max(0,Number(l2.bounties)||0), provisional:true, points:0 }); });
                 table.results = results;
                 table.liveStatus = alive.length <= 1 ? 'decided' : 'in-progress';
                 table.completed = false; // oficial sigue pendiente hasta reporte enviado
@@ -1123,7 +1123,7 @@ const app = {
             playerTurnTime: p.playerTurnTime || null,
             timeOfElimination: p.timeOfElimination || (p.elimination && p.elimination.timeOfElimination) || null,
             timeOfEliminationSec: p.timeOfEliminationSec != null ? p.timeOfEliminationSec : (p.elimination && p.elimination.timeOfEliminationSec != null ? p.elimination.timeOfEliminationSec : null),
-            bounties: 0,
+            bounties: Math.max(0, Number(p.bounties) || 0),
             elimination: p.elimination || null,
             points: this.getPointsForPosition(Number(p.placement) || 0, tableSize, t)
         }));
@@ -1150,7 +1150,7 @@ const app = {
         const players = (t.players || []).slice();
         const rounds = (t.rounds || []).filter(r => r && r.completed);
         const byId = {};
-        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, commanderDamageDealt: 0, commanderDamageReceived: 0, eliminations: 0, firstOutAtSec: null }; });
+        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, commanderDamageDealt: 0, commanderDamageReceived: 0, eliminations: 0, bounties: 0, firstOutAtSec: null }; });
         rounds.forEach(round => {
             (round.tables || []).forEach(table => {
                 if (!table || table.bye) {
@@ -1165,7 +1165,7 @@ const app = {
                     const s = byId[res.playerId]; if (!s) return;
                     const placement = Number(res.placement) || 0;
                     const pts = placement > 0 ? this.getPointsForPosition(placement, tableSize, t) : 0;
-                    s.points += pts + (Number(res.bounties) || 0);
+                    var rb = Math.max(0, Number(res.bounties) || 0); s.bounties = (s.bounties||0) + rb; s.points += pts + rb;
                     s.gamesPlayed += 1;
                     if (placement === 1) { s.wins += 1; s.gamesWon += 1; }
                     else if (placement > 0) { s.losses += 1; if (placement >= tableSize && tableSize > 1) s.eliminations += 1; }
@@ -1220,7 +1220,7 @@ const app = {
         var data = this.buildReportData(); if (!data) return;
         var hasCmdr = false;
         for (var i = 0; i < data.rows.length; i++) { var rr = data.rows[i]; if (rr.avgTurnTimeSec != null || rr.commanderDamageDealt || rr.commanderDamageReceived) { hasCmdr = true; break; } }
-        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas','Tiempo medio turno (s)','Tiempo medio turno','Eliminado (primer reloj ronda)','Salidas registradas'];
+        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','Bounties','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas','Tiempo medio turno (s)','Tiempo medio turno','Eliminado (primer reloj ronda)','Salidas registradas'];
         if (hasCmdr) head = head.concat(['Daño comandante infligido','Daño comandante recibido']);
         var escCsv = function(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; };
         var lines = [
@@ -1231,7 +1231,7 @@ const app = {
           var r = data.rows[j];
           var avgLabel = r.avgTurnTimeSec==null?'':(Math.floor(r.avgTurnTimeSec/60)+':'+String(r.avgTurnTimeSec%60).padStart(2,'0'));
           var elimLabel = r.firstOutAtSec==null?'':(Math.floor(r.firstOutAtSec/60)+':'+String(r.firstOutAtSec%60).padStart(2,'0'));
-          var row = [r.rank,r.name,r.points,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses,r.avgTurnTimeSec==null?'':r.avgTurnTimeSec,avgLabel,elimLabel,r.eliminations||0];
+          var row = [r.rank,r.name,r.points,r.bounties||0,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses,r.avgTurnTimeSec==null?'':r.avgTurnTimeSec,avgLabel,elimLabel,r.eliminations||0];
           if (hasCmdr) row = row.concat([r.commanderDamageDealt||0, r.commanderDamageReceived||0]);
           lines.push(row);
         }

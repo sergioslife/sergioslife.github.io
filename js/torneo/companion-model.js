@@ -7,7 +7,7 @@
       poison: 0, energy: 0, experience: 0, commanderTax: 0,
       storm: 0, manaPool: 0, monarch: false, initiative: false, extra: {},
       commanderDamage: {}, eliminated: false, elimination: null, eliminationOrder: null,
-      timeUsedSec: 0, lossExceptions: {}
+      timeUsedSec: 0, lossExceptions: {}, bounties: 0
     };
   }
   function ensureLive(table, playerId, startingLife) {
@@ -71,7 +71,7 @@
     ((table && table.players) || []).forEach(function(p){ var l = table.live && table.live[p.id]; if (l && Number(l.eliminationOrder) > max) max = Number(l.eliminationOrder); });
     return max + 1;
   }
-  function confirmElimination(table, playerId, condition, at, session) {
+  function confirmElimination(table, playerId, condition, at, session, extra) {
     var live = ensureLive(table, playerId);
     if (live.eliminated) return live;
     accrueIfActive(table, playerId);
@@ -80,11 +80,13 @@
     live.eliminated = true;
     live.eliminationOrder = nextEliminationOrder(table);
     live.timeUsedSec = effectiveTimeUsed(table, playerId); // snapshot at elimination
+    var elimBy = (extra && extra.eliminatedBy) || (condition && condition.eliminatedBy) || null;
     live.elimination = {
       type: condition && condition.type || 'manual',
       label: (condition && condition.label) || 'Derrota confirmada',
       source: condition && condition.source || null, commanderName: condition && condition.commanderName || null,
       detail: condition && condition.detail || null,
+      eliminatedBy: elimBy,
       at: ts,
       timeOfElimination: clock ? clock.label : null,
       timeOfEliminationSec: clock ? clock.sec : null,
@@ -94,6 +96,12 @@
     // if active player eliminated, pass turn state to next alive without accruing again
     if (activePlayerId(table) === playerId) moveTurnToNextAlive(table, playerId);
     return live;
+  }
+  function addBounty(table, killerId) {
+    if (!table || !killerId) return 0;
+    var live = ensureLive(table, killerId);
+    live.bounties = (Number(live.bounties) || 0) + 1;
+    return live.bounties;
   }
   function ignoreCondition(live, condition) {
     live.lossExceptions = live.lossExceptions || {};
@@ -110,9 +118,12 @@
     return ps[activeIndex(table)] ? ps[activeIndex(table)].id : null;
   }
   function turnElapsedSec(table) {
-    if (!table || !table.turn || !table.turn.startedAt) return 0;
-    if (table.turn.pausedAt) return Math.max(0, Math.floor(((table.turn.pausedAt - table.turn.startedAt) - (table.turn.pausedMs||0)) / 1000));
-    return Math.max(0, Math.floor(((Date.now() - table.turn.startedAt) - (table.turn.pausedMs||0)) / 1000));
+    if (!table || !table.turn) return 0;
+    var turn = table.turn;
+    if (turn.started === false && !turn.startedAt) return 0;
+    if (!turn.startedAt) return 0;
+    if (turn.pausedAt) return Math.max(0, Math.floor(((turn.pausedAt - turn.startedAt) - (turn.pausedMs||0)) / 1000));
+    return Math.max(0, Math.floor(((Date.now() - turn.startedAt) - (turn.pausedMs||0)) / 1000));
   }
   function accrueIfActive(table, playerId) {
     if (!table || activePlayerId(table) !== playerId) return;
@@ -170,7 +181,8 @@
       return { playerId: p.id, placement: place, elimination: elim, eliminationOrder: l.eliminationOrder || null,
         timeOfElimination: elim && (elim.timeOfElimination || null), timeOfEliminationSec: elim && (elim.timeOfEliminationSec != null ? elim.timeOfEliminationSec : null),
         playerTurnTimeSec: Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0)),
-        playerTurnTime: elim && elim.playerTurnTime ? elim.playerTurnTime : (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0)))
+        playerTurnTime: elim && elim.playerTurnTime ? elim.playerTurnTime : (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0))),
+        bounties: Math.max(0, Number(l.bounties) || 0)
       };
     });
     var alive = placements.filter(function(p){ return p.placement == null; });
@@ -210,6 +222,6 @@
     confirmElimination: confirmElimination, ignoreCondition: ignoreCondition, nextEliminationOrder: nextEliminationOrder,
     activePlayerId: activePlayerId, activeIndex: activeIndex, turnElapsedSec: turnElapsedSec, effectiveTimeUsed: effectiveTimeUsed,
     accrueActive: accrueActive, accrueIfActive: accrueIfActive, passTurn: passTurn, moveTurnToNextAlive: moveTurnToNextAlive,
-    alivePlayers: alivePlayers, computeOfficialReport: computeOfficialReport, roundRemainingSec: roundRemainingSec, playerBudgetSec: playerBudgetSec
+    alivePlayers: alivePlayers, computeOfficialReport: computeOfficialReport, roundRemainingSec: roundRemainingSec, playerBudgetSec: playerBudgetSec, addBounty: addBounty
   };
 })(window);
