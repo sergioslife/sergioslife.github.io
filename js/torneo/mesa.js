@@ -1,7 +1,23 @@
 (function () {
   'use strict';
+  var LS_SESSION='torneoMesa:sessionId', LS_TABLE='torneoMesa:tableId', LS_ACTIVE='torneoMesa:active';
+  function normSessionId(v){ return String(v==null?'':v).trim().replace(/\s+/g,'').toUpperCase(); }
+  function normTableId(v){ v=String(v==null?'':v).trim().toLowerCase().replace(/\s+/g,''); if(!v) return ''; if(/^\d+$/.test(v)) return 'mesa-'+v; if(/^mesa\s*-?\s*\d+$/i.test(String(v||'').trim())) return 'mesa-'+String(v).replace(/[^0-9]/g,''); return v.replace(/^table-?/,'mesa-').replace(/^id-?/,'mesa-'); }
+  function readJoinStorage(){ try{ return { sessionId:normSessionId(localStorage.getItem(LS_SESSION)||''), tableId:normTableId(localStorage.getItem(LS_TABLE)||'') }; }catch(e){ return {sessionId:'',tableId:''}; } }
+  function saveJoinStorage(sessionId, tableId){ try{ localStorage.setItem(LS_SESSION, sessionId); localStorage.setItem(LS_TABLE, tableId); localStorage.setItem(LS_ACTIVE, JSON.stringify({sessionId:sessionId, tableId:tableId, at:Date.now()})); localStorage.setItem('commander-active-mesa', JSON.stringify({sessionId:sessionId, tableId:tableId, at:Date.now()})); }catch(e){} }
+  function clearJoinStorage(){ try{ localStorage.removeItem(LS_ACTIVE); localStorage.removeItem('commander-active-mesa'); }catch(e){} }
+  function setJoinStatus(msg, isErr){ var el=$('m-join-status'); if(!el) return; if(!msg){ el.style.display='none'; el.textContent=''; el.style.color=''; return; } el.style.display='block'; el.textContent=msg; el.style.color=isErr?'#ff8fa3':'var(--t-text-muted,#9aa)'; }
+  function showJoin(msg, isErr){ var j=$('m-join'), b=$('m-board'); if(b) b.style.display='none'; if(j) j.style.display='block'; if(msg!=null) setJoinStatus(msg, isErr); }
+  function showBoard(){ var j=$('m-join'), b=$('m-board'); if(j) j.style.display='none'; if(b) b.style.display='block'; setJoinStatus('', false); }
   var qs = new URLSearchParams(location.search);
-  var S = { sessionId: (qs.get('sesion')||qs.get('session')||'').toUpperCase().trim(), tableId: (function(v){ v=String(v||'').trim(); if(!v) return ''; if(/^\d+$/.test(v)) return 'mesa-' + v; return v; })(qs.get('mesa')||qs.get('table')||qs.get('id')||''), session: null, table: null, unsubs: [], tick: null, localView: {}, lossModal: null, autoSubmitted: false, playerModal: null, animatingPick: false, joining: false, modalPauseCount: 0, autoPausedByModal: false, modalPauseNotice: "" };
+  var urlSession = normSessionId(qs.get('sesion')||qs.get('session')||qs.get('seccion')||qs.get('section')||qs.get('codigo')||'');
+  var urlTable = normTableId(qs.get('mesa')||qs.get('table')||qs.get('id')||qs.get('tableId')||'');
+  var hasUrlJoin = !!(urlSession && urlTable);
+  var stored = readJoinStorage();
+  var initSession = urlSession || stored.sessionId || '';
+  var initTable = urlTable || stored.tableId || '';
+  if(initSession && initTable) saveJoinStorage(initSession, initTable);
+  var S = { sessionId: initSession, tableId: initTable, _hasUrlJoin: hasUrlJoin, session: null, table: null, unsubs: [], tick: null, localView: {}, lossModal: null, autoSubmitted: false, playerModal: null, animatingPick: false, joining: false, modalPauseCount: 0, autoPausedByModal: false, modalPauseNotice: "", _connected:false, _connectTimer:null };
   var $ = function(id){ return document.getElementById(id); };
   var esc = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
   var fmt = function(sec){ sec=Math.floor(Number(sec)||0); var neg=sec<0; sec=Math.abs(sec); var m=Math.floor(sec/60),s=sec%60; return (neg?'-':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); };
@@ -19,7 +35,6 @@
     flag:'<svg viewBox="0 0 24 24" class="m-svg" aria-hidden="true"><path fill="currentColor" d="M6 3h2v18H6V3Zm3 2h10l-2 3 2 3H9V5Z"/></svg>'
   };
   function iconSvg(key, fallback){ return SVG[key] || SVG[fallback||'sliders'] || ''; }
-  function normTableId(v){ v=String(v||'').trim(); if(!v) return ''; if(/^\d+$/.test(v)) return 'mesa-' + v; return v; }
   function badge(){ var b=$('m-sync'); if(!b||!window.TorneoSync) return; var m=TorneoSync.mode||'local'; b.className='sync-mode sync-mode-'+m; b.textContent=m==='firestore'?'tiempo real':'local'; }
   function persistTable(patch, delay){ if(!S.sessionId||!S.tableId||!window.TorneoSync) return Promise.resolve(); return TorneoSync.patchTable(S.sessionId,S.tableId,patch,delay); }
   function flushTable(){ if(!S.sessionId||!S.tableId||!window.TorneoSync||!TorneoSync.flushTable) return; TorneoSync.flushTable(S.sessionId,S.tableId); }
@@ -272,12 +287,12 @@
     if((b=$('m-toggle-official'))) b.addEventListener('click', function(){ renderOfficialPreview(); openModal('m-official-modal'); });
     if((b=$('m-pick-random'))) b.addEventListener('click', animateRandomPick); if((b=$('m-start-time'))) b.addEventListener('click', startLocalTime);
     if((b=$('m-global-pause'))) b.addEventListener('click', toggleGlobalPause);
-    if((b=$('m-open-join'))) b.addEventListener('click', function(){ if($('m-board')) $('m-board').style.display='none'; if($('m-join')) $('m-join').style.display='block'; });
+    if((b=$('m-open-join'))) b.addEventListener('click', function(){ if($('m-session')) $('m-session').value=S.sessionId||''; if($('m-table')) $('m-table').value=S.tableId||''; showJoin('Puedes cambiar código de sesión o mesa. Los datos actuales se mantienen hasta entrar a otra mesa.', false); });
     if((b=$('m-join-btn'))) b.addEventListener('click', onJoinClick);
     var jf=$('m-join'); if(jf) jf.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); onJoinClick(ev); } });
   }
   function applySession(s){ S.session=s; renderTop(); if(S.table&&S.session&&S.session.roundStartedAt&&S.table.turn&&S.table.turn.activePlayerId&&!S.table.turn.started){ var st=$('m-pick-status'); if(st) st.textContent='Ronda lista. Cronómetros en pausa: selecciona quién inicia y presiona ▶ Iniciar Tiempo de Turno (o el botón central).'; renderTop(); renderGrid(); } }
-  function applyTable(t){ S.table=t||S.table; if(S.table){ S.table.live=S.table.live||{}; S.table.turn=S.table.turn||{}; if(S.table.officialReport&&S.table.officialReport.status==='submitted') S.autoSubmitted=true; } renderTop(); renderGrid(); checkPendingLossModal(); maybeAutoSubmit(); }
+  function applyTable(t){ if(t){ S._connected=true; clearTimeout(S._connectTimer); setJoinStatus('',false); } S.table=t||S.table; if(S.table){ S.table.live=S.table.live||{}; S.table.turn=S.table.turn||{}; if(S.table.officialReport&&S.table.officialReport.status==='submitted') S.autoSubmitted=true; } renderTop(); renderGrid(); checkPendingLossModal(); maybeAutoSubmit(); }
 
   function tickTimers(){
     if(!S.table || !S.session) return;
@@ -286,13 +301,18 @@
     var paused = isPaused();
     var aid = CompanionModel.activePlayerId(S.table);
     var cards = (document.getElementById('m-grid')||document).querySelectorAll ? (document.getElementById('m-grid')||document).querySelectorAll('.m-q[data-pid], .m-seat[data-seat], .m-seat[data-pid]') : [];
-    var budget = CompanionModel.turnBudget(S.table);
+    var playerCount = Math.max(1, (S.table.players||[]).length || 4);
+    var budget = (CompanionModel.turnBudget ? CompanionModel.turnBudget(S.table) : (CompanionModel.playerBudgetSec ? CompanionModel.playerBudgetSec(S.session, playerCount) : Math.floor(((S.session&&S.session.roundDurationSec)||3000)/playerCount)));
     for(var i=0;i<cards.length;i++){
       var q=cards[i], pid=q.getAttribute('data-pid')||q.getAttribute('data-seat'); if(!pid) continue;
       var live=(S.table.live&&S.table.live[pid])||{};
-      if(live.eliminated){ q.classList.remove('m-turn','is-active'); var eb=q.querySelector('.m-q-turnbadge'); if(eb) eb.remove(); continue; }
-      var used=CompanionModel.effectiveTimeUsed(S.table,pid); var left=Math.max(0,budget-used);
-      var pill=q.querySelector('.m-time-pill'); if(pill) pill.textContent=fmt(left);
+      if(live.eliminated){ q.classList.remove('m-turn','is-active'); var eb=q.querySelector('.m-q-turnbadge'); if(eb) eb.remove(); var dp=q.querySelector('.m-time-pill'); if(dp) dp.textContent=fmt(Math.max(0,(Number(live.turnTimeSec||live.timeUsedSec)||0))); continue; }
+      // Cuenta regresiva en tiempo real: solo el turno activo avanza (effectiveTimeUsed suma turnElapsedSec vivo);
+      // en pausa turnElapsedSec se congela por pausedAt/pausedMs, así que todos los pill se quedan estáticos.
+      var used=CompanionModel.effectiveTimeUsed(S.table,pid);
+      var left=Math.max(0, budget - used);
+      var pill=q.querySelector('.m-time-pill');
+      if(pill){ pill.textContent=fmt(left); pill.classList.toggle('warn', left>0 && left<=120); pill.classList.toggle('danger', left<=0); }
       var active = (aid===pid) && !paused && !!(S.table.turn && (S.table.turn.started||S.table.turn.startedAt));
       q.classList.toggle('m-turn', active); q.classList.toggle('is-active', active);
       var badge=q.querySelector('.m-q-turnbadge');
@@ -306,16 +326,57 @@
     var pass=$('m-island-pass'); if(pass) pass.disabled = paused || !started || !aid;
   }
   function subscribe(){ S.unsubs.forEach(function(u){try{u();}catch(e){}}); S.unsubs=[]; if(!window.TorneoSync||!TorneoSync.ready()) return; S.unsubs.push(TorneoSync.subscribeSession(S.sessionId, applySession)); S.unsubs.push(TorneoSync.subscribeTable(S.sessionId, S.tableId, applyTable)); }
-  function enter(){ var j=$('m-join'),b=$('m-board'),st=$('m-official-status'); if(S.joining) return; S.tableId=normTableId(S.tableId); if(!S.sessionId||!S.tableId){ if(st) st.textContent='Faltan código de sesión o mesa.'; if(j) j.style.display='block'; if(b) b.style.display='none'; return; } S.joining=true; if(st) st.textContent='Conectando a '+S.sessionId+' / '+S.tableId+'...'; try{ if(j) j.style.display='none'; if(b) b.style.display='block'; subscribe(); renderTop(); renderGrid(); if(S.tick) clearInterval(S.tick); S.tick=setInterval(function(){ try{
-          if(!S.table || !S.session) { renderTop(); return; }
-          renderTop();
-          var started = !!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt));
-          if(started) tickTimers(); else renderGrid();
-          checkPendingLossModal();
-        }catch(e){ console.warn('tick',e); } },1000); } catch(e){ console.error('enter',e); if(st) st.textContent='No se pudo cargar la mesa: '+(e&&e.message||e); if(j) j.style.display='block'; if(b) b.style.display='none'; } S.joining=false; }
-  function onJoinClick(ev){ if(ev&&ev.preventDefault) ev.preventDefault(); S.sessionId=(($('m-session')&&$('m-session').value)||'').trim().toUpperCase(); S.tableId=normTableId(($('m-table')&&$('m-table').value)||''); if(!S.sessionId||!S.tableId){ alert('Ingresa sesión y mesa (ej. mesa-1).'); return false; } try{ var url=new URL(location.href); url.searchParams.set('sesion',S.sessionId); url.searchParams.set('mesa',S.tableId); url.searchParams.delete('session'); url.searchParams.delete('table'); history.replaceState({},'',url); }catch(e){} enter(); return false; }
-  S.tableId = normTableId(S.tableId);
-  function boot(){ try{ badge(); if($('m-session')) $('m-session').value=S.sessionId; if($('m-table')) $('m-table').value=S.tableId; bind(); if(S.sessionId&&S.tableId) enter(); else { if($('m-join')) $('m-join').style.display='block'; if($('m-board')) $('m-board').style.display='none'; } } catch(e){ console.error('mesa boot',e); var st=$('m-official-status'); if(st) st.textContent='Error al iniciar mesa: '+(e&&e.message||e); } }
+  function enter(){
+    var st=$('m-official-status');
+    if(S.joining) return;
+    S.sessionId = normSessionId(S.sessionId);
+    S.tableId = normTableId(S.tableId);
+    if(!S.sessionId || !S.tableId){ showJoin('Falta el código de sesión o el ID de mesa.', true); if(st) st.textContent='Faltan código de sesión o mesa.'; return; }
+    if($('m-session')) $('m-session').value = S.sessionId;
+    if($('m-table')) $('m-table').value = S.tableId;
+    try{ var url=new URL(location.href); url.searchParams.set('sesion',S.sessionId); url.searchParams.set('mesa',S.tableId); url.searchParams.delete('session'); url.searchParams.delete('seccion'); url.searchParams.delete('table'); url.searchParams.delete('id'); url.searchParams.delete('section'); url.searchParams.delete('codigo'); history.replaceState({},'',url); }catch(e){}
+    saveJoinStorage(S.sessionId, S.tableId);
+    S.joining=true; S._connected=false;
+    showBoard();
+    setJoinStatus('Conectando a '+S.sessionId+' / '+S.tableId+'...', false);
+    if(st) st.textContent='Conectando a '+S.sessionId+' / '+S.tableId+'...';
+    try{
+      subscribe(); renderTop(); renderGrid();
+      if(S.tick) clearInterval(S.tick);
+      S.tick=setInterval(function(){ try{
+        if(!S.table || !S.session) { renderTop(); return; }
+        renderTop();
+        var started = !!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt));
+        if(started) tickTimers(); else renderGrid();
+        checkPendingLossModal();
+      }catch(e){ console.warn('tick',e); } },1000);
+      clearTimeout(S._connectTimer);
+      S._connectTimer = setTimeout(function(){
+        if(S._connected) return;
+        if(st) st.textContent='Esperando datos de '+S.sessionId+' / '+S.tableId+'... Verifica que el anfitrión haya publicado la sesión/mesa y que el código sea correcto. Puedes usar "Cambiar mesa".';
+        setJoinStatus('No llegaron datos todavía para '+S.sessionId+' / '+S.tableId+'. Revisa código/mesa o espera al anfitrión.', true);
+      }, 5500);
+    } catch(e){ console.error('enter',e); clearJoinStorage(); showJoin('No se pudo abrir la mesa: '+(e&&e.message||e)+'. Verifica código de sesión e ID de mesa.', true); if(st) st.textContent='No se pudo cargar la mesa.'; }
+    S.joining=false;
+  }
+  function onJoinClick(ev){
+    if(ev&&ev.preventDefault) ev.preventDefault();
+    var rawS=(($('m-session')&&$('m-session').value)||'');
+    var rawT=(($('m-table')&&$('m-table').value)||'');
+    var sessionId=normSessionId(rawS);
+    var tableId=normTableId(rawT);
+    if(!String(rawS||'').trim() || !String(rawT||'').trim()){ showJoin('Completa el código de sesión y el ID de mesa. Ejemplo: sesión ABC123 y mesa mesa-1.', true); return false; }
+    if(!sessionId || !tableId){ showJoin('Código de sesión o ID de mesa inválido. Revisa espacios/caracteres.', true); return false; }
+    S.sessionId=sessionId; S.tableId=tableId;
+    setJoinStatus('', false);
+    enter();
+    return false;
+  }
+  S.tableId = normTableId(S.tableId); S.sessionId = normSessionId(S.sessionId);
+  function boot(){ try{ badge(); if($('m-session')) $('m-session').value=S.sessionId||''; if($('m-table')) $('m-table').value=S.tableId||''; bind();
+    if(S.sessionId && S.tableId){ enter(); }
+    else { if(S._hasUrlJoin) showJoin('El enlace compartido no trae un código de sesión o ID de mesa válido. Ingresa los datos manualmente.', true); else showJoin('', false); }
+  } catch(e){ console.error('mesa boot',e); showJoin('Error al iniciar mesa: '+(e&&e.message||e)+'. Recarga la página o ingresa los datos manualmente.', true); var st=$('m-official-status'); if(st) st.textContent='Error al iniciar mesa.'; } }
   window.abrirModalContadores=function(pid){ return openPlayerModal(pid,'counters'); }; window.abrirModalDerrota=function(pid){ return surrender(pid); }; window.openPlayerModal=openPlayerModal; window.surrender=surrender;
   try{ TorneoSync.init().then(boot).catch(function(e){ console.warn('TorneoSync init',e); boot(); }); } catch(e){ console.error(e); boot(); }
 })();

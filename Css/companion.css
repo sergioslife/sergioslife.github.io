@@ -101,13 +101,13 @@
 .m-seat.is-warn { border-color: rgba(253,196,21,.55); }
 .m-seat.is-elim { opacity:.7; border-color:rgba(230,19,90,.42); }
 .m-seat.is-picking { outline:2px solid rgba(253,196,21,.95); }
-.m-seat-head { padding-right:38px; flex:0 0 auto; min-width:0; }
+.m-seat-head { padding-right:38px; flex:0 0 auto; min-width:0; position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; }
 .m-seat.is-elim .m-seat-head { padding-right:0; }
-.m-seat-name { font-weight:700; font-size:clamp(.72rem, 3cqw, .95rem); line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.m-seat-meta { display:flex; gap:4px; align-items:center; justify-content:space-between; min-width:0; }
+.m-seat-name { font-weight:700; font-size:clamp(.72rem, 3cqw, .95rem); line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center; }
+.m-seat-meta { display:flex; gap:4px; align-items:center; justify-content:center; min-width:0; width:100%; }
 .m-seat-status { font-size:clamp(.56rem, 2cqw, .68rem); color:var(--t-text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .m-seat.is-active .m-seat-status { color:#8ef0d8; } .m-seat.is-elim .m-seat-status { color:#ff8fa3; font-weight:600; }
-.m-time-pill { font-size:.56rem; color:var(--t-text-muted); border:1px solid rgba(255,255,255,.06); border-radius:999px; padding:1px 5px; font-variant-numeric:tabular-nums; flex:0 0 auto; }
+.m-time-pill { font-size:clamp(.62rem, 2.4cqw, .78rem); color:var(--t-text-muted); border:1px solid rgba(255,255,255,.08); border-radius:999px; padding:2px 10px; font-variant-numeric:tabular-nums; font-weight:700; letter-spacing:.02em; display:inline-flex; align-items:center; justify-content:center; margin:2px auto 0; flex:0 0 auto; min-width:6ch; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,.18); }
 .m-time-pill.warn { color:var(--t-amarillo,#FDC415); } .m-time-pill.danger { color:var(--t-rosa,#E6135A); }
 .m-life-zone { flex:1 1 0; min-height:0; display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:3px; align-items:stretch; }
 .m-life-col { display:flex; flex-direction:column; gap:3px; justify-content:center; min-height:0; }
