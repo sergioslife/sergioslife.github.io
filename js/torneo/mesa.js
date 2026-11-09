@@ -181,7 +181,19 @@
   function modalStepper(pid,field,label,val,opts){ opts=opts||{}; var n=Number(val)||0; var danger=opts.dangerAt!=null&&n>=opts.dangerAt?' danger':''; var ico=opts.svg?iconSvg(opts.svg):''; return '<div class="m-modal-row"><div class="m-modal-row-label">'+ico+'<span>'+esc(label)+'</span></div><div class="m-modal-step"><button data-modal-action="'+esc(field)+'" data-pid="'+esc(pid)+'" data-delta="-1">−</button><strong class="'+danger+'">'+n+'</strong><button data-modal-action="'+esc(field)+'" data-pid="'+esc(pid)+'" data-delta="1">+</button></div></div>'; }
   function toggleRow(pid,field,label,on,svg){ return '<button class="m-toggle-row'+(on?' on':'')+'" data-toggle-field="'+field+'" data-pid="'+esc(pid)+'"><span>'+iconSvg(svg,'crown')+'<span>'+esc(label)+'</span></span><strong>'+(on?'Activo':'Inactivo')+'</strong></button>'; }
   function tabBtn(pid,tab,svg,label,active){ return '<button class="m-tab'+(active===tab?' active':'')+'" data-player-tab="'+tab+'" data-pid="'+esc(pid)+'">'+iconSvg(svg)+'<span>'+esc(label)+'</span></button>'; }
-  function renderCmdrModal(p,live){ var others=(S.table.players||[]).filter(function(o){return o.id!==p.id;}); if(!others.length) return '<div class="c-counter-hint">Sin oponentes.</div>'; return others.map(function(o){ var e=(live.commanderDamage||{})[o.id]||{commanderName:'Comandante de '+o.name,damage:0}; var dmg=Number(e.damage)||0; var lethal=dmg>=21?' lethal':''; return '<div class="m-cmdr"><label>De '+esc(o.name)+'<input class="m-cmdr-name" data-target="'+esc(p.id)+'" data-op="'+esc(o.id)+'" value="'+esc(e.commanderName||'')+'" placeholder="Nombre comandante"></label><div class="m-cmdr-row"><button data-cmdr-dmg="1" data-target="'+esc(p.id)+'" data-op="'+esc(o.id)+'" data-delta="-1">−</button><strong class="'+lethal+'">'+dmg+'</strong><button data-cmdr-dmg="1" data-target="'+esc(p.id)+'" data-op="'+esc(o.id)+'" data-delta="1">+</button></div></div>'; }).join(''); }
+  function renderCmdrModal(p,live){
+    var others=(S.table.players||[]).filter(function(o){return o.id!==p.id;});
+    var rows=[];
+    // Propio comandante / "Camarada" (control mental, efectos espejo, etc.)
+    // Regla Commander: el daño de comandante recibido también resta vida general (bidireccional al corregir).
+    var selfKey = p.id;
+    var se=(live.commanderDamage||{})[selfKey]||{commanderName:'Camarada / Propio',damage:0};
+    var sdmg=Number(se.damage)||0; var slethal=sdmg>=21?' lethal':'';
+    rows.push('<div class="m-cmdr m-cmdr-self"><label>De '+esc(p.name)+' <span class="m-cmdr-tag">Camarada</span><input class="m-cmdr-name" data-target="'+esc(p.id)+'" data-op="'+esc(selfKey)+'" value="'+esc(se.commanderName||'Camarada / Propio')+'" placeholder="Nombre comandante"></label><div class="m-cmdr-row"><button data-cmdr-dmg="1" data-target="'+esc(p.id)+'" data-op="'+esc(selfKey)+'" data-delta="-1" type="button">−</button><strong class="'+slethal+'">'+sdmg+'</strong><button data-cmdr-dmg="1" data-target="'+esc(p.id)+'" data-op="'+esc(selfKey)+'" data-delta="1" type="button">+</button></div><div class="c-counter-hint">Daño de tu propio comandante/camarada: también resta/suma en vida general.</div></div>');
+    if(!others.length) rows.push('<div class="c-counter-hint">Sin oponentes.</div>');
+    rows = rows.concat(others.map(function(o){ var e=(live.commanderDamage||{})[o.id]||{commanderName:'Comandante de '+o.name,damage:0}; var dmg=Number(e.damage)||0; var lethal=dmg>=21?' lethal':''; return '<div class="m-cmdr"><label>De '+esc(o.name)+'<input class="m-cmdr-name" data-target="'+esc(p.id)+'" data-op="'+esc(o.id)+'" value="'+esc(e.commanderName||'')+'" placeholder="Nombre comandante"></label><div class="m-cmdr-row"><button data-cmdr-dmg="1" data-target="'+esc(p.id)+'" data-op="'+esc(o.id)+'" data-delta="-1" type="button">−</button><strong class="'+lethal+'">'+dmg+'</strong><button data-cmdr-dmg="1" data-target="'+esc(p.id)+'" data-op="'+esc(o.id)+'" data-delta="1" type="button">+</button></div></div>'; }));
+    return rows.join('');
+  }
   function openPlayerModal(pid,tab){ if(!S.table||!pid){ console.warn("openPlayerModal missing table/pid",!!S.table,pid); return; } try{ if(S.table.turn&&(S.table.turn.started||S.table.turn.startedAt)) autoPauseForModal("Partida en pausa por menú"); }catch(e){console.warn("autoPause",e);} ensureTableState(); var p=(S.table.players||[]).find(function(x){return x.id===pid;}); if(!p) return; var live=CompanionModel.ensureLive(S.table,pid,40); S.playerModal={pid:pid,tab:tab||'counters'}; var title=$('m-player-modal-title'); if(title) title.textContent=p.name; var body=$('m-player-modal-body'); if(!body){ console.warn('m-player-modal-body missing'); return; } var t=S.playerModal.tab; body.innerHTML='<div class="m-modal-tabs">'+tabBtn(pid,'commander','cmdr','Cmdr',t)+tabBtn(pid,'counters','sliders','Contadores',t)+tabBtn(pid,'tax','coins','Impuesto',t)+'</div>'+(t==='commander'?('<div class="m-cmdr-wrap m-cmdr-wrap-modal">'+renderCmdrModal(p,live)+'</div>'):'')+(t==='counters'?('<div class="m-modal-list">'+modalStepper(pid,'poison','Veneno',live.poison,{dangerAt:10,svg:'skull'})+modalStepper(pid,'energy','Energía',live.energy,{svg:'bolt'})+modalStepper(pid,'experience','Experiencia',live.experience,{svg:'star'})+modalStepper(pid,'storm','Tormenta',live.storm,{svg:'storm'})+modalStepper(pid,'manaPool','Maná flotante',live.manaPool,{svg:'mana'})+toggleRow(pid,'monarch','Monarca',!!live.monarch,'crown')+toggleRow(pid,'initiative','Iniciativa',!!live.initiative,'dungeon')+'</div>'):'')+(t==='tax'?('<div class="m-modal-list">'+modalStepper(pid,'commanderTax','Impuesto de comandante',live.commanderTax,{svg:'coins'})+'<div class="c-counter-hint">Costo adicional: +'+(2*(Number(live.commanderTax)||0))+' maná genérico (usualmente).</div></div>'):'')+(!live.eliminated?'<div class="m-modal-actions" style="margin-top:12px"><button class="btn-secondary m-surrender" data-surrender="'+esc(pid)+'">Rendición / pérdida forzada</button></div>':''); openModal('m-player-modal'); try{ var pm=$('m-player-modal'); if(pm){ pm.style.display='flex'; pm.style.zIndex='130'; } }catch(e){} }
   function closePlayerModal(){ var had=!!S.playerModal; S.playerModal=null; closeModal('m-player-modal'); if(had) autoResumeFromModal(); }
   function refreshPlayerModal(){ if(S.playerModal) openPlayerModal(S.playerModal.pid,S.playerModal.tab); }
@@ -273,7 +285,26 @@
             l[action] = (Number(l[action])||0) + delta;
           }
         }).then(function(){ setTimeout(checkPendingLossModal,30); });
-      } var cmd=e.target.closest('[data-cmdr-dmg]'); if(cmd){ var tpid=cmd.getAttribute('data-target'), op=cmd.getAttribute('data-op'), d=parseInt(cmd.getAttribute('data-delta'),10)||0; return patchLive(tpid,function(l){ l.commanderDamage=l.commanderDamage||{}; var en=l.commanderDamage[op]||(l.commanderDamage[op]={commanderName:'Comandante',damage:0}); en.damage=(Number(en.damage)||0)+d; }).then(function(){ refreshPlayerModal(); setTimeout(checkPendingLossModal,30); }); } if(e.target&&e.target.id==='m-loss-yes') return confirmLossYes(); if(e.target&&e.target.id==='m-loss-no') return confirmLossNo();
+      } var cmd=e.target.closest('[data-cmdr-dmg]'); if(cmd){
+        e.preventDefault(); e.stopPropagation();
+        var tpid=cmd.getAttribute('data-target'), op=cmd.getAttribute('data-op'), d=parseInt(cmd.getAttribute('data-delta'),10)||0;
+        if(cmd.disabled) return;
+        return patchLive(tpid,function(l,t){
+          if(l && l.eliminated) return;
+          l.commanderDamage=l.commanderDamage||{};
+          var en=l.commanderDamage[op]||(l.commanderDamage[op]={commanderName:(op===tpid?'Camarada / Propio':'Comandante'),damage:0});
+          var before = Number(en.damage); if(!isFinite(before)) before = 0;
+          var after = before + d;
+          if(after < 0) after = 0; // commander damage cannot go below 0
+          var actual = after - before; // actual delta applied (respects floor)
+          en.damage = after;
+          // Commander rules sync: commander damage delta is reflected in general life automatically (bidirectional).
+          if(actual !== 0){
+            var curLife = Number(l.life); if(!isFinite(curLife)) curLife = (typeof l.life==='number' ? l.life : 40);
+            l.life = curLife - actual; // +cmdr damage => -life; -cmdr damage (correction) => +life. Allows 0/negatives, never resets to 40.
+          }
+        }).then(function(){ refreshPlayerModal(); renderGrid(); renderTop(); setTimeout(checkPendingLossModal,30); });
+      } if(e.target&&e.target.id==='m-loss-yes') return confirmLossYes(); if(e.target&&e.target.id==='m-loss-no') return confirmLossNo();
       if(e.target&&e.target.id==='m-loss-cancel') return closeLossModal();
       if(e.target&&e.target.id==='m-loss-step0-yes'){ if(S.lossModal) S.lossModal.step=2; return renderLossModal(); }
       if(e.target&&e.target.id==='m-loss-step1-yes'){ if(S.lossModal) S.lossModal.step=2; return renderLossModal(); }
