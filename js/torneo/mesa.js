@@ -62,8 +62,8 @@
     var sessPatch={};
     if(S.session && S.session.roundPausedAt){ sessPatch.roundPausedDurationMs = (Number(S.session.roundPausedDurationMs)||0) + Math.max(0, now - S.session.roundPausedAt); sessPatch.roundPausedAt = null; S.session.roundPausedDurationMs=sessPatch.roundPausedDurationMs; S.session.roundPausedAt=null; }
     if(window.TorneoSync && TorneoSync.patchSession && Object.keys(sessPatch).length) { try{ TorneoSync.patchSession(S.sessionId, sessPatch); }catch(e){} }
-    persistTable({turn:JSON.parse(JSON.stringify(S.table.turn))},0).then(function(){ try{flushTable();}catch(e){} }).catch(function(){});
-    renderTop(); try{updateCenterIsland();}catch(e){}
+    persistTable({turn:JSON.parse(JSON.stringify(S.table.turn))},0).then(function(){ try{flushTable();}catch(e){} renderTop(); try{updateCenterIsland();}catch(e){} try{renderGrid();}catch(e){} }).catch(function(){});
+    renderTop(); try{updateCenterIsland();}catch(e){} try{renderGrid();}catch(e){}
     return true;
   }
   function forceCloseInteractiveModals(){
@@ -121,7 +121,7 @@
     if ((el=$('m-round-meta'))) el.textContent = !S.session.roundStartedAt ? 'esperando anfitrión' : (S.session.roundPausedAt ? 'pausada' : (rem===0 ? 'agotado' : 'en curso'));
     var started = !!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt));
     var ap = ps.find(function(p){return p.id===CompanionModel.activePlayerId(S.table);});
-    if ((el=$('m-active-name'))) el.textContent = started ? (ap ? ap.name : '-') : ((ap ? ap.name : '-') + ' · listo');
+    if ((el=$('m-active-name'))) el.textContent = (started && !isPaused()) ? (ap ? ap.name : '-') : (started && isPaused() ? ((ap ? ap.name : '-') + ' · pausa') : ((ap ? ap.name : '-') + ' · listo'));
     if ((el=$('m-active-time'))) el.textContent = started ? fmt(CompanionModel.turnElapsedSec(S.table)) : '00:00';
     var paused=isPaused(); var pass = $('m-pass-turn'); if (pass) { pass.disabled = !started || !!paused; pass.style.display = started ? '' : 'none'; }
     var fab = $('m-pass-fab'); if (fab) { fab.disabled = !started || !!(typeof isPaused==='function'&&isPaused()); }
@@ -133,25 +133,31 @@
   }
   function quadrant(p, idx, n) {
     var live = CompanionModel.ensureLive(S.table, p.id, 40), aid = CompanionModel.activePlayerId(S.table);
-    var active = aid === p.id && !live.eliminated && S.table.turn && S.table.turn.started;
+    var active = aid === p.id && !live.eliminated && S.table.turn && (S.table.turn.started || S.table.turn.startedAt) && !S.table.turn.pausedAt;
     var conditions = CompanionModel.detectLossConditions(S.table, p.id, S.session), warn = conditions.length ? conditions[0] : null;
     var budget = CompanionModel.playerBudgetSec(S.session, (S.table.players||[]).length || 4), used = CompanionModel.effectiveTimeUsed(S.table, p.id), left = budget - used;
     var timeClass = left < 0 ? 'danger' : (left <= 120 ? 'warn' : '');
-    var status = live.eliminated ? ('Eliminado · ' + placeLabel(live, (S.table.players||[]).length)) : (warn ? ('Condición: ' + esc(warn.label)) : (active ? 'Turno activo' : ((aid===p.id && !(S.table.turn&&S.table.turn.started)) ? 'Listo para iniciar' : 'En juego')));
-    return '<article class="m-seat'+(active?' is-active':'')+(live.eliminated?' is-elim':(warn?' is-warn':''))+' pos-'+idx+' seats-'+n+'" data-seat="'+esc(p.id)+'">'
+    var status = live.eliminated ? ('Has muerto · ' + placeLabel(live, (S.table.players||[]).length)) : (warn ? ('Condición: ' + esc(warn.label)) : (active ? 'Turno activo' : ((aid===p.id && !(S.table.turn&&S.table.turn.started)) ? 'Listo para iniciar' : 'En juego')));
+    var lifeNum = Number(live.life); if (!isFinite(lifeNum)) lifeNum = (typeof live.life === 'number' ? live.life : 40); // preserve 0/negative; never reset to 40
+    var dead = !!live.eliminated;
+    var lifeZone = dead
+      ? '<div class="m-life-zone is-dead" aria-disabled="true"><div class="m-life-core is-dead"><div class="m-life-val danger">Has muerto</div><div class="m-life-sub">Eliminado · cuadrante bloqueado</div></div></div>'
+      : '<div class="m-life-zone"><div class="m-life-col"><button class="m-life-btn" data-pid="'+esc(p.id)+'" data-action="life" data-delta="-5" type="button">−5</button><button class="m-life-btn" data-pid="'+esc(p.id)+'" data-action="life" data-delta="-1" type="button">−</button></div>'
+        + '<div class="m-life-core"><div class="m-life-val'+(lifeNum<=0?' danger':'')+'">'+lifeNum+'</div><div class="m-life-sub">vida</div></div>'
+        + '<div class="m-life-col"><button class="m-life-btn plus" data-pid="'+esc(p.id)+'" data-action="life" data-delta="1" type="button">+</button><button class="m-life-btn plus" data-pid="'+esc(p.id)+'" data-action="life" data-delta="5" type="button">+5</button></div></div>';
+    var dis = dead ? ' disabled aria-disabled="true"' : '';
+    return '<article class="m-seat'+(active?' is-active':'')+(dead?' is-elim':(warn?' is-warn':''))+' pos-'+idx+' seats-'+n+'" data-seat="'+esc(p.id)+'"'+(dead?' data-dead="1"':'')+'>'
       + '<header class="m-seat-head"><div class="m-seat-name" title="'+esc(p.name)+'">'+esc(p.name)+'</div><div class="m-seat-meta"><span class="m-seat-status">'+status+'</span><span class="m-time-pill '+timeClass+'">'+fmt(left)+'</span></div></header>'
-      + '<div class="m-life-zone"><div class="m-life-col"><button class="m-life-btn" data-pid="'+esc(p.id)+'" data-action="life" data-delta="-5">−5</button><button class="m-life-btn" data-pid="'+esc(p.id)+'" data-action="life" data-delta="-1">−</button></div>'
-      + '<div class="m-life-core"><div class="m-life-val'+((Number(live.life)||0)<=0?' danger':'')+'">'+(live.life!=null?live.life:40)+'</div><div class="m-life-sub">vida</div></div>'
-      + '<div class="m-life-col"><button class="m-life-btn plus" data-pid="'+esc(p.id)+'" data-action="life" data-delta="1">+</button><button class="m-life-btn plus" data-pid="'+esc(p.id)+'" data-action="life" data-delta="5">+5</button></div></div>'
-      + '<div class="m-quickbar">'
-      + '<button class="m-ico-btn" data-open-player-modal="commander" data-pid="'+esc(p.id)+'" type="button" title="Daño de comandante">'+iconSvg('cmdr')+'</button>'
-      + '<button class="m-ico-btn" data-open-player-modal="counters" data-pid="'+esc(p.id)+'" type="button" title="Contadores">'+iconSvg('sliders')+'</button>'
-      + '<button class="m-ico-btn" data-open-player-modal="tax" data-pid="'+esc(p.id)+'" type="button" title="Impuesto comandante">'+iconSvg('coins')+'<span>'+((Number(live.commanderTax)||0))+'</span></button>'
-      + (!live.eliminated ? '<button class="m-ico-btn danger" data-surrender="'+esc(p.id)+'" type="button" title="Rendirse">'+iconSvg('flag')+'</button>' : '')
+      + lifeZone
+      + '<div class="m-quickbar'+(dead?' is-dead':'')+'">'
+      + '<button class="m-ico-btn"'+(dead?dis:' data-open-player-modal="commander" data-pid="'+esc(p.id)+'"')+' type="button" title="Daño de comandante">'+iconSvg('cmdr')+'</button>'
+      + '<button class="m-ico-btn"'+(dead?dis:' data-open-player-modal="counters" data-pid="'+esc(p.id)+'"')+' type="button" title="Contadores">'+iconSvg('sliders')+'</button>'
+      + '<button class="m-ico-btn"'+(dead?dis:' data-open-player-modal="tax" data-pid="'+esc(p.id)+'"')+' type="button" title="Impuesto comandante">'+iconSvg('coins')+'<span>'+((Number(live.commanderTax)||0))+'</span></button>'
+      + (!dead ? '<button class="m-ico-btn danger" data-surrender="'+esc(p.id)+'" type="button" title="Rendirse">'+iconSvg('flag')+'</button>' : '<button class="m-ico-btn danger" disabled aria-disabled="true" type="button" title="Eliminado">'+iconSvg('flag')+'</button>')
       + '</div></article>';
   }
   function renderGrid() { if (!S.table) return; ensureTableState(); var ps = S.table.players || [], grid = $('m-grid'); if (!grid) return; var n = ps.length || 4; grid.className = 'm-grid seats-' + n + (n > 6 ? ' seats-many' : ''); grid.innerHTML = ps.map(function(p,i){ return quadrant(p,i,n); }).join(''); renderStartControls(); }
-  function renderStartControls() { if (!S.table) return; var sel = $('m-start-player'); if (!sel) return; var started = !!(S.table.turn && S.table.turn.started), ps = S.table.players || []; var prev = sel.value || (S.table.turn && S.table.turn.activePlayerId) || ''; sel.innerHTML = '<option value="">Seleccionar jugador...</option>' + ps.map(function(p){ return '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>'; }).join(''); if (prev && ps.some(function(p){return p.id===prev;})) sel.value = prev; sel.disabled = started || !!S.animatingPick; var pick = $('m-pick-random'); if (pick) pick.disabled = started || !!S.animatingPick || !ps.length; if (!started && !S.table.turn.activePlayerId && ps[0]) sel.value = ps[0].id; }
+  function renderStartControls() { if (!S.table) return; var sel = $('m-start-player'); if (!sel) return; var started = !!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt)), ps = S.table.players || []; var prev = sel.value || (S.table.turn && S.table.turn.activePlayerId) || ''; sel.innerHTML = '<option value="">Seleccionar jugador...</option>' + ps.map(function(p){ return '<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>'; }).join(''); if (prev && ps.some(function(p){return p.id===prev;})) sel.value = prev; sel.disabled = started || !!S.animatingPick; var pick = $('m-pick-random'); if (pick) pick.disabled = started || !!S.animatingPick || !ps.length; if (!started && !S.table.turn.activePlayerId && ps[0]) sel.value = ps[0].id; }
   function selectStartPlayer(pid, silent) { if (!S.table || !pid || (S.table.turn && S.table.turn.started)) return Promise.resolve(); ensureTableState(); var idx = (S.table.players||[]).findIndex(function(p){ return p.id===pid; }); if (idx < 0) return Promise.resolve(); S.table.turn.activePlayerId = pid; S.table.turn.index = idx; S.table.turn.started = false; S.table.turn.turnStartedAt = null; renderStartControls(); renderTop(); renderGrid(); return persistTable({ turn: JSON.parse(JSON.stringify(S.table.turn)) }, 120).then(function(){ if(!silent){ var st=$('m-pick-status'); if(st) st.textContent='Inicial: ' + ((S.table.players[idx]||{}).name||pid) + '. Presiona \"▶ Iniciar Tiempo de Turno\".'; } }); }
   function highlightSeat(pid){ var grid=$('m-grid'); if(!grid) return; var seats=grid.querySelectorAll('[data-seat]'); for(var i=0;i<seats.length;i++) seats[i].classList.toggle('is-picking', seats[i].getAttribute('data-seat')===pid); }
   function animateRandomPick(){ if(!S.table||S.animatingPick||(S.table.turn&&S.table.turn.started)) return; var ps=(S.table.players||[]).filter(function(p){ var l=S.table.live&&S.table.live[p.id]; return !(l&&l.eliminated); }); if(!ps.length) return; S.animatingPick=true; var sel=$('m-start-player'), st=$('m-pick-status'), i=0, steps=14+Math.floor(Math.random()*8), delay=55; renderStartControls(); (function tick(){ var p=ps[i%ps.length]; i++; if(sel) sel.value=p.id; if(st) st.textContent='Seleccionando: '+p.name+'...'; highlightSeat(p.id); if(i<steps){ delay=Math.min(260,Math.floor(delay*1.12)); setTimeout(tick,delay); } else { var chosen=ps[Math.floor(Math.random()*ps.length)]; if(sel) sel.value=chosen.id; if(st) st.textContent='Seleccionado: '+chosen.name+'.'; S.animatingPick=false; selectStartPlayer(chosen.id,true).then(function(){ renderGrid(); renderStartControls(); renderTop(); }); } })(); }
@@ -166,7 +172,7 @@
   function refreshPlayerModal(){ if(S.playerModal) openPlayerModal(S.playerModal.pid,S.playerModal.tab); }
   function patchLive(pid, mutator, opts){ if(!S.table) return Promise.resolve(); ensureTableState(); var live=CompanionModel.ensureLive(S.table,pid,40); mutator(live,S.table); var patch={live:{},turn:S.table.turn}; patch.live[pid]=JSON.parse(JSON.stringify(live)); if(S.table.turn&&S.table.turn.activePlayerId) patch.turn=JSON.parse(JSON.stringify(S.table.turn)); renderGrid(); renderTop(); return persistTable(patch, opts&&opts.delay!=null?opts.delay:160); }
   function persistAllLive(){ if(!S.table) return; var patch={live:{},turn:S.table.turn?JSON.parse(JSON.stringify(S.table.turn)):null}; (S.table.players||[]).forEach(function(p){ if(S.table.live[p.id]) patch.live[p.id]=JSON.parse(JSON.stringify(S.table.live[p.id])); }); persistTable(patch,80); }
-  function passTurn(){ if(!S.table) return; ensureTableState(); if(!(S.table.turn&&(S.table.turn.started||S.table.turn.startedAt))){ var st=$('m-pick-status'); if(st) st.textContent='Selecciona jugador inicial e Inicia Tiempo.'; return; } if(isPaused()){ var st2=$('m-pick-status'); if(st2) st2.textContent='Tiempo en pausa. Reanuda para pasar turno.'; return; } CompanionModel.passTurn(S.table); renderGrid(); renderTop(); persistAllLive(); }
+  function passTurn(){ if(!S.table) return; ensureTableState(); if(!(S.table.turn&&(S.table.turn.started||S.table.turn.startedAt))){ var st=$('m-pick-status'); if(st) st.textContent='Selecciona jugador inicial e Inicia Tiempo.'; return; } if(isPaused()){ var st2=$('m-pick-status'); if(st2) st2.textContent='Tiempo en pausa. Reanuda para pasar turno.'; return; } CompanionModel.passTurn(S.table); if(S.table.turn){ S.table.turn.started=true; if(!S.table.turn.startedAt) S.table.turn.startedAt=Date.now(); S.table.turn.pausedAt=null; S.table.turn.pausedMs=S.table.turn.pausedMs||0; } renderGrid(); renderTop(); persistAllLive(); }
 
   function lossPlayer(pid){ return (S.table && S.table.players || []).find(function(x){ return x.id===pid; }) || {id:pid,name:pid}; }
   function closeLossModal(opts){ opts=opts||{}; var had=!!S.lossModal; S.lossModal=null; closeModal('m-loss-modal'); if(had && !opts.keepPause) autoResumeFromModal(); }
@@ -239,7 +245,20 @@
   function surrender(pid){ if(!S.table) return; closePlayerModal(); openLossFlow(pid,{type:'surrender',label:'Rendición',detail:'El jugador confirmó su rendición.'},'surrender'); }
   function maybeAutoSubmit(){ if(!S.table||S.autoSubmitted) return; if(S.table.officialReport&&S.table.officialReport.status==='submitted'){ S.autoSubmitted=true; return; } var ps=S.table.players||[], alive=aliveCount(); if(ps.length>1&&alive<=1){ var st=$('m-official-status'); if(st) st.textContent='Mesa decidida. Enviando resultado oficial automáticamente...'; setTimeout(function(){ submitOfficial(true,true); },450); } }
   function submitOfficial(force,auto){ if(!S.table||!S.session) return; if(S.table.officialReport&&S.table.officialReport.status==='submitted'&&!force){ alert('El resultado oficial ya fue enviado.'); return; } ensureTableState(); CompanionModel.accrueActive(S.table); var alive=aliveCount(), rem=CompanionModel.roundRemainingSec(S.session), ps=S.table.players||[]; var reason=(alive<=1&&ps.length>1)?'eliminations':(rem===0?'global-timeout':'manual'); if(!auto&&!force&&alive>1&&rem>0){ if(!confirm('La mesa aún no termina. ¿Enviar resultado oficial actual?')) return; } var report=CompanionModel.computeOfficialReport(S.table,S.session,reason); S.table.officialReport=Object.assign({status:'submitted'},report); var livePatch={}; ps.forEach(function(p){ var l=S.table.live[p.id]; livePatch[p.id]={timeUsedSec:CompanionModel.effectiveTimeUsed(S.table,p.id),eliminated:!!(l&&l.eliminated),elimination:l&&l.elimination||null,eliminationOrder:l&&l.eliminationOrder||null}; }); S.autoSubmitted=true; persistTable({officialReport:S.table.officialReport,live:livePatch,turn:S.table.turn},0).then(function(){ flushTable(); renderGrid(); renderTop(); if(!auto) alert('Resultado oficial enviado al anfitrión.'); }).catch(function(e){ alert('No se pudo enviar: '+(e&&e.message||e)); S.autoSubmitted=false; }); }
-  function bind(){ document.body.addEventListener('click', function(e){ var closePm=e.target.closest('[data-close-player-modal]'); if(closePm) return closePlayerModal(); var closeOm=e.target.closest('[data-close-official-modal]'); if(closeOm) return closeModal('m-official-modal'); var closeLoss=e.target.closest('[data-loss-close]'); if(closeLoss){ return closeLossModal(); } var tab=e.target.closest('[data-player-tab]'); if(tab){ if(S.playerModal) openPlayerModal(tab.getAttribute('data-pid'),tab.getAttribute('data-player-tab')); return; } var openPm=e.target.closest('[data-open-player-modal]'); if(openPm){ e.preventDefault(); e.stopPropagation(); return openPlayerModal(openPm.getAttribute('data-pid'),openPm.getAttribute('data-open-player-modal')); } var togf=e.target.closest('[data-toggle-field]'); if(togf){ var fpid=togf.getAttribute('data-pid'), field=togf.getAttribute('data-toggle-field'); return patchLive(fpid,function(l){l[field]=!l[field];}).then(refreshPlayerModal); } var ma=e.target.closest('[data-modal-action]'); if(ma){ var mpid=ma.getAttribute('data-pid'), mf=ma.getAttribute('data-modal-action'), md=parseInt(ma.getAttribute('data-delta'),10)||0; return patchLive(mpid,function(l){l[mf]=(Number(l[mf])||0)+md;}).then(refreshPlayerModal); } var pass=e.target.closest('[data-pass-turn]'); if(pass) return passTurn(); var surrenderBtn=e.target.closest('[data-surrender]'); if(surrenderBtn){ e.preventDefault(); e.stopPropagation(); return surrender(surrenderBtn.getAttribute('data-surrender')); } var life=e.target.closest('[data-action][data-pid]'); if(life){ var pid=life.getAttribute('data-pid'), action=life.getAttribute('data-action'), delta=parseInt(life.getAttribute('data-delta'),10)||0; return patchLive(pid,function(l){ if(action==='life') l.life=(Number(l.life)||0)+delta; else l[action]=(Number(l[action])||0)+delta; }).then(function(){ setTimeout(checkPendingLossModal,30); }); } var cmd=e.target.closest('[data-cmdr-dmg]'); if(cmd){ var tpid=cmd.getAttribute('data-target'), op=cmd.getAttribute('data-op'), d=parseInt(cmd.getAttribute('data-delta'),10)||0; return patchLive(tpid,function(l){ l.commanderDamage=l.commanderDamage||{}; var en=l.commanderDamage[op]||(l.commanderDamage[op]={commanderName:'Comandante',damage:0}); en.damage=(Number(en.damage)||0)+d; }).then(function(){ refreshPlayerModal(); setTimeout(checkPendingLossModal,30); }); } if(e.target&&e.target.id==='m-loss-yes') return confirmLossYes(); if(e.target&&e.target.id==='m-loss-no') return confirmLossNo();
+  function bind(){ document.body.addEventListener('click', function(e){ var closePm=e.target.closest('[data-close-player-modal]'); if(closePm) return closePlayerModal(); var closeOm=e.target.closest('[data-close-official-modal]'); if(closeOm) return closeModal('m-official-modal'); var closeLoss=e.target.closest('[data-loss-close]'); if(closeLoss){ return closeLossModal(); } var tab=e.target.closest('[data-player-tab]'); if(tab){ if(S.playerModal) openPlayerModal(tab.getAttribute('data-pid'),tab.getAttribute('data-player-tab')); return; } var openPm=e.target.closest('[data-open-player-modal]'); if(openPm){ e.preventDefault(); e.stopPropagation(); return openPlayerModal(openPm.getAttribute('data-pid'),openPm.getAttribute('data-open-player-modal')); } var togf=e.target.closest('[data-toggle-field]'); if(togf){ var fpid=togf.getAttribute('data-pid'), field=togf.getAttribute('data-toggle-field'); return patchLive(fpid,function(l){l[field]=!l[field];}).then(refreshPlayerModal); } var ma=e.target.closest('[data-modal-action]'); if(ma){ var mpid=ma.getAttribute('data-pid'), mf=ma.getAttribute('data-modal-action'), md=parseInt(ma.getAttribute('data-delta'),10)||0; return patchLive(mpid,function(l){l[mf]=(Number(l[mf])||0)+md;}).then(refreshPlayerModal); } var pass=e.target.closest('[data-pass-turn]'); if(pass) return passTurn(); var surrenderBtn=e.target.closest('[data-surrender]'); if(surrenderBtn){ e.preventDefault(); e.stopPropagation(); return surrender(surrenderBtn.getAttribute('data-surrender')); }       var life=e.target.closest('[data-action][data-pid]'); if(life){
+        e.preventDefault(); e.stopPropagation();
+        var pid=life.getAttribute('data-pid'), action=life.getAttribute('data-action'), delta=parseInt(life.getAttribute('data-delta'),10)||0;
+        if(life.disabled) return;
+        return patchLive(pid,function(l,t){
+          if(l && l.eliminated) return; // eliminated quadrant: fully locked
+          if(action==='life'){
+            var cur = Number(l.life); if(!isFinite(cur)) cur = (typeof l.life==='number' ? l.life : 40);
+            l.life = cur + delta; // allow 0 and negatives; NEVER auto-reset to 40
+          } else {
+            l[action] = (Number(l[action])||0) + delta;
+          }
+        }).then(function(){ setTimeout(checkPendingLossModal,30); });
+      } var cmd=e.target.closest('[data-cmdr-dmg]'); if(cmd){ var tpid=cmd.getAttribute('data-target'), op=cmd.getAttribute('data-op'), d=parseInt(cmd.getAttribute('data-delta'),10)||0; return patchLive(tpid,function(l){ l.commanderDamage=l.commanderDamage||{}; var en=l.commanderDamage[op]||(l.commanderDamage[op]={commanderName:'Comandante',damage:0}); en.damage=(Number(en.damage)||0)+d; }).then(function(){ refreshPlayerModal(); setTimeout(checkPendingLossModal,30); }); } if(e.target&&e.target.id==='m-loss-yes') return confirmLossYes(); if(e.target&&e.target.id==='m-loss-no') return confirmLossNo();
       if(e.target&&e.target.id==='m-loss-cancel') return closeLossModal();
       if(e.target&&e.target.id==='m-loss-step0-yes'){ if(S.lossModal) S.lossModal.step=2; return renderLossModal(); }
       if(e.target&&e.target.id==='m-loss-step1-yes'){ if(S.lossModal) S.lossModal.step=2; return renderLossModal(); }
@@ -259,8 +278,41 @@
   }
   function applySession(s){ S.session=s; renderTop(); if(S.table&&S.session&&S.session.roundStartedAt&&S.table.turn&&S.table.turn.activePlayerId&&!S.table.turn.started){ var st=$('m-pick-status'); if(st) st.textContent='Ronda lista. Cronómetros en pausa: selecciona quién inicia y presiona ▶ Iniciar Tiempo de Turno (o el botón central).'; renderTop(); renderGrid(); } }
   function applyTable(t){ S.table=t||S.table; if(S.table){ S.table.live=S.table.live||{}; S.table.turn=S.table.turn||{}; if(S.table.officialReport&&S.table.officialReport.status==='submitted') S.autoSubmitted=true; } renderTop(); renderGrid(); checkPendingLossModal(); maybeAutoSubmit(); }
+
+  function tickTimers(){
+    if(!S.table || !S.session) return;
+    var started = !!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt));
+    if(!started) return;
+    var paused = isPaused();
+    var aid = CompanionModel.activePlayerId(S.table);
+    var cards = (document.getElementById('m-grid')||document).querySelectorAll ? (document.getElementById('m-grid')||document).querySelectorAll('.m-q[data-pid], .m-seat[data-seat], .m-seat[data-pid]') : [];
+    var budget = CompanionModel.turnBudget(S.table);
+    for(var i=0;i<cards.length;i++){
+      var q=cards[i], pid=q.getAttribute('data-pid')||q.getAttribute('data-seat'); if(!pid) continue;
+      var live=(S.table.live&&S.table.live[pid])||{};
+      if(live.eliminated){ q.classList.remove('m-turn','is-active'); var eb=q.querySelector('.m-q-turnbadge'); if(eb) eb.remove(); continue; }
+      var used=CompanionModel.effectiveTimeUsed(S.table,pid); var left=Math.max(0,budget-used);
+      var pill=q.querySelector('.m-time-pill'); if(pill) pill.textContent=fmt(left);
+      var active = (aid===pid) && !paused && !!(S.table.turn && (S.table.turn.started||S.table.turn.startedAt));
+      q.classList.toggle('m-turn', active); q.classList.toggle('is-active', active);
+      var badge=q.querySelector('.m-q-turnbadge');
+      if(active || (aid===pid && paused && started)){
+        if(!badge){ badge=document.createElement('span'); badge.className='m-q-turnbadge'; q.appendChild(badge); }
+        badge.textContent = paused ? 'PAUSA' : 'TURNO';
+        badge.style.display='';
+      } else if(badge){ badge.remove(); }
+      q.setAttribute('onclick', active ? 'passTurn()' : "openPlayerModal('"+pid+"')");
+    }
+    var pass=$('m-island-pass'); if(pass) pass.disabled = paused || !started || !aid;
+  }
   function subscribe(){ S.unsubs.forEach(function(u){try{u();}catch(e){}}); S.unsubs=[]; if(!window.TorneoSync||!TorneoSync.ready()) return; S.unsubs.push(TorneoSync.subscribeSession(S.sessionId, applySession)); S.unsubs.push(TorneoSync.subscribeTable(S.sessionId, S.tableId, applyTable)); }
-  function enter(){ var j=$('m-join'),b=$('m-board'),st=$('m-official-status'); if(S.joining) return; S.tableId=normTableId(S.tableId); if(!S.sessionId||!S.tableId){ if(st) st.textContent='Faltan código de sesión o mesa.'; if(j) j.style.display='block'; if(b) b.style.display='none'; return; } S.joining=true; if(st) st.textContent='Conectando a '+S.sessionId+' / '+S.tableId+'...'; try{ if(j) j.style.display='none'; if(b) b.style.display='block'; subscribe(); renderTop(); renderGrid(); if(S.tick) clearInterval(S.tick); S.tick=setInterval(function(){ try{ renderTop(); checkPendingLossModal(); }catch(e){} },1000); } catch(e){ console.error('enter',e); if(st) st.textContent='No se pudo cargar la mesa: '+(e&&e.message||e); if(j) j.style.display='block'; if(b) b.style.display='none'; } S.joining=false; }
+  function enter(){ var j=$('m-join'),b=$('m-board'),st=$('m-official-status'); if(S.joining) return; S.tableId=normTableId(S.tableId); if(!S.sessionId||!S.tableId){ if(st) st.textContent='Faltan código de sesión o mesa.'; if(j) j.style.display='block'; if(b) b.style.display='none'; return; } S.joining=true; if(st) st.textContent='Conectando a '+S.sessionId+' / '+S.tableId+'...'; try{ if(j) j.style.display='none'; if(b) b.style.display='block'; subscribe(); renderTop(); renderGrid(); if(S.tick) clearInterval(S.tick); S.tick=setInterval(function(){ try{
+          if(!S.table || !S.session) { renderTop(); return; }
+          renderTop();
+          var started = !!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt));
+          if(started) tickTimers(); else renderGrid();
+          checkPendingLossModal();
+        }catch(e){ console.warn('tick',e); } },1000); } catch(e){ console.error('enter',e); if(st) st.textContent='No se pudo cargar la mesa: '+(e&&e.message||e); if(j) j.style.display='block'; if(b) b.style.display='none'; } S.joining=false; }
   function onJoinClick(ev){ if(ev&&ev.preventDefault) ev.preventDefault(); S.sessionId=(($('m-session')&&$('m-session').value)||'').trim().toUpperCase(); S.tableId=normTableId(($('m-table')&&$('m-table').value)||''); if(!S.sessionId||!S.tableId){ alert('Ingresa sesión y mesa (ej. mesa-1).'); return false; } try{ var url=new URL(location.href); url.searchParams.set('sesion',S.sessionId); url.searchParams.set('mesa',S.tableId); url.searchParams.delete('session'); url.searchParams.delete('table'); history.replaceState({},'',url); }catch(e){} enter(); return false; }
   S.tableId = normTableId(S.tableId);
   function boot(){ try{ badge(); if($('m-session')) $('m-session').value=S.sessionId; if($('m-table')) $('m-table').value=S.tableId; bind(); if(S.sessionId&&S.tableId) enter(); else { if($('m-join')) $('m-join').style.display='block'; if($('m-board')) $('m-board').style.display='none'; } } catch(e){ console.error('mesa boot',e); var st=$('m-official-status'); if(st) st.textContent='Error al iniciar mesa: '+(e&&e.message||e); } }
