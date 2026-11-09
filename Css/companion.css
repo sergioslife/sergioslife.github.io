@@ -154,7 +154,7 @@
 .m-loss-msg { margin:0 0 8px; line-height:1.35; } .m-loss-hint { margin:0 0 14px; color:var(--t-text-muted); font-size:.86rem; line-height:1.35; }
 .m-surrender { color:#ff9fb4; border-color:rgba(230,19,90,.35); }
 @media (max-width: 700px) {
-  .m-btn-txt { display:none; } .m-pass-btn { padding:6px 8px; } .m-pass-fab { display:inline-flex; }
+  .m-btn-txt { display:none; }
   .m-sb-chip small { display:none; } .m-sb-chip { padding:4px 6px; gap:4px; } .mesa-top-actions .sync-mode { display:none; }
   .m-grid.seats-3 { grid-template-columns:minmax(0,1fr); grid-template-rows:repeat(3,minmax(0,1fr)); }
   .m-grid.seats-3 .m-seat.pos-0,.m-grid.seats-3 .m-seat.pos-1,.m-grid.seats-3 .m-seat.pos-2 { grid-column:auto; grid-row:auto; }
@@ -165,7 +165,7 @@
   .m-modal-actions { flex-direction:column-reverse; } .m-modal-actions button { width:100%; }
 }
 @media (orientation:landscape) and (max-height: 560px) {
-  .mesa-topbar { min-height:34px; padding:2px 4px; } .m-board { padding:2px; } .m-pass-fab { display:none !important; }
+  .mesa-topbar { min-height:34px; padding:2px 4px; } .m-board { padding:2px; }
   .m-seat { padding:3px; gap:1px; } .m-ico-btn { height:22px; min-width:24px; padding:0 4px; }
 }
 
@@ -177,18 +177,36 @@
 .m-toggle-row>span{display:inline-flex;align-items:center;gap:8px}
 
 
-/* pass turn centered (non-intrusive) */
-.mesa-top-actions .m-pass-btn{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:22;min-width:64px;min-height:64px;border-radius:999px;padding:10px;box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 0 1px rgba(105,192,175,.18);display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.mesa-top-actions .m-pass-btn .m-btn-txt{display:inline}
-.mesa-top-actions .m-pass-btn:disabled{opacity:.35;filter:saturate(.4)}
+/* pass turn: compact circular "bolita" centered over the mesa grid */
+.mesa-top-actions .m-pass-btn{
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+  z-index:35; width:58px; height:58px; min-width:58px; min-height:58px;
+  padding:0 !important; margin:0; border-radius:999px !important;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1.15rem; line-height:1; overflow:hidden;
+  box-shadow:0 10px 26px rgba(0,0,0,.5),0 0 0 2px rgba(105,192,175,.22),inset 0 1px 0 rgba(255,255,255,.08);
+  touch-action:manipulation;
+}
+.mesa-top-actions .m-pass-btn .m-btn-txt{display:none !important}
+.mesa-top-actions .m-pass-btn i{margin:0 !important; font-size:1.2rem}
+.mesa-top-actions .m-pass-btn:disabled{opacity:.3; filter:saturate(.2); box-shadow:0 6px 14px rgba(0,0,0,.35); pointer-events:none}
 .m-pass-fab{display:none !important}
-@media (max-width:700px){
-  .mesa-top-actions .m-pass-btn{min-width:56px;min-height:56px;padding:8px}
-  .mesa-top-actions .m-pass-btn .m-btn-txt{font-size:.72rem}
+@media (max-width:700px){ .mesa-top-actions .m-pass-btn{width:54px;height:54px;min-width:54px;min-height:54px;font-size:1.05rem} }
+@media (orientation:landscape) and (max-height:560px){ .mesa-top-actions .m-pass-btn{width:46px;height:46px;min-width:46px;min-height:46px} }
+
+/* Force landscape virtual on mobile/portrait webviews so mesa keeps 2x2 horizontal layout */
+@media (orientation:portrait) and (max-width: 920px){
+  html, body.mesa-body { width:100%; height:100%; overflow:hidden; background:#090909; }
+  body.mesa-body .mesa-app{
+    position:fixed;
+    top:50%; left:50%;
+    width:100dvh; height:100vw;
+    max-width:none; max-height:none;
+    transform:translate(-50%,-50%) rotate(90deg);
+    transform-origin:center center;
+    overflow:hidden;
+    margin:0;
+  }
+  /* transformed ancestor => fixed acts like absolute; keep modals covering rotated app */
+  body.mesa-body .m-modal{ position:absolute; inset:0; width:100%; height:100%; }
 }
-/* optional virtual landscape on portrait narrow devices (keeps 2x2 distribution readable) */
-@media (orientation:portrait) and (max-width:700px) and (max-aspect-ratio: 3/4){
-  .mesa-body.virtual-landscape, .mesa-body:has(.m-grid){ }
-}
-/* explicit class hook if enabled later; default: no forced rotation to avoid UX/accessibility issues */
-.mesa-body.force-landscape .mesa-app{position:fixed;top:50%;left:50%;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center;overflow:hidden}
