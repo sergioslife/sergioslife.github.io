@@ -25,10 +25,21 @@
     if (!c) return '';
     return [c.type, c.source || '', c.playerId || ''].join(':');
   }
+  function interactionElapsedSec(table, playerId) {
+    var l = ensureLive(table, playerId);
+    if (!l || l.eliminated || !l.interactionActiveAt) return 0;
+    // pausa global/turno congela interacción fuera de turno
+    if (table && table.turn && table.turn.pausedAt) return 0;
+    if (table && table.turn && !(table.turn.started || table.turn.startedAt)) return 0;
+    var pausedMs = Number(l.interactionPausedMs) || 0;
+    return Math.max(0, Math.floor((Date.now() - Number(l.interactionActiveAt) - pausedMs) / 1000));
+  }
   function effectiveTimeUsed(table, playerId) {
     var l = ensureLive(table, playerId);
     var used = Number(l.timeUsedSec) || 0;
     if (activePlayerId(table) === playerId && !(l.eliminated)) used += turnElapsedSec(table);
+    // tiempo de interacción fuera de turno (independiente del turno activo); evita doble conteo si es el jugador activo
+    if (!(activePlayerId(table) === playerId && !(l.eliminated))) used += interactionElapsedSec(table, playerId);
     return used;
   }
   function detectLossConditions(table, playerId, session) {
@@ -71,6 +82,14 @@
     ((table && table.players) || []).forEach(function(p){ var l = table.live && table.live[p.id]; if (l && Number(l.eliminationOrder) > max) max = Number(l.eliminationOrder); });
     return max + 1;
   }
+  function motivoEliminacionFrom(condition){
+    var c = condition || {}; var t = String(c.type||'').toLowerCase(); var label = String(c.label||'').toLowerCase();
+    if (t==='surrender' || t==='rendicion' || label.indexOf('rendici')>=0) return 'rendicion';
+    if (t==='time' || t==='tiempo' || t==='timeout' || t==='tiempo_agotado' || label.indexOf('tiempo')>=0) return 'tiempo_agotado';
+    if (t==='life' || t==='commander' || t==='poison' || t==='dano_letal' || label.indexOf('vida')>=0 || label.indexOf('comandante')>=0 || label.indexOf('veneno')>=0 || label.indexOf('letal')>=0) return 'dano_letal';
+    return 'dano_letal';
+  }
+  function motivoEliminacionLabel(code){ if(code==='rendicion') return 'Rendición'; if(code==='tiempo_agotado') return 'Tiempo agotado'; return 'Daño letal'; }
   function confirmElimination(table, playerId, condition, at, session, extra) {
     var live = ensureLive(table, playerId);
     if (live.eliminated) return live;
@@ -81,12 +100,18 @@
     live.eliminationOrder = nextEliminationOrder(table);
     live.timeUsedSec = effectiveTimeUsed(table, playerId); // snapshot at elimination
     var elimBy = (extra && extra.eliminatedBy) || (condition && condition.eliminatedBy) || null;
+    var motivo = motivoEliminacionFrom(condition);
+    live.motivoEliminacion = motivo;
+    live.motivoEliminacionLabel = motivoEliminacionLabel(motivo);
     live.elimination = {
       type: condition && condition.type || 'manual',
       label: (condition && condition.label) || 'Derrota confirmada',
       source: condition && condition.source || null, commanderName: condition && condition.commanderName || null,
       detail: condition && condition.detail || null,
       eliminatedBy: elimBy,
+      motivoEliminacion: motivo,
+      cause: motivo,
+      motivoEliminacionLabel: motivoEliminacionLabel(motivo),
       at: ts,
       timeOfElimination: clock ? clock.label : null,
       timeOfEliminationSec: clock ? clock.sec : null,
@@ -187,9 +212,18 @@
   }
   function passTurn(table) {
     if (!table || !table.players || !table.players.length) return table;
+    var aid = activePlayerId(table);
     accrueActive(table);
     var cur = activeIndex(table); // resolved from activePlayerId first
     var next = nextAliveIndex(table, cur);
+    table.turn = table.turn || {};
+    table.turn.totalTurnos = Math.max(0, Number(table.turn.totalTurnos) || 0) + 1; // turnos completados de la mesa
+    if (aid) {
+      table.live = table.live || {};
+      var al = ensureLive(table, aid);
+      al.turnosEjecutados = Math.max(0, Number(al.turnosEjecutados) || 0) + 1;
+      al.turnosTotalesParticipacion = al.turnosEjecutados;
+    }
     table.turn = Object.assign({}, table.turn, { index: next, activePlayerId: table.players[next].id, started: true, startedAt: Date.now(), turnStartedAt: Date.now(), pausedAt: null, pausedMs: 0 });
     return table;
   }
@@ -208,11 +242,16 @@
         place = n - Number(l.eliminationOrder) + 1;
       }
       var elim = l.elimination || null;
-      return { playerId: p.id, placement: place, elimination: elim, eliminationOrder: l.eliminationOrder || null,
+      var motivo = (elim && (elim.motivoEliminacion||elim.cause)) || l.motivoEliminacion || (l.eliminated ? motivoEliminacionFrom(elim||{type:'manual',label:'Derrota confirmada'}) : null);
+      // commander damage dealt by this player (sum of damage dealt to others as source in live maps is tracked per victim; compute dealt from all victims)
+      var cmdrDealt = 0; ((table && table.players) || []).forEach(function(v){ var vl=(table.live&&table.live[v.id])||{}; var cd=vl.commanderDamage||{}; if(cd[p.id] && cd[p.id].damage!=null) cmdrDealt += Math.max(0, Number(cd[p.id].damage)||0); });
+      return { playerId: p.id, playerName: p.name||p.playerName||p.id, nombreJugador: p.name||p.playerName||p.id, name: p.name||p.playerName||p.id, puestoFinal: place, placement: place, elimination: elim, eliminationOrder: l.eliminationOrder || null, motivoEliminacion: motivo, motivoEliminacionLabel: motivo ? motivoEliminacionLabel(motivo) : null, cause: motivo,
         timeOfElimination: elim && (elim.timeOfElimination || null), timeOfEliminationSec: elim && (elim.timeOfEliminationSec != null ? elim.timeOfEliminationSec : null),
         playerTurnTimeSec: Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0)),
         playerTurnTime: elim && elim.playerTurnTime ? elim.playerTurnTime : (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0))),
-        bounties: Math.max(0, Number(l.bounties) || 0)
+        bounties: Math.max(0, Number(l.bounties) || 0), bountiesObtenidos: Math.max(0, Number(l.bounties) || 0),
+        commanderDamageDealt: cmdrDealt, danoComandanteInfligido: cmdrDealt,
+        tiempoConsumido: (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0)))
       };
     });
     var alive = placements.filter(function(p){ return p.placement == null; });
@@ -220,19 +259,67 @@
       var la = ensureLive(table,a.playerId), lb = ensureLive(table,b.playerId);
       if ((lb.life||0)!==(la.life||0)) return (lb.life||0)-(la.life||0);
       if ((la.poison||0)!==(lb.poison||0)) return (la.poison||0)-(lb.poison||0);
-      return 0;
+      // stable: keep table order if indistinguishable
+      var ai = ps.findIndex(function(x){return x.id===a.playerId;}), bi = ps.findIndex(function(x){return x.id===b.playerId;});
+      return ai-bi;
     });
+    // Empate técnico: posiciones en disputa (1..N vivos o bloque empatado) se promedian y asignan a todos.
+    function setTieBlock(list, startPlace){
+      var count=list.length; if(!count) return;
+      var sum=0; for(var k=0;k<count;k++) sum += (n - (startPlace + k) + 1);
+      var avg = count ? (sum / count) : 0;
+      avg = Math.round(avg * 100) / 100;
+      for(var j=0;j<count;j++){ list[j].placement = startPlace; list[j].puestoFinal = startPlace; list[j].tied = count>1; list[j].tieCount = count; list[j].points = avg; list[j].puntos = avg; list[j].puntosEmpate = avg; }
+    }
     var nextPlace = 1;
-    alive.forEach(function(p){ p.placement = nextPlace++; });
-    placements.filter(function(p){ return !alive.find(function(a){return a.playerId===p.playerId;}) && p.placement==null; }).forEach(function(p){ p.placement = nextPlace++; });
-    placements.sort(function(a,b){ return a.placement-b.placement; });
+    var i=0;
+    while(i < alive.length){
+      var j=i+1;
+      var la0 = ensureLive(table, alive[i].playerId);
+      while(j < alive.length){
+        var lb0 = ensureLive(table, alive[j].playerId);
+        var same = ((Number(lb0.life)||0) === (Number(la0.life)||0)) && ((Number(la0.poison)||0) === (Number(lb0.poison)||0));
+        if(!same) break;
+        j++;
+      }
+      setTieBlock(alive.slice(i,j), nextPlace);
+      nextPlace += (j-i);
+      i=j;
+    }
+    // Eliminados conservan su puesto por orden de eliminación (no reciben puntos recalculados aquí; host usa placement).
+    placements.forEach(function(p){ if(p.points==null && p.placement!=null){ var pts = n - Number(p.placement) + 1; p.points=pts; p.puntos=pts; } p.puestoFinal = p.placement; });
+    placements.sort(function(a,b){ return Number(a.placement)-Number(b.placement) || (a.tieCount?0:1)-(b.tieCount?0:1) || (a.playerName||'').localeCompare(b.playerName||''); });
     var started = session && session.roundStartedAt ? session.roundStartedAt : (table.startedAt || Date.now());
     var paused = (session && session.roundPausedDurationMs) || 0;
     if (session && session.roundPausedAt) paused += Math.max(0, Date.now() - session.roundPausedAt);
     var totalDurationSec = Math.max(1, Math.floor((Date.now() - started - paused)/1000));
+    var totalTurnos = Math.max(0, Number((table.turn && table.turn.totalTurnos) || table.totalTurnos) || 0);
+    var winner = placements.find(function(p){ return Number(p.placement)===1; }) || null;
     var timeConsumedSec = {};
-    ps.forEach(function(p){ var l = ensureLive(table,p.id); timeConsumedSec[p.id] = effectiveTimeUsed(table,p.id); });
-    return { status: 'final', reason: reason || 'completed', placements: placements, totalDurationSec: totalDurationSec, timeConsumedSec: timeConsumedSec, submittedAt: Date.now(), version: 2 };
+    ps.forEach(function(p){
+      var l = ensureLive(table,p.id);
+      timeConsumedSec[p.id] = effectiveTimeUsed(table,p.id);
+      var pl = placements.find(function(x){ return x.playerId===p.id; });
+      if(pl){
+        pl.turnosEjecutados = Math.max(0, Number(l.turnosEjecutados) || 0);
+        pl.turnosTotales = totalTurnos; // turnos totales que duró la partida
+        pl.totalTurnos = totalTurnos;
+        pl.tiempoConsumidoTurnos = pl.playerTurnTime || pl.playerTurnTimeSec;
+        if(pl.placement===1 && !pl.motivoEliminacion){
+          pl.resultado = 'victoria';
+          pl.victoryAt = (l.victoryAt || (table.turn && table.turn.victoryAt) || Date.now());
+          pl.tiempoVictoriaSec = Math.max(0, Math.floor((pl.victoryAt - started - paused)/1000)) || totalDurationSec;
+          pl.tiempoVictoria = (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(pl.tiempoVictoriaSec);
+          pl.tiempoTotalSec = pl.tiempoVictoriaSec;
+          pl.tiempoTotal = pl.tiempoVictoria;
+        } else {
+          pl.tiempoTotalSec = Math.max(0, Math.floor(Number(l.timeUsedSec) || effectiveTimeUsed(table,p.id) || 0));
+          pl.tiempoTotal = pl.playerTurnTime || (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(pl.tiempoTotalSec);
+        }
+      }
+    });
+    var bracket = (session && (session.bracket || session.bracketLevel)) || (table && (table.bracket || table.bracketLevel)) || null;
+    return { status: 'final', reason: reason || 'completed', placements: placements, totalDurationSec: totalDurationSec, tiempoTotalSec: totalDurationSec, tiempoTotal: (function(sec){ var m=Math.floor(sec/60),s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); })(totalDurationSec), turnosTotales: totalTurnos, totalTurnos: totalTurnos, winnerId: winner ? winner.playerId : null, winnerVictoryAt: winner ? (winner.victoryAt || null) : null, bracket: bracket, timeConsumedSec: timeConsumedSec, submittedAt: Date.now(), version: 3 };
   }
   function roundRemainingSec(session) {
     if (!session || !session.roundDurationSec) return 0;

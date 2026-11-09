@@ -1750,3 +1750,10 @@ select:focus-visible {
 @media (max-width: 520px){
   #form-add-player button[type="submit"], #form-add-late button[type="submit"]{ flex:1 1 100%; width:100%; min-height:42px; }
 }
+.report-metrics-legend{margin:10px 0 4px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.02)}
+.report-metrics-legend h4{font-size:.95rem}
+.report-legend-list{margin:0;padding-left:18px;display:grid;gap:4px;font-size:.82rem;line-height:1.35;color:var(--t-text-muted,#b8b8b8)}
+.report-legend-list code{background:rgba(255,255,255,.06);padding:1px 4px;border-radius:4px}
+.report-preview-table [title]{cursor:help;text-decoration:underline dotted rgba(255,255,255,.28);text-underline-offset:2px}
+.report-row-adv { grid-template-columns: 42px minmax(120px,1.2fr) 78px 70px 70px 70px 96px 82px 110px 82px; min-width: 860px; font-size:.9rem; }
+@media (max-width: 900px) { .report-row-adv { min-width: 860px; } }

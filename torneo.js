@@ -1037,10 +1037,25 @@ const app = {
         this.renderStandings();
     },
 
-    getPointsForPosition(placement, tableSize, t) {
+    getPointsForPosition(placement, tableSize, t, tieCount) {
         t = t || this.getCurrentTournament();
-        if (!t || !t.scoring) return Math.max(0, (tableSize - placement) + 1);
-        return t.scoring[tableSize]?.[placement] || 0;
+        var n = Number(tableSize) || 0, p = Number(placement) || 0, tc = Math.max(1, Number(tieCount) || 1);
+        if (!p || !n) return 0;
+        // Empate técnico (promedio de puntos en disputa): suma posiciones/puntajes en disputa / N empatados.
+        if (tc > 1) {
+            var sum = 0;
+            for (var i = 0; i < tc; i++) {
+                var place = p + i;
+                if (place > n) break;
+                var val = 0;
+                if (t && t.scoring && t.scoring[n] && t.scoring[n][place] != null) val = Number(t.scoring[n][place]) || 0;
+                else val = Math.max(0, (n - place) + 1);
+                sum += val;
+            }
+            return Math.round((sum / tc) * 100) / 100; // soporta decimales (ej. 3.5, 2.5)
+        }
+        if (t && t.scoring && t.scoring[n] && t.scoring[n][p] != null) return Number(t.scoring[n][p]) || 0;
+        return Math.max(0, (n - p) + 1);
     },
 
     getMesaUrl(tableId, tableIndex) {
@@ -1125,14 +1140,30 @@ const app = {
             timeOfEliminationSec: p.timeOfEliminationSec != null ? p.timeOfEliminationSec : (p.elimination && p.elimination.timeOfEliminationSec != null ? p.elimination.timeOfEliminationSec : null),
             bounties: Math.max(0, Number(p.bounties) || 0),
             elimination: p.elimination || null,
-            points: this.getPointsForPosition(Number(p.placement) || 0, tableSize, t)
+            tied: !!p.tied || (Number(p.tieCount)||1)>1,
+            tieCount: Math.max(1, Number(p.tieCount)||1),
+            motivoEliminacion: p.motivoEliminacion || (p.elimination && (p.elimination.motivoEliminacion||p.elimination.cause)) || null,
+            turnosEjecutados: Math.max(0, Number(p.turnosEjecutados)||0),
+            turnosTotales: Math.max(0, Number(p.turnosTotales!=null?p.turnosTotales:report.totalTurnos!=null?report.totalTurnos:report.turnosTotales)||0),
+            totalTurnos: Math.max(0, Number(p.totalTurnos!=null?p.totalTurnos:p.turnosTotales!=null?p.turnosTotales:report.totalTurnos!=null?report.totalTurnos:report.turnosTotales)||0),
+            tiempoTotalSec: Math.max(0, Number(p.tiempoTotalSec!=null?p.tiempoTotalSec:p.tiempoVictoriaSec!=null?p.tiempoVictoriaSec:p.playerTurnTimeSec)||0),
+            tiempoTotal: p.tiempoTotal || p.tiempoVictoria || p.playerTurnTime || null,
+            tiempoVictoriaSec: p.tiempoVictoriaSec != null ? Number(p.tiempoVictoriaSec) : (p.placement===1 || p.puestoFinal===1 ? (report.totalDurationSec||report.tiempoTotalSec||null) : null),
+            tiempoVictoria: p.tiempoVictoria || ((p.placement===1 || p.puestoFinal===1) ? (report.tiempoTotal||null) : null),
+            bracket: p.bracket != null ? p.bracket : (report.bracket != null ? report.bracket : (t.bracket || t.bracketLevel || null)),
+            points: (p.points!=null ? Number(p.points) : (p.puntos!=null ? Number(p.puntos) : this.getPointsForPosition(Number(p.placement) || 0, tableSize, t, Math.max(1, Number(p.tieCount)||1))))
         }));
         table.completed = true;
         table.finishedAt = report.submittedAt || Date.now();
         table.officialReportAppliedAt = report.submittedAt || Date.now();
         table.officialReportReason = report.reason || null;
-        table.officialTotalDurationSec = report.totalDurationSec || 0;
+        table.officialTotalDurationSec = report.totalDurationSec || report.tiempoTotalSec || 0;
         table.officialTimeConsumedSec = report.timeConsumedSec || {};
+        table.totalTurnos = Math.max(0, Number(report.totalTurnos!=null?report.totalTurnos:report.turnosTotales) || 0);
+        table.turnosTotales = table.totalTurnos;
+        table.winnerId = report.winnerId || null;
+        table.winnerVictoryAt = report.winnerVictoryAt || null;
+        table.bracket = report.bracket != null ? report.bracket : (t.bracket || t.bracketLevel || table.bracket || null);
         if (round && round.tables.every(tb => tb.completed || tb.bye)) { round.completed = true; round.finishedAt = round.finishedAt || Date.now(); }
         this.saveTournaments();
         if (this.currentTournamentId === t.id) this.renderTournamentDetail();
@@ -1144,13 +1175,15 @@ const app = {
     // ========================
     _minPct(v) { return v <= 0 ? 0 : Math.max(1/3, v); },
     _fmtPct(v) { return (Math.round((v || 0) * 10000) / 100).toFixed(2) + '%'; },
+    _motivoLabel(code){ if(!code) return ''; if(code==='rendicion') return 'Rendición'; if(code==='tiempo_agotado') return 'Tiempo agotado'; if(code==='dano_letal') return 'Daño letal'; return String(code); },
+    _fmtPoints(v){ var n=Number(v)||0; return (Math.round(n*100)/100).toFixed(Math.abs(n%1)>0.0001?2:0); },
     buildReportData() {
         const t = this.getCurrentTournament();
         if (!t) return null;
         const players = (t.players || []).slice();
         const rounds = (t.rounds || []).filter(r => r && r.completed);
         const byId = {};
-        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, commanderDamageDealt: 0, commanderDamageReceived: 0, eliminations: 0, bounties: 0, firstOutAtSec: null }; });
+        players.forEach(p => { byId[p.id] = { playerId: p.id, name: p.name, nombreJugador: p.name, bracket: p.bracket || p.bracketLevel || t.bracket || t.bracketLevel || null, points: 0, wins: 0, losses: 0, draws: 0, gamesPlayed: 0, gamesWon: 0, opponents: [], timeUsedSec: 0, timeSamples: 0, turnosEjecutados: 0, totalTurnosMesa: 0, tiempoVictoriaSec: null, commanderDamageDealt: 0, commanderDamageReceived: 0, eliminations: 0, bounties: 0, firstOutAtSec: null, motivoEliminacion: null, motivoEliminacionLabel: null }; });
         rounds.forEach(round => {
             (round.tables || []).forEach(table => {
                 if (!table || table.bye) {
@@ -1164,8 +1197,9 @@ const app = {
                 (table.results || []).forEach(res => {
                     const s = byId[res.playerId]; if (!s) return;
                     const placement = Number(res.placement) || 0;
-                    const pts = placement > 0 ? this.getPointsForPosition(placement, tableSize, t) : 0;
-                    var rb = Math.max(0, Number(res.bounties) || 0); s.bounties = (s.bounties||0) + rb; s.points += pts + rb;
+                    const tieCount = Math.max(1, Number(res.tieCount) || 1);
+                    const pts = (res.points!=null ? Number(res.points) : (res.puntos!=null ? Number(res.puntos) : (placement > 0 ? this.getPointsForPosition(placement, tableSize, t, tieCount) : 0)));
+                    var rb = Math.max(0, Number(res.bounties) || 0); s.bounties = (s.bounties||0) + rb; s.points += (Number(pts)||0) + rb;
                     s.gamesPlayed += 1;
                     if (placement === 1) { s.wins += 1; s.gamesWon += 1; }
                     else if (placement > 0) { s.losses += 1; if (placement >= tableSize && tableSize > 1) s.eliminations += 1; }
@@ -1174,6 +1208,15 @@ const app = {
                     else if (res.duration) { s.timeUsedSec += (Number(res.duration)||0) * 60; s.timeSamples += 1; }
                     const elimSec = res.timeOfEliminationSec != null ? Number(res.timeOfEliminationSec) : (res.elimination && res.elimination.timeOfEliminationSec != null ? Number(res.elimination.timeOfEliminationSec) : null);
                     if (elimSec != null) s.firstOutAtSec = s.firstOutAtSec == null ? elimSec : Math.min(s.firstOutAtSec, elimSec);
+                    if (res && (res.turnosEjecutados!=null)) s.turnosEjecutados += Math.max(0, Number(res.turnosEjecutados)||0);
+                    var mesaTurnos = Math.max(0, Number(res.turnosTotales!=null?res.turnosTotales:res.totalTurnos!=null?res.totalTurnos:(table && (table.totalTurnos!=null?table.totalTurnos:table.turnosTotales)))||0);
+                    if (mesaTurnos) s.totalTurnosMesa = Math.max(s.totalTurnosMesa, mesaTurnos);
+                    if (res && (res.tiempoVictoriaSec!=null) && (placement===1 || res.placement===1)) s.tiempoVictoriaSec = Number(res.tiempoVictoriaSec);
+                    if (res && (res.tiempoTotalSec!=null) && s.timeSamples===0) { /* keep timeUsedSec as primary */ }
+                    if (res && res.bracket!=null && s.bracket==null) s.bracket = res.bracket;
+                    if (table && table.bracket!=null && s.bracket==null) s.bracket = table.bracket;
+                    var motivo = res.motivoEliminacion || (res.elimination && (res.elimination.motivoEliminacion||res.elimination.cause)) || (table.live && table.live[res.playerId] && (table.live[res.playerId].motivoEliminacion || (table.live[res.playerId].elimination && (table.live[res.playerId].elimination.motivoEliminacion||table.live[res.playerId].elimination.cause)))) || null;
+                    if (motivo && !s.motivoEliminacion) { s.motivoEliminacion = motivo; s.motivoEliminacionLabel = motivo==='rendicion'?'Rendición':(motivo==='tiempo_agotado'?'Tiempo agotado':'Daño letal'); }
                 });
                 if (table.live) {
                     Object.keys(table.live).forEach(pid => {
@@ -1203,7 +1246,7 @@ const app = {
         const totalTables = rounds.reduce((n,r)=> n + (r.tables||[]).filter(tb=>!tb.bye).length, 0);
         const status = t.status === 'finished' ? 'Posiciones Definitivas' : (rounds.length ? `Ronda ${rounds[rounds.length-1].roundNumber}` : 'Sin rondas completadas');
         const finishedAt = new Date();
-        const meta = { tournamentName: t.name || 'Torneo', date: finishedAt.toLocaleDateString('es-CO'), time: finishedAt.toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'}), status, players: players.length, tables: totalTables, roundsCompleted: rounds.length, format: this.getFormatLabel ? this.getFormatLabel(t.format) : (t.format||'') };
+        const meta = { tournamentName: t.name || 'Torneo', bracket: t.bracket || t.bracketLevel || null, date: finishedAt.toLocaleDateString('es-CO'), time: finishedAt.toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'}), status, players: players.length, tables: totalTables, roundsCompleted: rounds.length, format: this.getFormatLabel ? this.getFormatLabel(t.format) : (t.format||'') };
         return { meta, rows, tournament: t };
     },
     showReportModal() { this.refreshReportPreview(); const m=document.getElementById('modal-report'); if(m) m.style.display='flex'; },
@@ -1211,34 +1254,107 @@ const app = {
     refreshReportPreview() {
         const data = this.buildReportData(); if (!data) return;
         const meta = document.getElementById('report-preview-meta');
-        if (meta) meta.innerHTML = `<div class="report-meta-grid"><div><strong>Evento:</strong> ${this.escapeHtml(data.meta.tournamentName)}</div><div><strong>Formato:</strong> ${this.escapeHtml(data.meta.format)}</div><div><strong>Fecha/Hora:</strong> ${this.escapeHtml(data.meta.date)} ${this.escapeHtml(data.meta.time)}</div><div><strong>Estado:</strong> ${this.escapeHtml(data.meta.status)}</div><div><strong>Jugadores:</strong> ${data.meta.players}</div><div><strong>Mesas completadas:</strong> ${data.meta.tables}</div></div>`;
+        if (meta) meta.innerHTML = `<div class="report-meta-grid"><div><strong>Evento:</strong> ${this.escapeHtml(data.meta.tournamentName)}</div><div><strong>Formato:</strong> ${this.escapeHtml(data.meta.format)}</div><div><strong>Bracket:</strong> ${this.escapeHtml(String(data.meta.bracket||"-"))}</div><div><strong>Fecha/Hora:</strong> ${this.escapeHtml(data.meta.date)} ${this.escapeHtml(data.meta.time)}</div><div><strong>Estado:</strong> ${this.escapeHtml(data.meta.status)}</div><div><strong>Jugadores:</strong> ${data.meta.players}</div><div><strong>Mesas completadas:</strong> ${data.meta.tables}</div></div>`;
         const box = document.getElementById('report-preview-table'); if (!box) return;
-        const hasCmdr = data.rows.some(r => r.avgTurnTimeSec != null || r.commanderDamageDealt || r.commanderDamageReceived);
-        box.innerHTML = `<div class="standing-row header report-row ${hasCmdr?'report-row-cmdr':''}"><div>#</div><div>Jugador</div><div>Pts</div><div>%JG</div><div>%VPO</div><div>%JGO</div>${hasCmdr?'<div>Tiempo medio</div><div>Da�o Cmdr D/R</div>':''}</div>` + data.rows.map(r => `<div class="standing-row report-row ${hasCmdr?'report-row-cmdr':''}"><div class="standing-rank">${r.rank}</div><div class="standing-name">${this.escapeHtml(r.name)}</div><div class="standing-stat">${r.points}</div><div class="standing-stat">${this._fmtPct(r.mw)}</div><div class="standing-stat">${this._fmtPct(r.omw)}</div><div class="standing-stat">${this._fmtPct(r.ogw)}</div>${hasCmdr?`<div class="standing-stat">${r.avgTurnTimeSec!=null?Math.floor(r.avgTurnTimeSec/60)+'m '+(r.avgTurnTimeSec%60)+'s':'-'}</div><div class="standing-stat">${r.commanderDamageDealt||0}/${r.commanderDamageReceived||0}</div>`:''}</div>`).join('');
+        const fmtSec = (sec)=> sec==null||sec===''?'-':(Math.floor(Number(sec)/60)+'m '+String(Math.max(0,Math.floor(Number(sec)%60))).padStart(2,'0')+'s');
+        const tip = (txt, label)=> `<span title="${this.escapeHtml(txt)}">${label}</span>`;
+        box.innerHTML = `<div class="standing-row header report-row report-row-adv">
+          <div>#</div><div>Jugador</div>
+          <div>${tip('Puntos de torneo por resultado/puesto (incluye empate técnico y bounties).','Match Pts')}</div>
+          <div>${tip('Porcentaje de Juegos Ganados: mesas/partidas ganadas sobre participaciones.','%JG')}</div>
+          <div>${tip('Porcentaje de Victoria de Oponentes: promedio del %JG de tus oponentes.','%VPO')}</div>
+          <div>${tip('Porcentaje de Juegos Ganados de Oponentes: media del %JG de oponentes.','%JGO')}</div>
+          <div>${tip('Tiempo total consumido / duración de partida o victoria-eliminación registrada (mm:ss).','Tiempo')}</div>
+          <div>${tip('Turnos ejecutados por jugador / turnos totales registrados en mesa.','Turnos')}</div>
+          <div>${tip('Motivo final: victoria, dano_letal, tiempo_agotado o rendicion.','Motivo')}</div>
+          <div>${tip('Daño de comandante infligido / recibido.','Cmdr D/R')}</div>
+        </div>` + data.rows.map(r => {
+          const tTotal = r.tiempoVictoriaSec!=null ? r.tiempoVictoriaSec : (r.timeUsedSec!=null ? r.timeUsedSec : null);
+          const turnos = `${r.turnosEjecutados||0}/${r.totalTurnosMesa||0}`;
+          const motivo = (typeof this._motivoLabel==='function'?this._motivoLabel(r.motivoEliminacion):(r.motivoEliminacionLabel||r.motivoEliminacion||'-')) || '-';
+          return `<div class="standing-row report-row report-row-adv">
+            <div class="standing-rank">${r.rank}</div>
+            <div class="standing-name" title="${this.escapeHtml('Bracket: '+(r.bracket!=null?r.bracket:'-'))}">${this.escapeHtml(r.name)}</div>
+            <div class="standing-stat">${(Math.round((Number(r.points)||0)*100)/100)}</div>
+            <div class="standing-stat">${this._fmtPct(r.mw)}</div>
+            <div class="standing-stat">${this._fmtPct(r.omw)}</div>
+            <div class="standing-stat">${this._fmtPct(r.ogw)}</div>
+            <div class="standing-stat">${fmtSec(tTotal)}</div>
+            <div class="standing-stat">${this.escapeHtml(turnos)}</div>
+            <div class="standing-stat">${this.escapeHtml(motivo)}</div>
+            <div class="standing-stat">${(r.commanderDamageDealt||0)}/${(r.commanderDamageReceived||0)}</div>
+          </div>`;
+        }).join('');
+        var legend = document.getElementById('report-metrics-legend');
+        if (legend) legend.style.display = '';
     },
     downloadReportCSV() {
         var data = this.buildReportData(); if (!data) return;
         var hasCmdr = false;
         for (var i = 0; i < data.rows.length; i++) { var rr = data.rows[i]; if (rr.avgTurnTimeSec != null || rr.commanderDamageDealt || rr.commanderDamageReceived) { hasCmdr = true; break; } }
-        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','Bounties','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas','Tiempo medio turno (s)','Tiempo medio turno','Eliminado (primer reloj ronda)','Salidas registradas'];
+        var head = ['Puesto','Jugador','Puntos Totales (Match Points)','Bounties','%JG','%VPO','%JGO','Mesas jugadas','Ganadas','Perdidas','Tiempo total turnos (mm:ss)','Tiempo medio turno','Motivo de eliminación','Eliminado (primer reloj ronda)','Salidas registradas'];
         if (hasCmdr) head = head.concat(['Daño comandante infligido','Daño comandante recibido']);
         var escCsv = function(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; };
         var lines = [
-          ['Evento', data.meta.tournamentName], ['Formato', data.meta.format], ['Fecha', data.meta.date], ['Hora', data.meta.time],
-          ['Estado', data.meta.status], ['Total jugadores', data.meta.players], ['Mesas completadas', data.meta.tables], [], head
+          ['Evento', data.meta.tournamentName], ['Formato', data.meta.format], ['Bracket declarado', data.meta.bracket || ''], ['Fecha', data.meta.date], ['Hora', data.meta.time],
+          ['Estado', data.meta.status], ['Total jugadores', data.meta.players], ['Mesas completadas', data.meta.tables], [],
+          ['LEYENDA MÉTRICAS'], ['Match Points','Puntos por resultado/puesto (incluye empate técnico y bounties).'], ['%JG','Porcentaje de Juegos Ganados.'], ['%VPO','Porcentaje de Victoria de Oponentes.'], ['%JGO','Porcentaje de Juegos Ganados de Oponentes.'], ['Tiempo partida/victoria-eliminación','Duración registrada (mm:ss) hasta victoria o derrota.'], ['Total de turnos','Turnos consumidos/ejecutados por registro de mesa.'], ['Motivo de eliminación','victoria, dano_letal, tiempo_agotado o rendicion.'], ['Daño comandante D/R','Daño infligido / recibido por comandante.'], [], head
         ];
         for (var j = 0; j < data.rows.length; j++) {
           var r = data.rows[j];
           var avgLabel = r.avgTurnTimeSec==null?'':(Math.floor(r.avgTurnTimeSec/60)+':'+String(r.avgTurnTimeSec%60).padStart(2,'0'));
           var elimLabel = r.firstOutAtSec==null?'':(Math.floor(r.firstOutAtSec/60)+':'+String(r.firstOutAtSec%60).padStart(2,'0'));
-          var row = [r.rank,r.name,r.points,r.bounties||0,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses,r.avgTurnTimeSec==null?'':r.avgTurnTimeSec,avgLabel,elimLabel,r.eliminations||0];
-          if (hasCmdr) row = row.concat([r.commanderDamageDealt||0, r.commanderDamageReceived||0]);
+          var totalTurn = (r.timeUsedSec!=null? (Math.floor(r.timeUsedSec/60)+':'+String(Math.max(0,Math.floor(r.timeUsedSec%60))).padStart(2,'0')) : (avgLabel||''));
+          var motivo = this._motivoLabel ? this._motivoLabel(r.motivoEliminacion) : (r.motivoEliminacionLabel||r.motivoEliminacion||'');
+          var winLabel = (r.tiempoVictoriaSec!=null)?(Math.floor(r.tiempoVictoriaSec/60)+':'+String(Math.max(0,Math.floor(r.tiempoVictoriaSec%60))).padStart(2,'0')):'';
+          var partidaLabel = winLabel || totalTurn || avgLabel || '';
+          var row = [r.rank,r.name,(r.bracket!=null?r.bracket:''),(Math.round((Number(r.points)||0)*100)/100),r.bounties||0,this._fmtPct(r.mw),this._fmtPct(r.omw),this._fmtPct(r.ogw),r.gamesPlayed,r.wins,r.losses,r.turnosEjecutados||0,r.totalTurnosMesa||0,partidaLabel,winLabel,avgLabel,motivo,elimLabel,r.eliminations||0,r.commanderDamageDealt||0,r.commanderDamageReceived||0];
+
           lines.push(row);
         }
         var csv = '\uFEFF' + lines.map(function(row){ return Array.isArray(row) ? row.map(escCsv).join(',') : escCsv(row); }).join('\r\n');
         var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = (data.meta.tournamentName || 'reporte').replace(/[^\w\-]+/g,'_') + '_posiciones.csv'; a.click();
+        setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 500);
+    },
+    buildReportExportPayload() {
+        var data = this.buildReportData(); if (!data) return null;
+        var t = this.getCurrentTournament();
+        var trace = [];
+        try {
+          (t && t.rounds || []).forEach(function(round){
+            (round && round.tables || []).forEach(function(table, ti){
+              if (!table) return;
+              trace.push({
+                roundNumber: round.roundNumber, roundCompleted: !!round.completed,
+                tableId: table.id || ('mesa-'+(ti+1)), tableIndex: ti+1, tableSize: (table.players||[]).length, bracket: table.bracket || t.bracket || t.bracketLevel || null,
+                completed: !!table.completed, bye: !!table.bye, official: !!(table.officialReportAppliedAt || (table.officialReport && table.officialReport.status==='submitted')),
+                totalTurnos: Math.max(0, Number(table.totalTurnos!=null?table.totalTurnos:table.turnosTotales)||0),
+                totalDurationSec: table.officialTotalDurationSec!=null?table.officialTotalDurationSec:(table.officialReport&&table.officialReport.totalDurationSec)||null,
+                winnerId: table.winnerId || (table.officialReport&&table.officialReport.winnerId) || null,
+                players: (table.results||[]).map(function(r){ return {
+                  playerId:r.playerId, placement:r.placement, points:r.points!=null?r.points:r.puntos, bounties:r.bounties||0,
+                  tiempoTotalSec: r.tiempoVictoriaSec!=null?r.tiempoVictoriaSec:(r.tiempoTotalSec!=null?r.tiempoTotalSec:r.playerTurnTimeSec!=null?r.playerTurnTimeSec:r.turnTimeSec),
+                  tiempoPartidaEliminacion: r.tiempoVictoria||r.tiempoTotal||r.playerTurnTime||r.timeOfElimination||null,
+                  turnosEjecutados:r.turnosEjecutados!=null?r.turnosEjecutados:null,
+                  turnosTotales:r.turnosTotales!=null?r.turnosTotales:(r.totalTurnos!=null?r.totalTurnos:null),
+                  motivoEliminacion: r.motivoEliminacion || (r.elimination && (r.elimination.motivoEliminacion||r.elimination.cause)) || ((r.placement===1||r.puestoFinal===1)?'victoria':null),
+                  commanderDamageDealt:r.commanderDamageDealt!=null?r.commanderDamageDealt:r.danoComandanteInfligido,
+                  commanderDamageReceived:r.commanderDamageReceived!=null?r.commanderDamageReceived:null,
+                  elimination:r.elimination||null
+                };})
+              });
+            });
+          });
+        } catch(e) {}
+        return { meta: data.meta, standings: data.rows, tablesTraceability: trace, exportedAt: new Date().toISOString(), format: 'commander-tournament-report-v2' };
+    },
+    downloadReportJSON() {
+        var payload = this.buildReportExportPayload(); if (!payload) return;
+        var blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json;charset=utf-8;'});
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = (payload.meta && payload.meta.tournamentName || 'reporte').replace(/[^\w\-]+/g,'_') + '_trazabilidad.json'; a.click();
         setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 500);
     },
     async downloadReportPDF() {
@@ -1254,17 +1370,19 @@ const app = {
         doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text(String(m.tournamentName || 'Reporte de Torneo'), margin, y); y += 18;
         doc.setFont('helvetica','normal'); doc.setFontSize(10);
         [ `Formato: ${m.format}`, `Fecha y hora: ${m.date} ${m.time}`, `Estado: ${m.status}`, `Total jugadores: ${m.players} | Mesas completadas: ${m.tables} | Rondas completadas: ${m.roundsCompleted}` ].forEach(line=>{ doc.text(line, margin, y); y += 14; });
-        const hasCmdr = data.rows.some(r => r.avgTurnTimeSec != null || r.commanderDamageDealt || r.commanderDamageReceived);
-        const head = [['Puesto','Jugador','Puntos','%JG','%VPO','%JGO','Mesas','G/P'].concat(hasCmdr?[ 'Tiempo medio','Cmdr D/R' ]:[])];
-        const body = data.rows.map(r => [r.rank, r.name, r.points, this._fmtPct(r.mw), this._fmtPct(r.omw), this._fmtPct(r.ogw), r.gamesPlayed, `${r.wins}/${r.losses}`].concat(hasCmdr?[ r.avgTurnTimeSec!=null?Math.floor(r.avgTurnTimeSec/60)+'m '+(r.avgTurnTimeSec%60)+'s':'-', `${r.commanderDamageDealt||0}/${r.commanderDamageReceived||0}` ]:[]));
+        const fmtSec = (sec)=> sec==null||sec===''?'-':(Math.floor(Number(sec)/60)+':'+String(Math.max(0,Math.floor(Number(sec)%60))).padStart(2,'0'));
+        const head = [['#','Jugador','Bracket','Pts','%JG','%VPO','%JGO','Tiempo partida/victoria','Turnos (jug/mesa)','Motivo','Cmdr D/R']];
+        const body = data.rows.map(r => [r.rank, r.name, (r.bracket!=null?r.bracket:'-'), (Math.round((Number(r.points)||0)*100)/100), this._fmtPct(r.mw), this._fmtPct(r.omw), this._fmtPct(r.ogw), fmtSec(r.tiempoVictoriaSec!=null?r.tiempoVictoriaSec:r.timeUsedSec), `${r.turnosEjecutados||0}/${r.totalTurnosMesa||0}`, (this._motivoLabel?this._motivoLabel(r.motivoEliminacion):(r.motivoEliminacionLabel||r.motivoEliminacion||'-'))||'-', `${r.commanderDamageDealt||0}/${r.commanderDamageReceived||0}`]);
         if (doc.autoTable) {
-            doc.autoTable({ startY: y + 6, head, body, styles: { fontSize: 8, cellPadding: 4, overflow: 'linebreak' }, headStyles: { fillColor: [22,22,22], textColor: 255 }, alternateRowStyles: { fillColor: [246,246,246] }, margin: { left: margin, right: margin } });
+            doc.autoTable({ startY: y + 6, head, body, styles: { fontSize: 7, cellPadding: 3, overflow: 'linebreak' }, headStyles: { fillColor: [22,22,22], textColor: 255 }, alternateRowStyles: { fillColor: [246,246,246] }, margin: { left: margin, right: margin } });
+            y = (doc.lastAutoTable && doc.lastAutoTable.finalY) ? doc.lastAutoTable.finalY + 12 : y + 80;
         } else {
-            let yy = y + 18; doc.setFontSize(8); body.slice(0,40).forEach(row=>{ doc.text(row.join(' | ').slice(0,180), margin, yy); yy += 12; });
+            let yy = y + 18; doc.setFontSize(7); body.slice(0,40).forEach(row=>{ doc.text(row.join(' | ').slice(0,180), margin, yy); yy += 11; }); y = yy;
         }
-        const footerY = doc.internal.pageSize.getHeight() - 24;
-        doc.setFontSize(8); doc.setTextColor(100); doc.text('M�tricas: Match Points, %JG, %VPO, %JGO (estilo EventLink). Commander opcional: tiempo medio/da�o comandante.', margin, footerY);
-        doc.save((m.tournamentName || 'reporte').replace(/[^\w\-]+/g,'_') + '_posiciones.pdf');
+        const legend = ['Leyenda: Match Points=puntos por puesto (empate técnico/bounties). %JG=Juegos Ganados. %VPO=Victoria de Oponentes. %JGO=Juegos Ganados de Oponentes.', 'Tiempo=duración hasta victoria/eliminación (mm:ss). Turnos=ejecutados/totales mesa. Motivo=victoria,dano_letal,tiempo_agotado,rendicion. Cmdr D/R=daño comandante infligido/recibido.'];
+        doc.setFontSize(7); doc.setTextColor(90);
+        legend.forEach(function(line){ if (y > doc.internal.pageSize.getHeight()-28){ doc.addPage(); y=28; } doc.text(line, margin, y, {maxWidth: doc.internal.pageSize.getWidth()-margin*2}); y += 10; });
+                doc.save((m.tournamentName || 'reporte').replace(/[^\w\-]+/g,'_') + '_posiciones.pdf');
     },
 
     renderPlayersList() {

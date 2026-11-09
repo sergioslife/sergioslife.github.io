@@ -379,3 +379,14 @@ body.mesa-body { overflow:hidden !important; }
 .m-seat.is-elim .m-life-core.is-dead .m-life-sub{ opacity:.9; text-align:center; }
 .m-seat.is-elim .m-ico-btn[disabled], .m-seat.is-elim .m-life-btn[disabled], .m-quickbar.is-dead .m-ico-btn{ opacity:.42; pointer-events:none !important; cursor:not-allowed; }
 .m-life-val.danger{ color:#ff5b5b; }
+/* Winner state (last player alive): locked like eliminated, clear victory message */
+.m-seat.is-winner, .m-seat[data-winner="1"]{ border-color:rgba(253,196,21,.55) !important; filter:saturate(.95) brightness(.98); }
+.m-seat.is-winner .m-life-zone.is-dead.is-winner{ display:flex; align-items:center; justify-content:center; min-height:110px; padding:12px; }
+.m-seat.is-winner .m-life-core.is-dead.is-winner .m-life-val.win{ font-size:clamp(22px,4vw,34px); line-height:1.05; text-align:center; color:#ffd84d; text-shadow:0 0 16px rgba(253,196,21,.28); font-weight:700; }
+.m-seat.is-winner .m-life-core.is-dead.is-winner .m-life-sub{ opacity:.95; text-align:center; color:#ffe9a6; }
+.m-seat.is-winner .m-ico-btn[disabled], .m-seat.is-winner .m-life-btn[disabled]{ opacity:.42; pointer-events:none !important; cursor:not-allowed; }
+/* Out-of-turn interaction timer button */
+.m-ico-btn.interact{ color:#ffd84d; border-color:rgba(253,196,21,.28); }
+.m-ico-btn.interact.active{ color:#111; background:rgba(253,196,21,.92); border-color:rgba(253,196,21,.95); animation:m-interact-pulse 1s ease-in-out infinite; }
+@keyframes m-interact-pulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(253,196,21,.0), 0 0 0 rgba(253,196,21,0);} 50%{ box-shadow:0 0 0 3px rgba(253,196,21,.18), 0 0 14px rgba(253,196,21,.35);} }
+.m-seat.is-elim .m-ico-btn.interact, .m-seat.is-winner .m-ico-btn.interact{ animation:none; }

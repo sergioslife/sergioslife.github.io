@@ -164,7 +164,8 @@
     var tname = S.session.tournamentName || 'Mesa';
     var tlabel = S.table.tableIndex ? ('Mesa ' + S.table.tableIndex) : S.tableId;
     if ((el = $('m-title'))) el.textContent = tname + ' · ' + tlabel;
-    if ((el = $('m-sub'))) el.textContent = S.sessionId + ' · R' + (S.session.roundNumber || '-') + ' · ' + aliveCount() + '/' + ps.length + ' vivos';
+    var turnos = Math.max(0, Number((S.table.turn && S.table.turn.totalTurnos) || 0)); var wid = soleWinnerId();
+    if ((el = $('m-sub'))) el.textContent = S.sessionId + ' · R' + (S.session.roundNumber || '-') + ' · ' + aliveCount() + '/' + ps.length + ' vivos · ' + turnos + ' turnos' + (wid ? ' · ¡Ganador!' : '');
     var rem = CompanionModel.roundRemainingSec ? CompanionModel.roundRemainingSec(S.session) : 0;
     var rt = $('m-round-timer'); if (rt) { rt.textContent = fmt(rem); rt.className = (rem <= 60 ? 'danger' : rem <= 300 ? 'warn' : ''); }
     if ((el = $('m-round-meta'))) {
@@ -188,6 +189,26 @@
     renderOfficialPreview(); checkPendingLossModal(); try { updateCenterIsland(); } catch (e) {}
   }
 
+    function soleWinnerId(){
+    if(!S.table) return null; var ps=S.table.players||[]; if(ps.length < 2) return null;
+    var alive = ps.filter(function(p){ var l=S.table.live && S.table.live[p.id]; return !(l && l.eliminated); });
+    return alive.length===1 ? alive[0].id : null;
+  }
+  function winnerTimeSec(){
+    if(!S.session || !S.session.roundStartedAt) return 0;
+    var paused = Number(S.session.roundPausedDurationMs)||0;
+    if(S.session.roundPausedAt) paused += Math.max(0, Date.now() - S.session.roundPausedAt);
+    return Math.max(0, Math.floor((Date.now() - S.session.roundStartedAt - paused)/1000));
+  }
+  function markWinnerState(){
+    if(!S.table) return;
+    var wid = soleWinnerId(); if(!wid) return;
+    ensureTableState();
+    S.table.turn = S.table.turn || {};
+    if(S.table.turn.winnerId === wid && S.table.turn.victoryAt) return;
+    S.table.turn.winnerId = wid; S.table.turn.victoryAt = Date.now(); S.table.turn.victoryTimeSec = winnerTimeSec(); S.table.turn.totalTurnos = Math.max(0, Number(S.table.turn.totalTurnos)||0);
+    var l = CompanionModel.ensureLive(S.table, wid, 40); l.winner = true; l.victoryAt = S.table.turn.victoryAt; l.victoryTimeSec = S.table.turn.victoryTimeSec;
+  }
   function quadrant(p, idx, n) {
     var live = CompanionModel.ensureLive(S.table, p.id, 40);
     var aid = CompanionModel.activePlayerId ? CompanionModel.activePlayerId(S.table) : (S.table.turn && S.table.turn.activePlayerId);
@@ -200,26 +221,28 @@
     var left = Math.max(0, budget - used);
     var timeClass = left <= 0 ? 'danger' : (left <= 120 ? 'warn' : '');
     var dead = !!live.eliminated;
-    var status = dead ? ('Has muerto · ' + placeLabel(live, (S.table.players || []).length)) : (warn ? ('Condición: ' + esc(warn.label)) : (active ? 'Turno activo' : ((aid === p.id && !started) ? 'Listo para iniciar' : 'En juego')));
+    var winner = !dead && soleWinnerId() === p.id;
+    var status = dead ? ('Has muerto · ' + placeLabel(live, (S.table.players || []).length)) : (winner ? '¡Has ganado! · 1º' : (warn ? ('Condición: ' + esc(warn.label)) : (active ? 'Turno activo' : ((aid === p.id && !started) ? 'Listo para iniciar' : 'En juego'))));
     var lifeNum = Number(live.life); if (!isFinite(lifeNum)) lifeNum = (typeof live.life === 'number' ? live.life : 40);
-    var lifeZone = dead
-      ? '<div class="m-life-zone is-dead" aria-disabled="true"><div class="m-life-core is-dead"><div class="m-life-val danger">Has muerto</div><div class="m-life-sub">Eliminado · cuadrante bloqueado</div></div></div>'
+    var lifeZone = (dead || winner)
+      ? '<div class="m-life-zone is-dead' + (winner?' is-winner':'') + '" aria-disabled="true"><div class="m-life-core is-dead' + (winner?' is-winner':'') + '"><div class="m-life-val ' + (winner?'win':'danger') + '">' + (winner?'¡Has ganado!':'Has muerto') + '</div><div class="m-life-sub">' + (winner?('1º puesto · Victoria registrada' + (S.table && S.table.turn && S.table.turn.victoryTimeSec!=null ? (' · ' + fmt(S.table.turn.victoryTimeSec)) : '')):('Eliminado · cuadrante bloqueado')) + '</div></div></div>'
       : '<div class="m-life-zone"><div class="m-life-col"><button class="m-life-btn" data-pid="' + esc(p.id) + '" data-action="life" data-delta="-5" type="button">−5</button><button class="m-life-btn" data-pid="' + esc(p.id) + '" data-action="life" data-delta="-1" type="button">−</button></div>'
         + '<div class="m-life-core"><div class="m-life-val' + (lifeNum <= 0 ? ' danger' : '') + '">' + lifeNum + '</div><div class="m-life-sub">vida</div></div>'
         + '<div class="m-life-col"><button class="m-life-btn plus" data-pid="' + esc(p.id) + '" data-action="life" data-delta="1" type="button">+</button><button class="m-life-btn plus" data-pid="' + esc(p.id) + '" data-action="life" data-delta="5" type="button">+5</button></div></div>';
-    var dis = dead ? ' disabled aria-disabled="true"' : '';
-    return '<article class="m-seat' + (active ? ' is-active' : '') + (dead ? ' is-elim' : (warn ? ' is-warn' : '')) + ' pos-' + idx + ' seats-' + n + '" data-seat="' + esc(p.id) + '" data-pid="' + esc(p.id) + '"' + (dead ? ' data-dead="1"' : '') + '>'
+    var dis = (dead || winner) ? ' disabled aria-disabled="true"' : '';
+    return '<article class="m-seat' + (active ? ' is-active' : '') + (dead ? ' is-elim' : (winner ? ' is-winner is-elim' : (warn ? ' is-warn' : ''))) + ' pos-' + idx + ' seats-' + n + '" data-seat="' + esc(p.id) + '" data-pid="' + esc(p.id) + '"' + ((dead||winner) ? ' data-dead="1"' : '') + '>'
       + '<header class="m-seat-head"><div class="m-seat-name" title="' + esc(p.name) + '">' + esc(p.name) + '</div><div class="m-seat-meta"><span class="m-seat-status">' + status + '</span><span class="m-time-pill ' + timeClass + '">' + fmt(left) + '</span></div></header>'
       + lifeZone
-      + '<div class="m-quickbar' + (dead ? ' is-dead' : '') + '">'
-      + '<button class="m-ico-btn"' + (dead ? dis : ' data-open-player-modal="commander" data-pid="' + esc(p.id) + '"') + ' type="button" title="Daño de comandante">' + iconSvg('cmdr') + '</button>'
-      + '<button class="m-ico-btn btn-abrir-contadores"' + (dead ? dis : ' data-open-player-modal="counters" data-pid="' + esc(p.id) + '"') + ' type="button" title="Contadores">' + iconSvg('sliders') + '</button>'
-      + '<button class="m-ico-btn"' + (dead ? dis : ' data-open-player-modal="tax" data-pid="' + esc(p.id) + '"') + ' type="button" title="Impuesto comandante">' + iconSvg('coins') + '<span>' + (Number(live.commanderTax) || 0) + '</span></button>'
-      + (!dead ? '<button class="m-ico-btn danger" data-surrender="' + esc(p.id) + '" type="button" title="Rendirse">' + iconSvg('flag') + '</button>' : '<button class="m-ico-btn danger" disabled aria-disabled="true" type="button" title="Eliminado">' + iconSvg('flag') + '</button>')
+      + '<div class="m-quickbar' + ((dead||winner) ? ' is-dead' : '') + '">'
+      + '<button class="m-ico-btn"' + ((dead||winner) ? dis : ' data-open-player-modal="commander" data-pid="' + esc(p.id) + '"') + ' type="button" title="Daño de comandante">' + iconSvg('cmdr') + '</button>'
+      + '<button class="m-ico-btn btn-abrir-contadores"' + ((dead||winner) ? dis : ' data-open-player-modal="counters" data-pid="' + esc(p.id) + '"') + ' type="button" title="Contadores">' + iconSvg('sliders') + '</button>'
+      + '<button class="m-ico-btn"' + ((dead||winner) ? dis : ' data-open-player-modal="tax" data-pid="' + esc(p.id) + '"') + ' type="button" title="Impuesto comandante">' + iconSvg('coins') + '<span>' + (Number(live.commanderTax) || 0) + '</span></button>'
+      + (!(dead||winner) ? '<button class="m-ico-btn interact' + (live.interactionActiveAt ? ' active' : '') + '" data-action="interaction" data-pid="' + esc(p.id) + '" type="button" title="' + (live.interactionActiveAt ? 'Terminar Interacción' : 'Iniciar Interacción') + '" aria-label="' + (live.interactionActiveAt ? 'Terminar Interacción' : 'Iniciar Interacción') + '"><i class="fas fa-stopwatch"></i><span>' + (live.interactionActiveAt ? 'Terminar' : 'Interacción') + '</span></button>' : '<button class="m-ico-btn interact" disabled aria-disabled="true" type="button" title="Interacción"><i class="fas fa-stopwatch"></i></button>')
+      + (!(dead||winner) ? '<button class="m-ico-btn danger" data-surrender="' + esc(p.id) + '" type="button" title="Rendirse">' + iconSvg('flag') + '</button>' : '<button class="m-ico-btn danger" disabled aria-disabled="true" type="button" title="' + (winner?'Ganador':'Eliminado') + '">' + iconSvg('flag') + '</button>')
       + '</div></article>';
   }
   function renderGrid() {
-    if (!S.table) return; ensureTableState();
+    if (!S.table) return; ensureTableState(); try{ markWinnerState(); }catch(e){}
     var ps = S.table.players || [], grid = $('m-grid'); if (!grid) return;
     var n = ps.length || 4;
     grid.className = 'm-grid seats-' + n + (n > 6 ? ' seats-many' : '');
@@ -328,6 +351,33 @@
     renderGrid(); renderTop();
     return persistTable(patch, opts && opts.delay != null ? opts.delay : 160);
   }
+  function interactionElapsedSec(pid){
+    var l = S.table && S.table.live && S.table.live[pid]; if(!l || !l.interactionActiveAt) return 0;
+    if(isPaused()) return 0;
+    if(!(S.table && S.table.turn && (S.table.turn.started || S.table.turn.startedAt))) return 0;
+    return Math.max(0, Math.floor((Date.now() - Number(l.interactionActiveAt) - (Number(l.interactionPausedMs)||0))/1000));
+  }
+  function accrueInteraction(pid){
+    var l = S.table && S.table.live && S.table.live[pid]; if(!l || !l.interactionActiveAt) return 0;
+    var sec = interactionElapsedSec(pid);
+    if(sec>0) l.timeUsedSec = (Number(l.timeUsedSec)||0) + sec;
+    l.interactionActiveAt = null; l.interactionPausedMs = 0; l.interactionTotalSec = (Number(l.interactionTotalSec)||0) + sec;
+    return sec;
+  }
+  function toggleInteraction(pid){
+    if(!S.table) return false; ensureTableState();
+    var l = CompanionModel.ensureLive(S.table, pid, 40); if(l.eliminated || l.winner) return false;
+    if(!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt))){ var st=$('m-pick-status'); if(st) st.textContent='Inicia el tiempo de turno antes de usar interacciones.'; return false; }
+    if(isPaused()){ alert('La partida está en pausa. Reanuda para registrar interacción.'); return false; }
+    if(l.interactionActiveAt){ accrueInteraction(pid); }
+    else { l.interactionActiveAt = Date.now(); l.interactionPausedMs = 0; }
+    renderGrid(); renderTop();
+    var patch={live:{}}; patch.live[pid]={ timeUsedSec:CompanionModel.effectiveTimeUsed?CompanionModel.effectiveTimeUsed(S.table,pid):l.timeUsedSec, interactionActiveAt:l.interactionActiveAt||null, interactionPausedMs:l.interactionPausedMs||0, interactionTotalSec:l.interactionTotalSec||0 };
+    persistTable(patch, 0).then(function(){ try{flushTable();}catch(e){} }).catch(function(){});
+    try{ tickTimers(); }catch(e){}
+    return true;
+  }
+
   function persistAllLive() {
     if (!S.table) return;
     var patch = { live: {}, turn: S.table.turn ? JSON.parse(JSON.stringify(S.table.turn)) : null };
@@ -337,7 +387,7 @@
 
   // ---- Turn rotation (antihorario, skips eliminated; model handles order) ----
   function passTurn() {
-    if (!S.table) return; ensureTableState();
+    if (!S.table) return; ensureTableState(); if (soleWinnerId()) return;
     if (!(S.table.turn && (S.table.turn.started || S.table.turn.startedAt))) { var st = $('m-pick-status'); if (st) st.textContent = 'Selecciona jugador inicial e Inicia Tiempo.'; return; }
     if (isPaused()) { var st2 = $('m-pick-status'); if (st2) st2.textContent = 'Tiempo en pausa. Reanuda para pasar turno.'; return; }
     if (CompanionModel.passTurn) CompanionModel.passTurn(S.table);
@@ -385,6 +435,7 @@
     for (var i = 0; i < ps.length; i++) { var live = CompanionModel.ensureLive(S.table, ps[i].id); if (live.eliminated) continue; var conds = CompanionModel.detectLossConditions(S.table, ps[i].id, S.session) || []; if (conds.length) { openLossFlow(ps[i].id, conds[0], 'condition'); return; } }
   }
   function showBountyToast(msg) { var t = $('m-bounty-toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(S._bountyToastTimer); S._bountyToastTimer = setTimeout(function () { try { t.classList.remove('show'); } catch (e) {} }, 2200); }
+  function stopAllInteractions(persist){ if(!S.table) return; var changed=false; (S.table.players||[]).forEach(function(p){ var l=S.table.live&&S.table.live[p.id]; if(l && l.interactionActiveAt){ accrueInteraction(p.id); changed=true; } }); if(changed && persist!==false){ persistTable({live: (function(){ var o={}; (S.table.players||[]).forEach(function(p){ if(S.table.live&&S.table.live[p.id]){ var l=S.table.live[p.id]; o[p.id]={timeUsedSec:l.timeUsedSec,interactionActiveAt:null,interactionPausedMs:0,interactionTotalSec:l.interactionTotalSec||0}; } }); return o; })()},0); } }
   function finalizeLoss(killerId) {
     if (!S.lossModal || !S.table) return;
     var pid = S.lossModal.pid, cond = S.lossModal.condition || { type: 'manual', label: 'Derrota confirmada' };
@@ -418,13 +469,13 @@
   function submitOfficial(force, auto) {
     if (!S.table || !S.session) return;
     if (S.table.officialReport && S.table.officialReport.status === 'submitted' && !force) { alert('El resultado oficial ya fue enviado.'); return; }
-    ensureTableState(); if (CompanionModel.accrueActive) CompanionModel.accrueActive(S.table);
+    ensureTableState(); try{ stopAllInteractions(false); }catch(e){} if (CompanionModel.accrueActive) CompanionModel.accrueActive(S.table);
     var alive = aliveCount(), rem = CompanionModel.roundRemainingSec ? CompanionModel.roundRemainingSec(S.session) : 0, ps = S.table.players || [];
     var reason = (alive <= 1 && ps.length > 1) ? 'eliminations' : (rem === 0 ? 'global-timeout' : 'manual');
     if (!auto && !force && alive > 1 && rem > 0) { if (!confirm('La mesa aún no termina. ¿Enviar resultado oficial actual?')) return; }
     var report = CompanionModel.computeOfficialReport(S.table, S.session, reason);
     S.table.officialReport = Object.assign({ status: 'submitted' }, report);
-    var livePatch = {}; ps.forEach(function (p) { var l = S.table.live[p.id]; livePatch[p.id] = { timeUsedSec: CompanionModel.effectiveTimeUsed ? CompanionModel.effectiveTimeUsed(S.table, p.id) : (l && l.timeUsedSec) || 0, eliminated: !!(l && l.eliminated), elimination: l && l.elimination || null, eliminationOrder: l && l.eliminationOrder || null, bounties: (l && l.bounties) || 0 }; });
+    var livePatch = {}; ps.forEach(function (p) { var l = S.table.live[p.id]; livePatch[p.id] = { timeUsedSec: CompanionModel.effectiveTimeUsed ? CompanionModel.effectiveTimeUsed(S.table, p.id) : (l && l.timeUsedSec) || 0, interactionTotalSec: Math.max(0, Number(l && l.interactionTotalSec)||0) + (l && l.interactionActiveAt ? interactionElapsedSec(p.id) : 0), interactionActiveAt: null, turnosEjecutados: (l && Number(l.turnosEjecutados)||0), winner: !!(l && l.winner), victoryAt: l && l.victoryAt || null, victoryTimeSec: l && l.victoryTimeSec != null ? l.victoryTimeSec : null, eliminated: !!(l && l.eliminated), elimination: l && l.elimination || null, eliminationOrder: l && l.eliminationOrder || null, bounties: (l && l.bounties) || 0, motivoEliminacion: (l && (l.motivoEliminacion || (l.elimination && (l.elimination.motivoEliminacion||l.elimination.cause)))) || null }; });
     S.autoSubmitted = true;
     persistTable({ officialReport: S.table.officialReport, live: livePatch, turn: S.table.turn }, 0).then(function () { flushTable(); renderGrid(); renderTop(); if (!auto) alert('Resultado oficial enviado al anfitrión.'); }).catch(function (e) { alert('No se pudo enviar: ' + (e && e.message || e)); S.autoSubmitted = false; });
   }
@@ -443,7 +494,7 @@
     for (var i = 0; i < cards.length; i++) {
       var q = cards[i], pid = q.getAttribute('data-pid') || q.getAttribute('data-seat'); if (!pid) continue;
       var live = (S.table.live && S.table.live[pid]) || {};
-      if (live.eliminated) { q.classList.remove('m-turn', 'is-active', 'has-turnbadge'); var eb = q.querySelector('.m-q-turnbadge'); if (eb) eb.remove(); continue; }
+      if (live.eliminated || live.winner || (S.table && S.table.turn && S.table.turn.winnerId===pid)) { q.classList.remove('m-turn', 'is-active', 'has-turnbadge'); var eb = q.querySelector('.m-q-turnbadge'); if (eb) eb.remove(); continue; }
       // Cuenta regresiva en tiempo real: effectiveTimeUsed suma el turno vivo solo al jugador activo; en pausa se congela.
       var used = CompanionModel.effectiveTimeUsed ? CompanionModel.effectiveTimeUsed(S.table, pid) : (Number(live.timeUsedSec) || 0);
       var left = Math.max(0, budget - used);
@@ -493,6 +544,13 @@
       }
       if (e.target && e.target.closest && e.target.closest('.m-life-zone .m-life-col, .m-life-zone .m-life-btn')) { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation(); return false; }
 
+      var interactBtn = e.target && e.target.closest ? e.target.closest('[data-action="interaction"][data-pid], .m-ico-btn.interact[data-pid]') : null;
+      if (interactBtn) {
+        e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        if (interactBtn.disabled || interactBtn.getAttribute('aria-disabled') === 'true') return false;
+        toggleInteraction(interactBtn.getAttribute('data-pid'));
+        return false;
+      }
       var closePm = e.target.closest('[data-close-player-modal]'); if (closePm) return closePlayerModal();
       var closeOm = e.target.closest('[data-close-official-modal]'); if (closeOm) return closeModal('m-official-modal');
       var closeLoss = e.target.closest('[data-loss-close]'); if (closeLoss) return closeLossModal();

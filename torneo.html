@@ -408,25 +408,41 @@
         </div>
     </div>
 
-    <!-- Modal Reporte / Exportaci�n -->
+        <!-- Modal Reporte / Exportación -->
     <div id="modal-report" class="modal" style="display:none">
         <div class="modal-backdrop" onclick="app.hideReportModal()"></div>
         <div class="modal-content modal-wide report-modal-content">
-            <h2><i class="fas fa-file-export"></i> Reporte de Rendimiento y Posiciones</h2>
+            <h2><i class="fas fa-file-export"></i> Reporte de Rendimiento y Posiciones (Reporte Prueba)</h2>
             <div id="report-preview-meta" class="report-preview-meta"></div>
             <div class="report-actions">
-                <button type="button" class="btn-primary btn-sm" onclick="app.downloadReportPDF()"><i class="fas fa-file-pdf"></i> Descargar Reporte PDF</button>
+                <button type="button" class="btn-primary btn-sm" onclick="app.downloadReportPDF()"><i class="fas fa-file-pdf"></i> Descargar PDF</button>
                 <button type="button" class="btn-secondary btn-sm" onclick="app.downloadReportCSV()"><i class="fas fa-file-csv"></i> Descargar CSV / Excel</button>
+                <button type="button" class="btn-secondary btn-sm" onclick="app.downloadReportJSON()"><i class="fas fa-file-code"></i> Descargar JSON (trazabilidad)</button>
                 <button type="button" class="btn-secondary btn-sm" onclick="app.refreshReportPreview()"><i class="fas fa-rotate"></i> Actualizar vista previa</button>
             </div>
             <div id="report-preview-table" class="report-preview-table standings-table"></div>
-            <p class="report-footnote">M�tricas estilo EventLink: Match Points, %JG (partidas/mesas ganadas sobre participaciones registradas), %VPO (media del %JG de oponentes), %JGO (media del %JG de oponentes). En multijugador se usan resultados de mesa completados; m�nimo EventLink 33.33% aplicado a MW/GW base cuando hay participaci�n. Campos opcionales de Commander (tiempo medio usado/recibido) se incluyen si la mesa t�ctil report� tiempos.</p>
+            <div id="report-metrics-legend" class="report-metrics-legend">
+                <h4 style="margin:12px 0 8px"><i class="fas fa-circle-info"></i> Leyenda de métricas</h4>
+                <ul class="report-legend-list">
+                    <li><strong>Match Points</strong>: puntos por resultado/puesto (incluye promedio por empate técnico y bounties cuando aplique).</li>
+                    <li><strong>%JG</strong>: Porcentaje de Juegos Ganados (mesas/partidas ganadas sobre participaciones registradas).</li>
+                    <li><strong>%VPO</strong>: Porcentaje de Victoria de Oponentes (promedio del %JG de tus oponentes).</li>
+                    <li><strong>%JGO</strong>: Porcentaje de Juegos Ganados de Oponentes (media del %JG de oponentes; base EventLink para desempate).</li>
+                    <li><strong>Tiempo partida/victoria/eliminación</strong>: duración (mm:ss) hasta victoria o derrota/eliminación.</li>
+                    <li><strong>Total de turnos</strong>: turnos consumidos/ejecutados en la partida por registro de mesa.</li>
+                    <li><strong>Motivo de eliminación</strong>: <code>victoria</code>, <code>dano_letal</code>, <code>tiempo_agotado</code> o <code>rendicion</code>.</li>
+                    <li><strong>Daño de comandante D/R</strong>: daño infligido / recibido por comandante (cuando se reporta).</li>
+                    <li><strong>Bracket declarado</strong>: bracket informado para correlacionar velocidad/cierres con restricciones de combos y <em>Game Changers</em>.</li>
+                </ul>
+            </div>
+            <p class="report-footnote">Las exportaciones (CSV/PDF/JSON) incluyen variables por jugador y trazabilidad por mesa/ronda cuando hay datos: puestos, tiempos, turnos, motivo, daño de comandante, bounties y metadatos de bracket para estadísticas de liga.</p>
             <div class="form-actions">
                 <button type="button" class="btn-secondary" onclick="app.hideReportModal()">Cerrar</button>
             </div>
         </div>
     </div>
-    <!-- Modal Editar Mesa -->
+
+<!-- Modal Editar Mesa -->
     <div id="modal-edit-table" class="modal" style="display:none">
         <div class="modal-backdrop" onclick="app.hideEditTableModal()"></div>
         <div class="modal-content">
