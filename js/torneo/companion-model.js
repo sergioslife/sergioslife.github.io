@@ -109,13 +109,20 @@
     return live;
   }
   function activeIndex(table) {
-    if (table && table.turn && typeof table.turn.index === 'number') return table.turn.index;
+    var ps = (table && table.players) || [];
+    // Prefer activePlayerId: it matches the visible active seat; turn.index may be stale after sync/edits.
+    if (table && table.turn && table.turn.activePlayerId && ps.length) {
+      var byId = ps.findIndex(function(p){ return p && p.id === table.turn.activePlayerId; });
+      if (byId >= 0) return byId;
+    }
+    if (table && table.turn && typeof table.turn.index === 'number' && table.turn.index >= 0 && table.turn.index < ps.length) return table.turn.index;
     return 0;
   }
   function activePlayerId(table) {
-    if (table && table.turn && table.turn.activePlayerId) return table.turn.activePlayerId;
     var ps = (table && table.players) || [];
-    return ps[activeIndex(table)] ? ps[activeIndex(table)].id : null;
+    if (table && table.turn && table.turn.activePlayerId) return table.turn.activePlayerId;
+    var i = (table && table.turn && typeof table.turn.index === 'number') ? table.turn.index : 0;
+    return ps[i] ? ps[i].id : (ps[0] ? ps[0].id : null);
   }
   function turnElapsedSec(table) {
     if (!table || !table.turn) return 0;
@@ -138,29 +145,52 @@
     var aid = activePlayerId(table); if (!aid) return table;
     accrueIfActive(table, aid); return table;
   }
+  function turnOrderIndices(table){
+    var ps=(table&&table.players)||[], n=ps.length;
+    // Allow explicit override from host/session if present.
+    var explicit = (table&&table.turn&&table.turn.orderIndices) || (table&&table.turnOrderIndices);
+    if(Array.isArray(explicit) && explicit.length===n){
+      var ok=true; for(var e=0;e<explicit.length;e++) if(explicit.indexOf(e)<0){ ok=false; break; }
+      if(ok) return explicit.slice();
+    }
+    // Physical antihorario (counter-clockwise) for Mesa Táctil 4 seats per requested mapping:
+    // 1) A Arriba-Derecha -> 2) B Abajo-Derecha -> 3) C Abajo-Izquierda -> 4) D Arriba-Izquierda -> 1)
+    // Default .m-grid.seats-4 auto-flow (no explicit grid-area): row1=[pos-0 top-left, pos-1 top-right], row2=[pos-2 bottom-left, pos-3 bottom-right].
+    // Antihorario physical: top-right(1) -> bottom-right(3) -> bottom-left(2) -> top-left(0) => [1,3,2,0].
+    if(n===4) return [1,3,2,0];
+    // Generic fallback: circular by rendered seat index.
+    var out=[]; for(var i=0;i<n;i++) out.push(i); return out;
+  }
   function nextAliveIndex(table, from) {
     var ps = (table && table.players) || [];
     if (!ps.length) return 0;
-    for (var step = 1; step <= ps.length; step++) {
-      var i = (from + step + ps.length) % ps.length;
+    var n = ps.length;
+    var base = (typeof from === 'number' && isFinite(from)) ? ((from % n) + n) % n : activeIndex(table);
+    var order = turnOrderIndices(table);
+    var pos = order.indexOf(base);
+    if(pos < 0) pos = 0;
+    for (var step = 1; step <= order.length; step++) {
+      var i = order[(pos + step) % order.length];
       var live = table.live && table.live[ps[i].id];
       if (!live || !live.eliminated) return i;
     }
-    return from;
+    return base;
   }
   function moveTurnToNextAlive(table, fromPlayerId) {
     var ps = (table && table.players) || []; if (!ps.length) return table;
-    var from = ps.findIndex(function(p){return p.id===fromPlayerId;}); if (from < 0) from = activeIndex(table);
+    accrueActive(table);
+    var from = ps.findIndex(function(p){return p.id===fromPlayerId;});
+    if (from < 0) from = activeIndex(table);
     var next = nextAliveIndex(table, from);
-    table.turn = Object.assign({}, table.turn, { index: next, activePlayerId: ps[next].id, startedAt: Date.now(), pausedAt: null, pausedMs: 0 });
+    table.turn = Object.assign({}, table.turn, { index: next, activePlayerId: ps[next].id, started: true, startedAt: Date.now(), turnStartedAt: Date.now(), pausedAt: null, pausedMs: 0 });
     return table;
   }
   function passTurn(table) {
     if (!table || !table.players || !table.players.length) return table;
     accrueActive(table);
-    var cur = activeIndex(table);
+    var cur = activeIndex(table); // resolved from activePlayerId first
     var next = nextAliveIndex(table, cur);
-    table.turn = Object.assign({}, table.turn, { index: next, activePlayerId: table.players[next].id, startedAt: Date.now(), pausedAt: null, pausedMs: 0 });
+    table.turn = Object.assign({}, table.turn, { index: next, activePlayerId: table.players[next].id, started: true, startedAt: Date.now(), turnStartedAt: Date.now(), pausedAt: null, pausedMs: 0 });
     return table;
   }
   function alivePlayers(table) {
