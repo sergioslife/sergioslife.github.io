@@ -281,6 +281,33 @@
   body.mesa-body .m-center-island{ position:absolute; }
 }
 
+
+/* modal visibility/orientation hardening */
+.m-modal.is-open{display:flex !important; z-index:130 !important;}
+#m-player-modal.is-open,#m-loss-modal.is-open,#m-official-modal.is-open,#m-start-modal.is-open{z-index:130 !important;}
+.mesa-app,.m-board,.m-grid,.m-seat{overflow:visible} /* modals are siblings/overlays; seats keep internal clipping below */
+.m-seat{overflow:hidden}
+
+.m-modal{ display:none; }
+.m-modal.is-open, .m-modal[style*="display: flex"], .m-modal[style*="display:flex"]{ display:flex !important; }
+.m-modal, .m-modal *{ transform-style:flat; }
+.m-modal-backdrop{ transform:none !important; }
+.m-modal-card, .m-player-card, .m-start-card{
+  transform:rotate(0deg) !important;
+  writing-mode:horizontal-tb !important;
+}
+/* counters: 2 columns on compact/landscape for readability */
+@media (orientation:landscape), (min-width:640px), (max-height:560px){
+  .m-player-card .m-modal-list{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  .m-player-card .m-modal-list .c-counter-hint,
+  .m-player-card .m-toggle-row,
+  .m-player-card .m-modal-actions{ grid-column:1 / -1; }
+}
+
 /* Global scroll restored (admin/gestor/panels). Mesa-only overflow hidden above. */
 html, body { overflow-y:auto !important; overflow-x:hidden; }
 body.mesa-body { overflow:hidden !important; }
